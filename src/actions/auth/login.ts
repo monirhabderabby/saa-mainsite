@@ -30,6 +30,10 @@ export async function loginAction(data: LoginSchemaValues) {
       };
     }
 
+    if (user.status !== "APPROVED") {
+      return { success: false, message: "Account pending approval." };
+    }
+
     // 3. Compare password
     const isPasswordValid = await bcrypt.compare(password, user.password);
 

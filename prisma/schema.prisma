@@ -57,8 +57,8 @@ model Team {
 }
 
 model User {
-    id           String    @id @default(cuid())
-    email        String    @unique
+    id           String     @id @default(cuid())
+    email        String     @unique
     firstName    String?
     lastName     String?
     departmentId String?
@@ -66,6 +66,7 @@ model User {
     dateOfBirth  DateTime?
     gender       String?
     phone        String?
+    status       UserStatus @default(PENDING)
 
     employeeId            String?   @unique
     address               String?
@@ -87,6 +88,13 @@ model User {
     updatedAt DateTime @updatedAt
 
     @@index([departmentId])
+}
+
+enum UserStatus {
+    PENDING
+    APPROVED
+    REJECTED
+    INACTIVE // Scalable for future (e.g., left company)
 }
 
 model Account {
@@ -158,16 +166,14 @@ model UserTeam {
     @@index([teamId])
 }
 
-model Role {
-    id          String    @id @default(cuid())
-    name        String    @unique // e.g., "agm", "gm", "team_leader", "sales_member", "operation_member"
-    description String?
-    scope       RoleScope @default(GLOBAL) // semantic hint; enforcement via UserRole scope fields
-    createdAt   DateTime  @default(now())
-    updatedAt   DateTime  @updatedAt
-
-    permissions RolePermission[]
-    userRoles   UserRole[]
+enum Role {
+    GM // Global: Approves users, all access
+    HR // Global: Manages users
+    AGM_OPERATION // Dept: Operation AGM
+    AGM_SALES // Dept: Sales AGM
+    TEAM_LEADER_SALES // Team: Sales team leader
+    SALES_MEMBER // Team: Sales member
+    OPERATION_MEMBER // Team: Operation member
 }
 
 enum RoleScope {
@@ -194,7 +200,7 @@ model RolePermission {
     roleId       String
     permissionId String
 
-    role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+    role       Role
     permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
     @@id([roleId, permissionId])
@@ -210,7 +216,7 @@ model UserRole {
     createdAt    DateTime @default(now())
 
     user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-    role       Role        @relation(fields: [roleId], references: [id], onDelete: Cascade)
+    role       Role
     department Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
     team       Team?       @relation(fields: [teamId], references: [id], onDelete: SetNull)
 

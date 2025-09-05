@@ -32,6 +32,7 @@ export async function registerAction(data: RegistrationSchemaValues) {
         firstName,
         lastName,
         password: hashedPassword,
+        status: "PENDING",
       },
       select: {
         id: true,
