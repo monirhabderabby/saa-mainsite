@@ -25,7 +25,8 @@ import {
   RegistrationSchemaValues,
 } from "@/schemas/auth/registration";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, MoveLeft } from "lucide-react";
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -63,11 +64,11 @@ export default function RegistrationForm() {
     <Card>
       <ResizablePanel.Root value={state}>
         <ResizablePanel.Content value="form">
-          <CardContent className="pb-0">
+          <CardContent className="w-full md:w-[500px]">
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-8 max-w-3xl mx-auto py-10"
+                className="space-y-5 max-w-[500px] mx-auto py-10"
               >
                 <div className="grid grid-cols-12 gap-4">
                   <div className="col-span-6">
@@ -195,6 +196,26 @@ export default function RegistrationForm() {
                 </Button>
               </form>
             </Form>
+            <div className="text-center text-sm ">
+              <span className="text-gray-600">Already have an account?</span>{" "}
+              <Link
+                href="/login"
+                className="font-medium text-primary hover:underline"
+              >
+                Log in here
+              </Link>
+            </div>
+
+            {/* Back to home */}
+            <div className="w-full flex justify-center mt-3">
+              <Link
+                href="/"
+                className="flex items-center gap-x-2 text-[14px] group"
+              >
+                <MoveLeft />
+                <span className="group-hover:underline">Back to home</span>
+              </Link>
+            </div>
           </CardContent>
         </ResizablePanel.Content>
         <ResizablePanel.Content value="success">
