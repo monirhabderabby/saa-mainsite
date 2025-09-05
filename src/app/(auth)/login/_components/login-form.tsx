@@ -14,12 +14,15 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { loginSchema, LoginSchemaValues } from "@/schemas/auth/login";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export default function LoginForm() {
   const [pending, startTransition] = useTransition();
+  const router = useRouter();
+
   const form = useForm<LoginSchemaValues>({
     resolver: zodResolver(loginSchema),
   });
@@ -33,6 +36,7 @@ export default function LoginForm() {
         }
 
         toast.success(res.message);
+        router.push("/");
       });
     });
   }
@@ -50,7 +54,11 @@ export default function LoginForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="" type="email" {...field} />
+                <Input
+                  placeholder="Enter email here..."
+                  type="email"
+                  {...field}
+                />
               </FormControl>
 
               <FormMessage />
@@ -65,7 +73,7 @@ export default function LoginForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <PasswordInput placeholder="" {...field} />
+                <PasswordInput placeholder="Passowrd" {...field} />
               </FormControl>
 
               <FormMessage />

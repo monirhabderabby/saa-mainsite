@@ -1,5 +1,6 @@
 "use server";
 
+import { signIn } from "@/auth";
 import prisma from "@/lib/prisma";
 import { loginSchema, LoginSchemaValues } from "@/schemas/auth/login";
 import bcrypt from "bcryptjs";
@@ -45,6 +46,12 @@ export async function loginAction(data: LoginSchemaValues) {
     }
 
     // 4. Success – return user data (omit sensitive fields)
+
+    await signIn("credentials", {
+      email: email,
+      password: password,
+      redirect: false,
+    });
     return {
       success: true,
       message: "Login successful.",
