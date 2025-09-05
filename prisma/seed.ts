@@ -142,7 +142,6 @@ async function main() {
       create: {
         id: userRoleId,
         userId: user.id,
-        roleId: u.role, // must match the enum value as string
         departmentId: null, // optional, for global role
         teamId: null, // optional
         role: u.role, // required by UserRoleUncheckedCreateInput

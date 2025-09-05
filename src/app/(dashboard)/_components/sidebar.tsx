@@ -30,9 +30,9 @@ const routes = [
   },
   {
     id: 2,
-    label: "Users",
+    label: "Employees",
     icon: Users,
-    href: "/dashboard/users",
+    href: "/employees",
   },
   {
     id: 3,

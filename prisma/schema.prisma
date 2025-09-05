@@ -209,19 +209,17 @@ model RolePermission {
 model UserRole {
     id           String   @id @default(cuid())
     userId       String
-    roleId       String
-    // Optional scoping: a role can be global, department-scoped, or team-scoped
+    role         Role // <-- enum column stored in DB
     departmentId String?
     teamId       String?
     createdAt    DateTime @default(now())
 
     user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-    role       Role
     department Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
     team       Team?       @relation(fields: [teamId], references: [id], onDelete: SetNull)
 
     @@index([userId])
-    @@index([roleId])
+    @@index([role])
     @@index([departmentId])
     @@index([teamId])
 }
