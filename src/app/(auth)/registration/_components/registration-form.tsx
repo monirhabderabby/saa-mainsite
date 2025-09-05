@@ -1,4 +1,5 @@
 "use client";
+import { registerAction } from "@/actions/auth/registration";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,18 +25,38 @@ import {
   RegistrationSchemaValues,
 } from "@/schemas/auth/registration";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { Loader2 } from "lucide-react";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export default function RegistrationForm() {
   const [state, setState] = useState<"form" | "success">("form");
+  const [pending, startTransition] = useTransition();
   const form = useForm<RegistrationSchemaValues>({
     resolver: zodResolver(registrationSchema),
   });
 
   function onSubmit(values: RegistrationSchemaValues) {
-    console.log(values);
-    setState("success");
+    startTransition(() => {
+      registerAction(values).then((res) => {
+        if (!res.success) {
+          toast.error(res.message);
+          return;
+        }
+
+        form.reset({
+          firstName: "",
+          lastName: "",
+          password: "",
+          confirmPassword: "",
+          employeeId: "",
+          email: "",
+        });
+
+        setState("success");
+      });
+    });
   }
 
   return (
@@ -57,7 +78,12 @@ export default function RegistrationForm() {
                         <FormItem>
                           <FormLabel>First Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="" type="text" {...field} />
+                            <Input
+                              placeholder=""
+                              type="text"
+                              {...field}
+                              disabled={pending}
+                            />
                           </FormControl>
 
                           <FormMessage />
@@ -74,7 +100,7 @@ export default function RegistrationForm() {
                         <FormItem>
                           <FormLabel>Last Name</FormLabel>
                           <FormControl>
-                            <Input type="text" {...field} />
+                            <Input type="text" {...field} disabled={pending} />
                           </FormControl>
 
                           <FormMessage />
@@ -91,7 +117,12 @@ export default function RegistrationForm() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="" type="email" {...field} />
+                        <Input
+                          placeholder=""
+                          type="email"
+                          {...field}
+                          disabled={pending}
+                        />
                       </FormControl>
 
                       <FormMessage />
@@ -106,7 +137,11 @@ export default function RegistrationForm() {
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <PasswordInput placeholder="" {...field} />
+                        <PasswordInput
+                          placeholder=""
+                          {...field}
+                          disabled={pending}
+                        />
                       </FormControl>
 
                       <FormMessage />
@@ -121,7 +156,11 @@ export default function RegistrationForm() {
                     <FormItem>
                       <FormLabel>Confirm Password</FormLabel>
                       <FormControl>
-                        <PasswordInput placeholder="" {...field} />
+                        <PasswordInput
+                          placeholder=""
+                          {...field}
+                          disabled={pending}
+                        />
                       </FormControl>
 
                       <FormMessage />
@@ -136,7 +175,12 @@ export default function RegistrationForm() {
                     <FormItem>
                       <FormLabel>Employee ID</FormLabel>
                       <FormControl>
-                        <Input placeholder="" type="" {...field} />
+                        <Input
+                          placeholder=""
+                          type=""
+                          {...field}
+                          disabled={pending}
+                        />
                       </FormControl>
                       <FormDescription>
                         Collect this from HR for verification and records
@@ -145,8 +189,9 @@ export default function RegistrationForm() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
-                  Submit
+                <Button type="submit" className="w-full" disabled={pending}>
+                  Create Account{" "}
+                  {pending && <Loader2 className="animate-spin" />}
                 </Button>
               </form>
             </Form>
