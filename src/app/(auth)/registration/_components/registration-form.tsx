@@ -42,7 +42,7 @@ export default function RegistrationForm() {
     <Card>
       <ResizablePanel.Root value={state}>
         <ResizablePanel.Content value="form">
-          <CardContent>
+          <CardContent className="pb-0">
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -145,7 +145,9 @@ export default function RegistrationForm() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit">Submit</Button>
+                <Button type="submit" className="w-full">
+                  Submit
+                </Button>
               </form>
             </Form>
           </CardContent>
