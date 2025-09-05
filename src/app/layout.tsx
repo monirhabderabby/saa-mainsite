@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Raleway } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const raleway = Raleway({
@@ -20,7 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={cn(raleway.className, "antialiased")}>{children}</body>
+      <body className={cn(raleway.className, "antialiased")}>
+        {children} <Toaster />
+      </body>
     </html>
   );
 }
