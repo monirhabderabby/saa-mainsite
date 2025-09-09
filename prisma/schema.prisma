@@ -7,94 +7,91 @@ generator client {
     provider = "prisma-client-js"
 }
 
-model Department {
-    id         String   @id @default(cuid())
-    name       String   @unique
-    employeeId String[]
-    // e.g. "Operation", "Sales", "BPU"
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt
-
-    teams             Team[]
-    serviceCategories ServiceCategory[]
-    userRoles         UserRole[] // dept-scoped roles
-    users             User[] // optional home dept
-
-    @@index([name])
+enum AccountStatus {
+    PENDING
+    ACTIVE
+    PAUSED
 }
 
-model ServiceCategory {
-    id           String   @id @default(cuid())
-    name         String
-    departmentId String
-    createdAt    DateTime @default(now())
-    updatedAt    DateTime @updatedAt
-
-    department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
-    teams      Team[]
-
-    @@unique([departmentId, name])
-    @@index([departmentId])
-}
-
-model Team {
-    id                String   @id @default(cuid())
-    name              String
-    departmentId      String
-    serviceCategoryId String?
-    createdAt         DateTime @default(now())
-    updatedAt         DateTime @updatedAt
-
-    department      Department       @relation(fields: [departmentId], references: [id], onDelete: Cascade)
-    serviceCategory ServiceCategory? @relation(fields: [serviceCategoryId], references: [id], onDelete: SetNull)
-
-    members UserTeam[]
-    roles   UserRole[] // team-scoped roles
-
-    @@unique([departmentId, name])
-    @@index([departmentId])
-    @@index([serviceCategoryId])
+enum Role {
+    SUPER_ADMIN
+    ADMIN
+    OPERATION_MEMBER
+    SALES_MEMBER
 }
 
 model User {
-    id           String     @id @default(cuid())
-    email        String     @unique
-    firstName    String?
-    lastName     String?
-    departmentId String?
-    password     String
-    dateOfBirth  DateTime?
-    gender       String?
-    phone        String?
-    status       UserStatus @default(PENDING)
+    id            String        @id @default(cuid())
+    fullName      String?
+    email         String        @unique
+    emailVerified DateTime?
+    image         String?
+    employeeId    String        @unique
+    accountStatus AccountStatus @default(PENDING)
+    role          Role
 
-    employeeId            String?   @unique
-    address               String?
-    emergencyContactName  String?
-    emergencyContactPhone String?
-    joinDate              DateTime?
-    designation           String? // e.g. "AGM", "Team Leader"
-
-    department  Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
-    memberships UserTeam[]
-    roles       UserRole[]
+    serviceId String?
+    service   Services? @relation(fields: [serviceId], references: [id])
 
     accounts      Account[]
     sessions      Session[]
+    permissions   Permissions[]
+    teams         Team[]          @relation("UserTeams")
     // Optional for WebAuthn support
     Authenticator Authenticator[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-
-    @@index([departmentId])
 }
 
-enum UserStatus {
-    PENDING
-    APPROVED
-    REJECTED
-    INACTIVE // Scalable for future (e.g., left company)
+model Services {
+    id   String @id @default(cuid())
+    name String
+
+    teams Team[]
+    users User[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Team {
+    id   String @id @default(cuid())
+    name String
+
+    userId    String?
+    serviceId String?
+    members   User[]    @relation("UserTeams")
+    service   Services? @relation(fields: [serviceId], references: [id])
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+enum PermissionTool {
+    ISSUE_SHEET
+    UPDATE_SHEET
+}
+
+model Permissions {
+    id   String         @id @default(cuid())
+    name PermissionTool
+
+    // Relation to User
+    userId String?
+    user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    // issue sheet (tool)
+    isIssueUpdatAllowed  Boolean @default(true)
+    isIssueCreateAllowed Boolean @default(false)
+
+    // update sheet (tool)
+    isMessageCreateAllowed  Boolean @default(false)
+    isMessageTLCheckAllowed Boolean @default(false)
+    isMessageDoneByAllowed  Boolean @default(false)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model Account {
@@ -150,76 +147,4 @@ model Authenticator {
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@id([userId, credentialID])
-}
-
-model UserTeam {
-    userId String
-    teamId String
-    title  String? // e.g., "AGM", "Team Leader", "Member"
-    from   DateTime  @default(now())
-    to     DateTime?
-
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-    team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
-
-    @@id([userId, teamId])
-    @@index([teamId])
-}
-
-enum Role {
-    GM // Global: Approves users, all access
-    HR // Global: Manages users
-    AGM_OPERATION // Dept: Operation AGM
-    AGM_SALES // Dept: Sales AGM
-    TEAM_LEADER_SALES // Team: Sales team leader
-    SALES_MEMBER // Team: Sales member
-    OPERATION_MEMBER // Team: Operation member
-}
-
-enum RoleScope {
-    GLOBAL
-    DEPARTMENT
-    TEAM
-}
-
-model Permission {
-    id        String   @id @default(cuid())
-    // canonical: "<resource>:<action>" e.g. "issue:create", "issue:status:update"
-    key       String   @unique
-    resource  String // e.g., "issue", "update"
-    action    String // e.g., "create", "read", "update", "delete", "status:update"
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    roles RolePermission[]
-
-    @@index([resource, action])
-}
-
-model RolePermission {
-    roleId       String
-    permissionId String
-
-    role       Role
-    permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
-
-    @@id([roleId, permissionId])
-}
-
-model UserRole {
-    id           String   @id @default(cuid())
-    userId       String
-    role         Role // <-- enum column stored in DB
-    departmentId String?
-    teamId       String?
-    createdAt    DateTime @default(now())
-
-    user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-    department Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
-    team       Team?       @relation(fields: [teamId], references: [id], onDelete: SetNull)
-
-    @@index([userId])
-    @@index([role])
-    @@index([departmentId])
-    @@index([teamId])
 }
