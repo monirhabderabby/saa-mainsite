@@ -44,7 +44,7 @@ const routes = [
     id: 3,
     label: "Services",
     icon: FileText,
-    href: "/dashboard/services",
+    href: "/services",
     access: ["ADMIN", "SUPER_ADMIN"] as Role[],
   },
   {
