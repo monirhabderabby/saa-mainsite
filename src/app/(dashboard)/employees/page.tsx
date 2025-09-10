@@ -1,29 +1,15 @@
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
 import prisma from "@/lib/prisma";
+import EmployeeTableContainer from "./_components/employee-table-container";
 
 const Page = async () => {
-  const users = await prisma.user.findMany();
+  const users = await prisma.user.findMany({});
 
-  console.log(users);
   return (
     <Card className="shadow-none">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>Employee Directory</CardTitle>
-            <CardDescription>
-              Browse and search for employees by their ID.
-            </CardDescription>
-          </div>
-          <Input className="max-w-[400px]" placeholder="Enter Employee ID" />
-        </div>
-      </CardHeader>
+      <CardContent>
+        <EmployeeTableContainer data={users ?? []} />
+      </CardContent>
     </Card>
   );
 };
