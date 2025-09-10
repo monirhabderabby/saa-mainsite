@@ -101,7 +101,7 @@ const Sidebar = ({ cu }: Props) => {
 
   return (
     <>
-      <div className="fixed inset-y-0 left-0 z-50 w-52 border-r dark:border-r-0 dark:bg-customDark-foundation">
+      <div className="fixed inset-y-0 left-0 z-50 w-52 border-r  ">
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="border-b p-4 flex justify-center items-center border-black/30 dark:border-white/20">

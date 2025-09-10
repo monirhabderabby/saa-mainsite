@@ -6,7 +6,7 @@ const Page = async () => {
   const users = await prisma.user.findMany({});
 
   return (
-    <Card className="shadow-none dark:bg-customDark-background p-0">
+    <Card className="shadow-none ">
       <CardContent>
         <EmployeeTableContainer data={users ?? []} />
       </CardContent>
