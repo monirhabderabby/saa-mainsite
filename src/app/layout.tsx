@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { ThemeProvider } from "@/providers/theme/theme-provider";
 import type { Metadata } from "next";
 import { Raleway } from "next/font/google";
 import { Toaster } from "sonner";
@@ -21,8 +22,16 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={cn(raleway.className, "antialiased")}>
-        {children} <Toaster />
+      <body className={cn(raleway.className, "antialiased bg-background")}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>{" "}
+        <Toaster />
       </body>
     </html>
   );

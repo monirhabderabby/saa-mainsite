@@ -1,6 +1,7 @@
 import { User } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import moment from "moment";
+import AccountStatusAction from "./table-actions/account-status-action";
 
 export const employeeColumns: ColumnDef<User>[] = [
   {
@@ -14,6 +15,11 @@ export const employeeColumns: ColumnDef<User>[] = [
   {
     accessorKey: "email",
     header: "Email",
+  },
+  {
+    accessorKey: "accountStatus",
+    header: "Status",
+    cell: ({ row }) => <AccountStatusAction data={row.original} />,
   },
   {
     accessorKey: "createdAt",

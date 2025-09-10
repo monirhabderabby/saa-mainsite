@@ -10,7 +10,7 @@ generator client {
 enum AccountStatus {
     PENDING
     ACTIVE
-    PAUSED
+    DEACTIVE
 }
 
 enum Role {

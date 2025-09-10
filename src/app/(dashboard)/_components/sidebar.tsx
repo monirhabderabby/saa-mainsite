@@ -101,10 +101,10 @@ const Sidebar = ({ cu }: Props) => {
 
   return (
     <>
-      <div className="fixed inset-y-0 left-0 z-50 w-52 border-r bg-white">
+      <div className="fixed inset-y-0 left-0 z-50 w-52 border-r dark:border-r-0 dark:bg-customDark-foundation">
         <div className="flex h-full flex-col">
           {/* Logo */}
-          <div className="border-b p-4 flex justify-center items-center bg-black">
+          <div className="border-b p-4 flex justify-center items-center border-black/30 dark:border-white/20">
             <div className="relative h-[100px] w-[150px]">
               <Image src={logoSrc} alt="logo" fill />
             </div>
@@ -127,8 +127,8 @@ const Sidebar = ({ cu }: Props) => {
                       className={`flex items-center gap-3 rounded-md px-3 text-[14px] py-2
           ${
             isActive
-              ? "bg-primary text-primary-foreground"
-              : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              ? "bg-primary dark:bg-customYellow-primary/10 text-primary-foreground dark:text-customYellow-primary"
+              : "text-muted-foreground  hover:bg-muted hover:text-foreground dark:hover:text-customYellow-primary"
           }
         `}
                     >

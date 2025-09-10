@@ -21,7 +21,7 @@ const SiteLayout = async ({ children }: Props) => {
         {/* Top Bar */}
         <Topbar name={"Monir Hossain Rabby" as string} />
 
-        <div className="p-6 bg-[#F5F7FA] min-h-[calc(100vh-80px)]">
+        <div className="p-6 bg-[#F5F7FA] dark:bg-background min-h-[calc(100vh-65px)]">
           {children}
         </div>
       </div>
