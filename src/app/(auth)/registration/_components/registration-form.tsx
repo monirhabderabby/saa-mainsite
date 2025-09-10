@@ -21,6 +21,13 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import * as ResizablePanel from "@/components/ui/resizable-panel";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   registrationSchema,
   RegistrationSchemaValues,
 } from "@/schemas/auth/registration";
@@ -32,7 +39,11 @@ import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-export default function RegistrationForm() {
+interface Props {
+  services: { id: string; name: string }[];
+}
+
+export default function RegistrationForm({ services }: Props) {
   const [state, setState] = useState<"form" | "success">("form");
   const [pending, startTransition] = useTransition();
   const form = useForm<RegistrationSchemaValues>({
@@ -132,7 +143,23 @@ export default function RegistrationForm() {
                     <FormItem>
                       <FormLabel>Service</FormLabel>
                       <FormControl>
-                        <Input placeholder="" {...field} disabled={pending} />
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a service" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {services.map((item) => (
+                              <SelectItem value={item.id} key={item.id}>
+                                {item.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </FormControl>
 
                       <FormMessage />
