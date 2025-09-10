@@ -12,9 +12,10 @@ const SiteLayout = async ({ children }: Props) => {
   const cu = await auth();
 
   if (!cu) redirect("/login");
+
   return (
     <div className="flex min-h-screen flex-col">
-      <Sidebar />
+      <Sidebar cu={cu.user} />
       {/* Main Content */}
       <div className="ml-52 flex flex-1 flex-col">
         {/* Top Bar */}

@@ -4,15 +4,13 @@ import { logoutAction } from "@/actions/auth/logout";
 import { Button } from "@/components/ui/button";
 import AlertModal from "@/components/ui/custom/alert-modal";
 import { logoSrc } from "@/constants/assets";
+import { Role } from "@prisma/client";
 import {
   Building,
-  FileStack,
   FileText,
   LayoutDashboard,
-  ListRestart,
   LogOut,
   Settings,
-  TableOfContents,
   Users,
 } from "lucide-react";
 import Image from "next/image";
@@ -20,6 +18,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
+import { ExtendedUser } from "../../../../next-auth-d";
 
 const routes = [
   {
@@ -27,52 +26,49 @@ const routes = [
     label: "Overview",
     icon: LayoutDashboard,
     href: "/dashboard",
+    access: [
+      "ADMIN",
+      "OPERATION_MEMBER",
+      "SALES_MEMBER",
+      "SUPER_ADMIN",
+    ] as Role[],
   },
   {
     id: 2,
     label: "Employees",
     icon: Users,
     href: "/employees",
+    access: ["ADMIN", "SUPER_ADMIN"] as Role[],
   },
   {
     id: 3,
-    label: "Documents",
+    label: "Services",
     icon: FileText,
-    href: "/dashboard/documents",
+    href: "/dashboard/services",
+    access: ["ADMIN", "SUPER_ADMIN"] as Role[],
   },
   {
     id: 4,
-    label: "Companies",
+    label: "Teams",
     icon: Building,
-    href: "/dashboard/companies",
+    href: "/dashboard/teams",
+    access: ["ADMIN", "SUPER_ADMIN"] as Role[],
   },
-  {
-    id: 5,
-    label: "Category",
-    icon: FileStack,
-    href: "/dashboard/categories",
-  },
-  {
-    id: 6,
-    label: "Content",
-    icon: TableOfContents,
-    href: "/dashboard/content",
-  },
-  {
-    id: 7,
-    label: "WaitList",
-    icon: ListRestart,
-    href: "/dashboard/waitlist",
-  },
+
   {
     id: 8,
     label: "Settings",
     icon: Settings,
     href: "/dashboard/settings",
+    access: ["ADMIN", "SUPER_ADMIN"] as Role[],
   },
 ];
 
-const Sidebar = () => {
+interface Props {
+  cu: ExtendedUser;
+}
+
+const Sidebar = ({ cu }: Props) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -98,6 +94,11 @@ const Sidebar = () => {
     };
   }, []);
 
+  // inside Sidebar component, before return
+  const accessibleRoutes = routes.filter((route) =>
+    route.access.includes(cu.role)
+  );
+
   return (
     <>
       <div className="fixed inset-y-0 left-0 z-50 w-52 border-r bg-white">
@@ -112,7 +113,7 @@ const Sidebar = () => {
           {/* Navigation Links */}
           <nav className="flex-1 overflow-auto p-3">
             <ul className="space-y-2">
-              {routes.map((route) => {
+              {accessibleRoutes.map((route) => {
                 const Icon = route.icon;
                 const isActive =
                   route.href === "/dashboard"
