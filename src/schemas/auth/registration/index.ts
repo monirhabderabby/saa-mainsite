@@ -2,9 +2,9 @@ import { z } from "zod";
 
 export const registrationSchema = z
   .object({
-    firstName: z.string().min(1, { message: "First name is required" }),
+    fullName: z.string().min(1, { message: "Full name is required" }),
 
-    lastName: z.string().min(1, { message: "Last name is required" }),
+    serviceId: z.string().min(1, { message: "Service ID is required" }),
 
     email: z
       .string()
@@ -23,7 +23,7 @@ export const registrationSchema = z
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
-    path: ["confirmPassword"], // show error under confirmPassword field
+    path: ["confirmPassword"], // error shows under confirmPassword field
   });
 
 export type RegistrationSchemaValues = z.infer<typeof registrationSchema>;

@@ -8,12 +8,7 @@ import { Input } from "@/components/ui/input";
 import prisma from "@/lib/prisma";
 
 const Page = async () => {
-  const users = await prisma.user.findMany({
-    include: {
-      department: true,
-      roles: true,
-    },
-  });
+  const users = await prisma.user.findMany();
 
   console.log(users);
   return (

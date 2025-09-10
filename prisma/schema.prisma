@@ -29,6 +29,7 @@ model User {
     employeeId    String        @unique
     accountStatus AccountStatus @default(PENDING)
     role          Role
+    password      String
 
     serviceId String?
     service   Services? @relation(fields: [serviceId], references: [id])

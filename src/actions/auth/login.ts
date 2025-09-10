@@ -31,8 +31,12 @@ export async function loginAction(data: LoginSchemaValues) {
       };
     }
 
-    if (user.status !== "APPROVED") {
-      return { success: false, message: "Account pending approval." };
+    if (user.accountStatus !== "ACTIVE") {
+      return {
+        success: false,
+        message:
+          "Your account is not active. Please contact your leader for assistance.",
+      };
     }
 
     // 3. Compare password
@@ -58,10 +62,6 @@ export async function loginAction(data: LoginSchemaValues) {
       user: {
         id: user.id,
         email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        designation: user.designation,
-        departmentId: user.departmentId,
       },
     };
   } catch (err) {

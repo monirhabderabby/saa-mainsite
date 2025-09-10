@@ -18,7 +18,7 @@ export async function registerAction(data: RegistrationSchemaValues) {
     };
   }
 
-  const { email, employeeId, firstName, lastName, password } = parsed.data;
+  const { email, employeeId, fullName, password } = parsed.data;
 
   try {
     // ✅ Hash password
@@ -29,16 +29,15 @@ export async function registerAction(data: RegistrationSchemaValues) {
       data: {
         email,
         employeeId,
-        firstName,
-        lastName,
+        fullName,
         password: hashedPassword,
-        status: "PENDING",
+        accountStatus: "PENDING",
+        role: "ADMIN", // or another default role as per your schema
       },
       select: {
         id: true,
         email: true,
-        firstName: true,
-        lastName: true,
+        fullName: true,
         employeeId: true,
         createdAt: true,
       },

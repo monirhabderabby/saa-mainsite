@@ -26,6 +26,7 @@ import {
 } from "@/schemas/auth/registration";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, MoveLeft } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
@@ -47,12 +48,12 @@ export default function RegistrationForm() {
         }
 
         form.reset({
-          firstName: "",
-          lastName: "",
+          fullName: "",
           password: "",
           confirmPassword: "",
           employeeId: "",
           email: "",
+          serviceId: "",
         });
 
         setState("success");
@@ -62,22 +63,33 @@ export default function RegistrationForm() {
 
   return (
     <Card>
+      <CardHeader>
+        <div className="flex flex-col justify-center items-center">
+          <Image
+            src="/black-logo.svg"
+            width={180}
+            height={57}
+            alt="black logo"
+          />
+          <CardTitle>Welcome Back</CardTitle>
+        </div>
+      </CardHeader>
       <ResizablePanel.Root value={state}>
         <ResizablePanel.Content value="form">
           <CardContent className="w-full md:w-[500px]">
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-5 max-w-[500px] mx-auto py-10"
+                className="space-y-5 max-w-[500px] mx-auto pb-10"
               >
                 <div className="grid grid-cols-12 gap-4">
-                  <div className="col-span-6">
+                  <div className="col-span-12">
                     <FormField
                       control={form.control}
-                      name="firstName"
+                      name="fullName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>First Name</FormLabel>
+                          <FormLabel>Full Name</FormLabel>
                           <FormControl>
                             <Input
                               placeholder=""
@@ -85,23 +97,6 @@ export default function RegistrationForm() {
                               {...field}
                               disabled={pending}
                             />
-                          </FormControl>
-
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="col-span-6">
-                    <FormField
-                      control={form.control}
-                      name="lastName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Last Name</FormLabel>
-                          <FormControl>
-                            <Input type="text" {...field} disabled={pending} />
                           </FormControl>
 
                           <FormMessage />
@@ -124,6 +119,20 @@ export default function RegistrationForm() {
                           {...field}
                           disabled={pending}
                         />
+                      </FormControl>
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="serviceId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Service</FormLabel>
+                      <FormControl>
+                        <Input placeholder="" {...field} disabled={pending} />
                       </FormControl>
 
                       <FormMessage />
@@ -219,7 +228,7 @@ export default function RegistrationForm() {
           </CardContent>
         </ResizablePanel.Content>
         <ResizablePanel.Content value="success">
-          <CardContent className="pb-0 px-0 min-w-[300px]">
+          <CardContent className="pb-0 px-0 min-w-[400px]">
             <CardHeader>
               <CardTitle>Email sent!</CardTitle>
               <CardDescription>Check your inbox to continue</CardDescription>
