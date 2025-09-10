@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AccountStatus, User } from "@prisma/client";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 
 import {
@@ -13,6 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
+import { statusUpdate } from "@/actions/user/update";
 import AlertModal from "@/components/ui/custom/alert-modal";
 import {
   Select,
@@ -25,6 +26,7 @@ import {
   userStatusSchema,
   UserStatusSchemaType,
 } from "@/schemas/employees/table";
+import { toast } from "sonner";
 
 interface Props {
   data: User;
@@ -40,6 +42,7 @@ const AccountStatusForm = ({ data }: Props) => {
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [pending, startTransition] = useTransition();
   const [pendingValue, setPendingValue] = useState<AccountStatus | null>(null);
 
   const handleChange = (value: AccountStatus) => {
@@ -54,7 +57,6 @@ const AccountStatusForm = ({ data }: Props) => {
       form.handleSubmit(onSubmit)();
       setPendingValue(null);
     }
-    setIsModalOpen(false);
   };
 
   const handleCancel = () => {
@@ -63,7 +65,18 @@ const AccountStatusForm = ({ data }: Props) => {
   };
 
   const onSubmit = (values: UserStatusSchemaType) => {
-    console.log("Status updated:", values);
+    startTransition(() => {
+      statusUpdate(values).then((res) => {
+        if (!res.success) {
+          toast.error(res.message);
+          return;
+        }
+
+        // handle success
+        toast.success(res.message);
+        setIsModalOpen(false);
+      });
+    });
     // call your API to update user status here
   };
 
@@ -102,7 +115,7 @@ const AccountStatusForm = ({ data }: Props) => {
         isOpen={isModalOpen}
         onConfirm={handleConfirm}
         onClose={handleCancel}
-        loading={false}
+        loading={pending}
         title="Confirm Status Change"
         message={`Are you sure you want to change status to "${pendingValue}"?`}
       />
