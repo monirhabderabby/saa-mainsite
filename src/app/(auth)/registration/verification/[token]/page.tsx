@@ -12,7 +12,6 @@ const Page = ({}: { params: { token: string } }) => {
     <div className="w-full min-h-screen flex justify-center items-center">
       <Card className="min-w-[300px] shadow-none">
         <CardHeader>
-          <div></div>
           <CardTitle className="text-center">Verification Completed</CardTitle>
           <CardDescription className="text-center">
             Congratulations, your identity has been verified.
