@@ -3,7 +3,12 @@ import prisma from "@/lib/prisma";
 import EmployeeTableContainer from "./_components/employee-table-container";
 
 const Page = async () => {
-  const users = await prisma.user.findMany({});
+  const users = await prisma.user.findMany({
+    include: {
+      service: true,
+      permissions: true,
+    },
+  });
 
   return (
     <Card className="shadow-none ">

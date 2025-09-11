@@ -10,15 +10,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Switch } from "@/components/ui/switch";
-import { Hash, Mail, User, Users } from "lucide-react";
+import { UserWithAllIncludes } from "@/types/user";
+import { Hash, Mail, User as UserIcon, Users } from "lucide-react";
 import { ReactNode, useState } from "react";
+import { PermissionSwitch } from "./permission-switch";
 
 interface ProfileViewProps {
   trigger: ReactNode;
+  user: UserWithAllIncludes;
 }
 
-export function ProfileView({ trigger }: ProfileViewProps) {
+export function ProfileView({ trigger, user }: ProfileViewProps) {
   const [open, setOpen] = useState(false);
   const getInitials = (name: string) => {
     return name
@@ -32,7 +34,7 @@ export function ProfileView({ trigger }: ProfileViewProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="">
         <DialogHeader>
           <DialogTitle className="text-center">Profile Details</DialogTitle>
         </DialogHeader>
@@ -43,18 +45,18 @@ export function ProfileView({ trigger }: ProfileViewProps) {
             <Avatar className="h-20 w-20">
               <AvatarImage
                 src={`/placeholder.svg?height=80&width=80&query=professional+profile+photo`}
-                alt="Monir Hossain"
+                alt={user.fullName as string}
               />
               <AvatarFallback className="text-lg font-semibold">
-                {getInitials("Monir Hossain")}
+                {getInitials(user.fullName as string)}
               </AvatarFallback>
             </Avatar>
             <div className="text-center">
               <h3 className="text-xl font-semibold text-balance">
-                Monir Hossain
+                {user.fullName}
               </h3>
               <Badge variant="secondary" className="mt-1">
-                team name
+                Dev-X
               </Badge>
             </div>
           </div>
@@ -67,16 +69,18 @@ export function ProfileView({ trigger }: ProfileViewProps) {
                 <div>
                   <p className="text-sm font-medium">ID</p>
                   <p className="text-sm text-muted-foreground">
-                    fsdfsdfsdffsdfdsf
+                    {user.employeeId}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-center space-x-3">
-                <User className="h-4 w-4 text-muted-foreground" />
+                <UserIcon className="h-4 w-4 text-muted-foreground" />
                 <div>
                   <p className="text-sm font-medium">Name</p>
-                  <p className="text-sm text-muted-foreground">Monir Hossain</p>
+                  <p className="text-sm text-muted-foreground">
+                    {user.fullName}
+                  </p>
                 </div>
               </div>
 
@@ -84,9 +88,7 @@ export function ProfileView({ trigger }: ProfileViewProps) {
                 <Mail className="h-4 w-4 text-muted-foreground" />
                 <div>
                   <p className="text-sm font-medium">Email</p>
-                  <p className="text-sm text-muted-foreground">
-                    monirhrabby.personal@gmail.com
-                  </p>
+                  <p className="text-sm text-muted-foreground">{user.email}</p>
                 </div>
               </div>
 
@@ -101,38 +103,58 @@ export function ProfileView({ trigger }: ProfileViewProps) {
           </Card>
 
           {/* Access Permissions */}
-          <Card>
-            <CardContent className="pt-6">
-              <h4 className="text-lg font-semibold mb-4 text-center">
-                Access Permissions
-              </h4>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Add Entry</span>
-                  <Switch
-                    checked={false}
-                    // onCheckedChange={() => handlePermissionToggle("addEntry")}
-                  />
-                </div>
+          <div className="grid grid-cols-2 gap-5">
+            {user.permissions.map((p) => (
+              <Card key={p.id}>
+                <CardContent className="pt-6">
+                  <h4 className="text-lg font-semibold mb-4 text-center">
+                    {p.name} Permissions
+                  </h4>
+                  <div className="space-y-4">
+                    {p.name === "ISSUE_SHEET" && (
+                      <>
+                        <PermissionSwitch
+                          label="Issue Create"
+                          checked={p.isIssueCreateAllowed}
+                          permissionId={p.id}
+                          field="isIssueCreateAllowed"
+                        />
+                        <PermissionSwitch
+                          label="Issue Update"
+                          checked={p.isIssueUpdatAllowed}
+                          permissionId={p.id}
+                          field="isIssueUpdatAllowed"
+                        />
+                      </>
+                    )}
 
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">TL Check</span>
-                  <Switch
-                    checked={false}
-                    // onCheckedChange={() => handlePermissionToggle("tlCheck")}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Done By</span>
-                  <Switch
-                    checked={false}
-                    // onCheckedChange={() => handlePermissionToggle("doneBy")}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                    {p.name === "UPDATE_SHEET" && (
+                      <>
+                        <PermissionSwitch
+                          label="Update By"
+                          checked={p.isMessageCreateAllowed}
+                          permissionId={p.id}
+                          field="isMessageCreateAllowed"
+                        />
+                        <PermissionSwitch
+                          label="TL Check"
+                          checked={p.isMessageTLCheckAllowed}
+                          permissionId={p.id}
+                          field="isMessageTLCheckAllowed"
+                        />
+                        <PermissionSwitch
+                          label="Done By"
+                          checked={p.isMessageDoneByAllowed}
+                          permissionId={p.id}
+                          field="isMessageDoneByAllowed"
+                        />
+                      </>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

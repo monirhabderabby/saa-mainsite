@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataTable } from "@/components/ui/data-table";
 import { Input } from "@/components/ui/input";
-import { User } from "@prisma/client";
+import { UserWithAllIncludes } from "@/types/user";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -16,7 +16,7 @@ import { useState } from "react";
 import { employeeColumns } from "./employee-column";
 
 interface Props {
-  data: User[];
+  data: UserWithAllIncludes[];
 }
 
 const EmployeeTableContainer = ({ data }: Props) => {

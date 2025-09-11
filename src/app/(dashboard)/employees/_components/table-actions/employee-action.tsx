@@ -1,13 +1,13 @@
 import { Button } from "@/components/ui/button";
-import { User } from "@prisma/client";
+import { UserWithAllIncludes } from "@/types/user";
 import { Eye } from "lucide-react";
 import { ProfileView } from "./profile/profile-view";
 
 interface Props {
-  data: User;
+  data: UserWithAllIncludes;
 }
 
-const EmployeeAction = ({}: Props) => {
+const EmployeeAction = ({ data }: Props) => {
   return (
     <ProfileView
       trigger={
@@ -15,6 +15,7 @@ const EmployeeAction = ({}: Props) => {
           <Eye />
         </Button>
       }
+      user={data}
     />
   );
 };

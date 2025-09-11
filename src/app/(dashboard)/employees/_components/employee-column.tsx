@@ -1,10 +1,10 @@
-import { User } from "@prisma/client";
+import { UserWithAllIncludes } from "@/types/user";
 import { ColumnDef } from "@tanstack/react-table";
 import moment from "moment";
 import AccountStatusAction from "./table-actions/account-status-action";
 import EmployeeAction from "./table-actions/employee-action";
 
-export const employeeColumns: ColumnDef<User>[] = [
+export const employeeColumns: ColumnDef<UserWithAllIncludes>[] = [
   {
     accessorKey: "employeeId",
     header: "Employee ID",
