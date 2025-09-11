@@ -1,12 +1,16 @@
 "use server";
 
+import { EmailVerification } from "@/email-templates/email-verification";
 import prisma from "@/lib/prisma";
+import { resend } from "@/lib/resend";
 import {
   registrationSchema,
   RegistrationSchemaValues,
 } from "@/schemas/auth/registration";
 import { Prisma } from "@prisma/client";
+import { render } from "@react-email/render";
 import bcrypt from "bcryptjs";
+import { v4 as uuidv4 } from "uuid";
 
 export async function registerAction(data: RegistrationSchemaValues) {
   // ✅ Validate user input
@@ -43,6 +47,38 @@ export async function registerAction(data: RegistrationSchemaValues) {
         serviceId: true,
         createdAt: true,
       },
+    });
+
+    // ✅ Create verification token (expires in 24h)
+    const token = uuidv4();
+    const expireOn = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
+
+    const verificationRes = await prisma.userVerification.create({
+      data: {
+        userId: user.id,
+        token,
+        expireOn,
+      },
+    });
+
+    const verificationUrl =
+      process.env.AUTH_URL +
+      `/registration/verification/${verificationRes.token}`;
+
+    // Render the EmailVerification component to HTML
+    const emailHtml = await render(
+      EmailVerification({
+        userName: user.fullName as string,
+        verificationUrl,
+      })
+    );
+
+    // Enviar OTP por correo electrónico
+    await resend.emails.send({
+      from: "ScaleUp Ads Agency <support@monirhrabby.info>",
+      to: [user.email as string],
+      subject: `Welcome to ScaleUp Ads Agency – Please verify your email`,
+      html: emailHtml,
     });
 
     return {

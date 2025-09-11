@@ -44,6 +44,7 @@ interface Props {
 }
 
 export default function RegistrationForm({ services }: Props) {
+  const [email, setEmail] = useState("");
   const [state, setState] = useState<"form" | "success">("form");
   const [pending, startTransition] = useTransition();
   const form = useForm<RegistrationSchemaValues>({
@@ -63,9 +64,10 @@ export default function RegistrationForm({ services }: Props) {
           password: "",
           confirmPassword: "",
           employeeId: "",
-          email: "",
           serviceId: "",
         });
+
+        setEmail(res.user?.email as string);
 
         setState("success");
       });
@@ -257,8 +259,11 @@ export default function RegistrationForm({ services }: Props) {
         <ResizablePanel.Content value="success">
           <CardContent className="pb-0 px-0 min-w-[400px]">
             <CardHeader>
-              <CardTitle>Email sent!</CardTitle>
-              <CardDescription>Check your inbox to continue</CardDescription>
+              <CardTitle className="text-center">Check your email</CardTitle>
+              <CardDescription className="text-center pt-3">
+                We emailed a magic link to <br />
+                <span className="font-bold">{email}</span>
+              </CardDescription>
             </CardHeader>
           </CardContent>
         </ResizablePanel.Content>
