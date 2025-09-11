@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "db:seed": "prisma db seed",
-    "email": "email dev --dir src/email-templates"
+    "email": "email dev --dir src/email-templates",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
