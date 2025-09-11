@@ -1,5 +1,5 @@
 datasource db {
-    provider = "postgresql"
+    provider = "mongodb"
     url      = env("DATABASE_URL")
 }
 
@@ -20,8 +20,13 @@ enum Role {
     SALES_MEMBER
 }
 
+enum PermissionTool {
+    ISSUE_SHEET
+    UPDATE_SHEET
+}
+
 model User {
-    id            String        @id @default(cuid())
+    id            String        @id @default(auto()) @map("_id") @db.ObjectId
     fullName      String?
     email         String        @unique
     emailVerified DateTime?
@@ -31,65 +36,58 @@ model User {
     role          Role
     password      String
 
-    serviceId String?
+    serviceId String?   @db.ObjectId
     service   Services? @relation(fields: [serviceId], references: [id])
 
     accounts      Account[]
     sessions      Session[]
     permissions   Permissions[]
-    teams         Team[]          @relation("UserTeams")
-    // Optional for WebAuthn support
+    userTeams     UserTeam[]
     Authenticator Authenticator[]
 
     createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    updatedAt DateTime @default(now())
 }
 
 model UserVerification {
-    id       String   @id @default(cuid())
-    userId   String
+    id       String   @id @default(auto()) @map("_id") @db.ObjectId
+    userId   String   @db.ObjectId
     expireOn DateTime
     token    String   @unique
 
     createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    updatedAt DateTime
 }
 
 model Services {
-    id   String @id @default(cuid())
+    id   String @id @default(auto()) @map("_id") @db.ObjectId
     name String
 
     teams Team[]
     users User[]
 
     createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    updatedAt DateTime @default(now())
 }
 
 model Team {
-    id   String @id @default(cuid())
+    id   String @id @default(auto()) @map("_id") @db.ObjectId
     name String
 
-    userId    String?
-    serviceId String?
-    members   User[]    @relation("UserTeams")
-    service   Services? @relation(fields: [serviceId], references: [id])
+    userId    String?    @db.ObjectId
+    serviceId String?    @db.ObjectId
+    userTeams UserTeam[]
+    service   Services?  @relation(fields: [serviceId], references: [id])
 
     createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-}
-
-enum PermissionTool {
-    ISSUE_SHEET
-    UPDATE_SHEET
+    updatedAt DateTime @default(now())
 }
 
 model Permissions {
-    id   String         @id @default(cuid())
+    id   String         @id @default(auto()) @map("_id") @db.ObjectId
     name PermissionTool
 
-    // Relation to User
-    userId String?
+    userId String? @db.ObjectId
     user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     // issue sheet (tool)
@@ -102,11 +100,12 @@ model Permissions {
     isMessageDoneByAllowed  Boolean @default(false)
 
     createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    updatedAt DateTime @default(now())
 }
 
 model Account {
-    userId            String
+    id                String  @id @default(auto()) @map("_id") @db.ObjectId
+    userId            String  @db.ObjectId
     type              String
     provider          String
     providerAccountId String
@@ -119,35 +118,38 @@ model Account {
     session_state     String?
 
     createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    updatedAt DateTime @default(now())
 
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@id([provider, providerAccountId])
+    @@unique([provider, providerAccountId])
 }
 
 model Session {
+    id           String   @id @default(auto()) @map("_id") @db.ObjectId
     sessionToken String   @unique
-    userId       String
+    userId       String   @db.ObjectId
     expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    updatedAt DateTime @default(now())
 }
 
 model VerificationToken {
+    id         String   @id @default(auto()) @map("_id") @db.ObjectId
     identifier String
     token      String
     expires    DateTime
 
-    @@id([identifier, token])
+    @@unique([identifier, token])
 }
 
-// Optional for WebAuthn support
 model Authenticator {
+    id                   String  @id @default(auto()) @map("_id") @db.ObjectId
     credentialID         String  @unique
-    userId               String
+    userId               String  @db.ObjectId
     providerAccountId    String
     credentialPublicKey  String
     counter              Int
@@ -157,5 +159,14 @@ model Authenticator {
 
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@id([userId, credentialID])
+    @@unique([userId, credentialID])
+}
+
+model UserTeam {
+    id     String @id @default(auto()) @map("_id") @db.ObjectId
+    userId String @db.ObjectId
+    teamId String @db.ObjectId
+
+    user User @relation(fields: [userId], references: [id])
+    team Team @relation(fields: [teamId], references: [id])
 }

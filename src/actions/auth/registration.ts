@@ -22,7 +22,7 @@ export async function registerAction(data: RegistrationSchemaValues) {
     };
   }
 
-  const { email, employeeId, fullName, password, serviceId } = parsed.data;
+  const { email, employeeId, fullName, password } = parsed.data;
 
   try {
     // ✅ Hash password
@@ -35,7 +35,6 @@ export async function registerAction(data: RegistrationSchemaValues) {
         employeeId,
         fullName,
         password: hashedPassword,
-        serviceId,
         accountStatus: "PENDING",
         role: "ADMIN", // or another default role as per your schema
       },
@@ -53,11 +52,14 @@ export async function registerAction(data: RegistrationSchemaValues) {
     const token = uuidv4();
     const expireOn = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
 
+    const now = new Date();
     const verificationRes = await prisma.userVerification.create({
       data: {
         userId: user.id,
         token,
         expireOn,
+        createdAt: now,
+        updatedAt: now,
       },
     });
 

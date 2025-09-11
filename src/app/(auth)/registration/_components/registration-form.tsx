@@ -49,6 +49,9 @@ export default function RegistrationForm({ services }: Props) {
   const [pending, startTransition] = useTransition();
   const form = useForm<RegistrationSchemaValues>({
     resolver: zodResolver(registrationSchema),
+    defaultValues: {
+      serviceId: "fsdfds",
+    },
   });
 
   function onSubmit(values: RegistrationSchemaValues) {
