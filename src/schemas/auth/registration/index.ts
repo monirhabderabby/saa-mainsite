@@ -4,11 +4,7 @@ export const registrationSchema = z
   .object({
     fullName: z.string().min(1, { message: "Full name is required" }),
 
-    serviceId: z
-      .string()
-      .min(1, { message: "Service ID is required" })
-      .optional(),
-
+    serviceId: z.string().min(1, { message: "Service ID is required" }),
     email: z
       .string()
       .min(1, { message: "Email is required" })
