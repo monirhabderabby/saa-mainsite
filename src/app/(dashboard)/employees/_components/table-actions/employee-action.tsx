@@ -1,10 +1,7 @@
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { User } from "@prisma/client";
-import { EllipsisVertical } from "lucide-react";
+import { Eye } from "lucide-react";
+import { ProfileView } from "./profile/profile-view";
 
 interface Props {
   data: User;
@@ -12,12 +9,13 @@ interface Props {
 
 const EmployeeAction = ({}: Props) => {
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger>
-        <EllipsisVertical className="h-4 w-4" />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent></DropdownMenuContent>
-    </DropdownMenu>
+    <ProfileView
+      trigger={
+        <Button size="icon" variant="ghost">
+          <Eye />
+        </Button>
+      }
+    />
   );
 };
 

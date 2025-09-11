@@ -28,60 +28,72 @@ export async function registerAction(data: RegistrationSchemaValues) {
     // ✅ Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // ✅ Create user (relies on unique constraints in schema)
-    const user = await prisma.user.create({
-      data: {
-        email,
-        employeeId,
-        fullName,
-        serviceId,
-        password: hashedPassword,
-        accountStatus: "PENDING",
-        role: "ADMIN", // or another default role as per your schema
-      },
-      select: {
-        id: true,
-        email: true,
-        fullName: true,
-        employeeId: true,
-        serviceId: true,
-        createdAt: true,
-      },
-    });
+    const user = await prisma.$transaction(async (tx) => {
+      // ✅ Create user (relies on unique constraints in schema)
+      const user = await tx.user.create({
+        data: {
+          email,
+          employeeId,
+          fullName,
+          serviceId,
+          password: hashedPassword,
+          accountStatus: "PENDING",
+          role: "ADMIN", // or another default role as per your schema
+        },
+        select: {
+          id: true,
+          email: true,
+          fullName: true,
+          employeeId: true,
+          serviceId: true,
+          createdAt: true,
+        },
+      });
 
-    // ✅ Create verification token (expires in 24h)
-    const token = uuidv4();
-    const expireOn = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
+      // ✅ Create verification token (expires in 24h)
+      const token = uuidv4();
+      const expireOn = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
 
-    const now = new Date();
-    const verificationRes = await prisma.userVerification.create({
-      data: {
-        userId: user.id,
-        token,
-        expireOn,
-        createdAt: now,
-        updatedAt: now,
-      },
-    });
+      const now = new Date();
+      const verificationRes = await tx.userVerification.create({
+        data: {
+          userId: user.id,
+          token,
+          expireOn,
+          createdAt: now,
+          updatedAt: now,
+        },
+      });
 
-    const verificationUrl =
-      process.env.AUTH_URL +
-      `/registration/verification/${verificationRes.token}`;
+      const verificationUrl =
+        process.env.AUTH_URL +
+        `/registration/verification/${verificationRes.token}`;
 
-    // Render the EmailVerification component to HTML
-    const emailHtml = await render(
-      EmailVerification({
-        userName: user.fullName as string,
-        verificationUrl,
-      })
-    );
+      // Render the EmailVerification component to HTML
+      const emailHtml = await render(
+        EmailVerification({
+          userName: user.fullName as string,
+          verificationUrl,
+        })
+      );
 
-    // Enviar OTP por correo electrónico
-    await resend.emails.send({
-      from: "ScaleUp Ads Agency <support@monirhrabby.info>",
-      to: [user.email as string],
-      subject: `Welcome to ScaleUp Ads Agency – Please verify your email`,
-      html: emailHtml,
+      // Enviar OTP por correo electrónico
+      await resend.emails.send({
+        from: "ScaleUp Ads Agency <support@monirhrabby.info>",
+        to: [user.email as string],
+        subject: `Welcome to ScaleUp Ads Agency – Please verify your email`,
+        html: emailHtml,
+      });
+
+      // create permissions in a single operation
+      await tx.permissions.createMany({
+        data: [
+          { name: "ISSUE_SHEET", userId: user.id },
+          { name: "UPDATE_SHEET", userId: user.id },
+        ],
+      });
+
+      return user;
     });
 
     return {
