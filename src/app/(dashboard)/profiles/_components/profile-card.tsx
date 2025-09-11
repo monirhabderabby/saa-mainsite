@@ -1,5 +1,5 @@
 "use client";
-import { deleteService } from "@/actions/services/delete";
+import { deleteProfile } from "@/actions/profiles/delete";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import AlertModal from "@/components/ui/custom/alert-modal";
@@ -9,22 +9,22 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Services } from "@prisma/client";
+import { Profile } from "@prisma/client";
 import { EllipsisVertical, Pencil, Trash } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import AddServiceDialog from "./add-service-modal";
+import AddProfileDialog from "./add-profile-dialog";
 
 interface Props {
-  data: Services;
+  data: Profile;
 }
-const ServiceCard = ({ data }: Props) => {
+const ProfileCard = ({ data }: Props) => {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
 
   const onDelete = () => {
     startTransition(() => {
-      deleteService(data.id).then((res) => {
+      deleteProfile(data.id).then((res) => {
         if (!res.success) {
           toast.error(res.message);
           return;
@@ -50,7 +50,7 @@ const ServiceCard = ({ data }: Props) => {
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem asChild>
-                  <AddServiceDialog
+                  <AddProfileDialog
                     trigger={
                       <Button
                         variant="ghost"
@@ -85,11 +85,11 @@ const ServiceCard = ({ data }: Props) => {
         onClose={() => setOpen(false)}
         onConfirm={onDelete}
         loading={pending}
-        title="Delete Service Permanently?"
+        title="Delete Profile Permanently?"
         message={`Deleting "${data.name}" will permanently remove this service from your system. Any appointments, records, or analytics associated with this service will be affected. This action cannot be undone.`}
       />
     </>
   );
 };
 
-export default ServiceCard;
+export default ProfileCard;

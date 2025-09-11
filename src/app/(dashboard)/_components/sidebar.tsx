@@ -8,6 +8,7 @@ import { Role } from "@prisma/client";
 import {
   Building,
   FileText,
+  Laptop,
   LayoutDashboard,
   LogOut,
   Settings,
@@ -46,6 +47,13 @@ const routes = [
     label: "Services",
     icon: FileText,
     href: "/services",
+    access: ["SUPER_ADMIN"] as Role[],
+  },
+  {
+    id: 4,
+    label: "Profiles",
+    icon: Laptop,
+    href: "/profiles",
     access: ["SUPER_ADMIN"] as Role[],
   },
   {
