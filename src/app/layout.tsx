@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/providers/theme/theme-provider";
 import type { Metadata } from "next";
 import { Raleway } from "next/font/google";
+import NextTopLoader from "nextjs-toploader";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -32,6 +33,8 @@ export default async function RootLayout({
           {children}
         </ThemeProvider>{" "}
         <Toaster />
+
+        <NextTopLoader showSpinner={false} color="#FFC300" />
       </body>
     </html>
   );

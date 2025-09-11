@@ -2,6 +2,7 @@ import { User } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import moment from "moment";
 import AccountStatusAction from "./table-actions/account-status-action";
+import EmployeeAction from "./table-actions/employee-action";
 
 export const employeeColumns: ColumnDef<User>[] = [
   {
@@ -29,5 +30,9 @@ export const employeeColumns: ColumnDef<User>[] = [
 
       return <p>{moment(date).format("DD MMM, YYYY")}</p>;
     },
+  },
+  {
+    header: "Action",
+    cell: ({ row }) => <EmployeeAction data={row.original} />,
   },
 ];

@@ -46,7 +46,7 @@ const routes = [
     label: "Services",
     icon: FileText,
     href: "/services",
-    access: ["ADMIN", "SUPER_ADMIN"] as Role[],
+    access: ["SUPER_ADMIN"] as Role[],
   },
   {
     id: 4,
@@ -73,6 +73,7 @@ const Sidebar = ({ cu }: Props) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [mounted, setMounted] = useState(false);
 
   const pathname = usePathname();
 
@@ -97,6 +98,10 @@ const Sidebar = ({ cu }: Props) => {
     };
   }, []);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // inside Sidebar component, before return
   const accessibleRoutes = routes.filter((route) =>
     route.access.includes(cu.role)
@@ -109,11 +114,13 @@ const Sidebar = ({ cu }: Props) => {
           {/* Logo */}
           <div className="border-b p-4 flex justify-center items-center border-black/30 dark:border-white/20">
             <div className="relative h-[100px] w-[150px]">
-              <Image
-                src={theme === "light" ? logoSrcBlack : logoSrcWhite}
-                alt="logo"
-                fill
-              />
+              {mounted && (
+                <Image
+                  src={theme === "light" ? logoSrcBlack : logoSrcWhite}
+                  alt="logo"
+                  fill
+                />
+              )}
             </div>
           </div>
 

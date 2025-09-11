@@ -90,7 +90,7 @@ const AccountStatusForm = ({ data }: Props) => {
             <FormItem>
               <FormControl>
                 <Select value={field.value} onValueChange={handleChange}>
-                  <SelectTrigger className="w-[200px] shadow-none">
+                  <SelectTrigger className="w-fit shadow-none">
                     <SelectValue
                       placeholder="Select account status"
                       className="shadow-none"
