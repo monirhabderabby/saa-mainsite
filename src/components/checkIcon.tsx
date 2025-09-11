@@ -1,5 +1,7 @@
+"use client";
 import { motion } from "framer-motion";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function CheckIcon(props: any) {
   return (
     <svg
@@ -16,7 +18,7 @@ export function CheckIcon(props: any) {
           delay: props?.delay || 0.2,
           type: "tween",
           ease: "easeOut",
-          duration: 0.3,
+          duration: 0.5,
         }}
         strokeLinecap="round"
         strokeLinejoin="round"
