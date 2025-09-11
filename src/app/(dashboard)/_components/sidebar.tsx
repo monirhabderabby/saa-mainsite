@@ -3,7 +3,7 @@
 import { logoutAction } from "@/actions/auth/logout";
 import { Button } from "@/components/ui/button";
 import AlertModal from "@/components/ui/custom/alert-modal";
-import { logoSrc } from "@/constants/assets";
+import { logoSrcBlack, logoSrcWhite } from "@/constants/assets";
 import { Role } from "@prisma/client";
 import {
   Building,
@@ -13,6 +13,7 @@ import {
   Settings,
   Users,
 } from "lucide-react";
+import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -75,6 +76,8 @@ const Sidebar = ({ cu }: Props) => {
 
   const pathname = usePathname();
 
+  const { theme } = useTheme();
+
   const onLogout = () => {
     setIsLoading(true);
     startTransition(() => {
@@ -106,7 +109,11 @@ const Sidebar = ({ cu }: Props) => {
           {/* Logo */}
           <div className="border-b p-4 flex justify-center items-center border-black/30 dark:border-white/20">
             <div className="relative h-[100px] w-[150px]">
-              <Image src={logoSrc} alt="logo" fill />
+              <Image
+                src={theme === "light" ? logoSrcBlack : logoSrcWhite}
+                alt="logo"
+                fill
+              />
             </div>
           </div>
 
