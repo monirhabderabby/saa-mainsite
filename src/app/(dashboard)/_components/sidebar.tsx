@@ -12,6 +12,7 @@ import {
   LayoutDashboard,
   LogOut,
   Settings,
+  Sheet,
   Users,
 } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -63,9 +64,21 @@ const routes = [
     href: "/dashboard/teams",
     access: ["ADMIN", "SUPER_ADMIN"] as Role[],
   },
+  {
+    id: 5,
+    label: "Update Sheet",
+    icon: Sheet,
+    href: "/update-sheet",
+    access: [
+      "ADMIN",
+      "SUPER_ADMIN",
+      "OPERATION_MEMBER",
+      "SALES_MEMBER",
+    ] as Role[],
+  },
 
   {
-    id: 8,
+    id: 6,
     label: "Settings",
     icon: Settings,
     href: "/dashboard/settings",
