@@ -48,7 +48,8 @@ async function verifyUser(
     });
 
     return {
-      message: "Congratulations, your email has been verified.",
+      message:
+        "Congratulations, your email has been successfully verified. The final step is to have your account activated by your Operation Manager or authorized personnel.",
       verified: true,
     };
   } catch (err) {
@@ -80,7 +81,9 @@ const Page = async ({ params }: { params: { token: string } }) => {
             </div>
           )}
           <CardTitle className="text-center pt-3">Verification</CardTitle>
-          <CardDescription className="text-center">{message}</CardDescription>
+          <CardDescription className="text-center max-w-[400px]">
+            {message}
+          </CardDescription>
 
           <div className="w-full flex justify-center">
             <Button asChild effect="hoverUnderline" variant="link">

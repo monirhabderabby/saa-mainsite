@@ -32,12 +32,18 @@ import {
   RegistrationSchemaValues,
 } from "@/schemas/auth/registration";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Role } from "@prisma/client";
 import { Loader2, MoveLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+
+export const allowedRegistrationRoles = [
+  { id: Role.OPERATION_MEMBER, name: "Operation Member" },
+  { id: Role.SALES_MEMBER, name: "Sales Member" },
+];
 
 interface Props {
   services: { id: string; name: string }[];
@@ -65,7 +71,6 @@ export default function RegistrationForm({ services }: Props) {
         form.reset({
           fullName: "",
           password: "",
-          confirmPassword: "",
           employeeId: "",
           serviceId: "",
         });
@@ -92,7 +97,7 @@ export default function RegistrationForm({ services }: Props) {
       </CardHeader>
       <ResizablePanel.Root value={state}>
         <ResizablePanel.Content value="form">
-          <CardContent className="w-full md:w-[500px]">
+          <CardContent className="w-full md:w-fit">
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -122,55 +127,57 @@ export default function RegistrationForm({ services }: Props) {
                   </div>
                 </div>
 
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder=""
-                          type="email"
-                          {...field}
-                          disabled={pending}
-                        />
-                      </FormControl>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder=""
+                            type="email"
+                            {...field}
+                            disabled={pending}
+                          />
+                        </FormControl>
 
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="serviceId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Service</FormLabel>
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a service" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {services.map((item) => (
-                              <SelectItem value={item.id} key={item.id}>
-                                {item.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="serviceId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Service</FormLabel>
+                        <FormControl>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select a service" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {services.map((item) => (
+                                <SelectItem value={item.id} key={item.id}>
+                                  {item.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
 
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <FormField
                   control={form.control}
@@ -191,46 +198,59 @@ export default function RegistrationForm({ services }: Props) {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Confirm Password</FormLabel>
-                      <FormControl>
-                        <PasswordInput
-                          placeholder=""
-                          {...field}
-                          disabled={pending}
-                        />
-                      </FormControl>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <FormField
+                    control={form.control}
+                    name="employeeId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Employee ID</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder=""
+                            type=""
+                            {...field}
+                            disabled={pending}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Collect this from HR for verification and records
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="employeeId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Employee ID</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder=""
-                          type=""
-                          {...field}
-                          disabled={pending}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Collect this from HR for verification and records
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={form.control}
+                    name="role"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Role</FormLabel>
+                        <FormControl>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select a role" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {allowedRegistrationRoles.map((item) => (
+                                <SelectItem value={item.id} key={item.id}>
+                                  {item.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
                 <Button type="submit" className="w-full" disabled={pending}>
                   Create Account{" "}
                   {pending && <Loader2 className="animate-spin" />}

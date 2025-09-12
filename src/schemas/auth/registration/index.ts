@@ -1,28 +1,24 @@
 import { z } from "zod";
 
-export const registrationSchema = z
-  .object({
-    fullName: z.string().min(1, { message: "Full name is required" }),
+export const registrationSchema = z.object({
+  fullName: z.string().min(1, { message: "Full name is required" }),
 
-    serviceId: z.string().min(1, { message: "Service ID is required" }),
-    email: z
-      .string()
-      .min(1, { message: "Email is required" })
-      .email({ message: "Please enter a valid email address" }),
+  serviceId: z.string().min(1, { message: "Service ID is required" }),
 
-    password: z
-      .string()
-      .min(6, { message: "Password must be at least 6 characters long" }),
+  email: z
+    .string()
+    .min(1, { message: "Email is required" })
+    .email({ message: "Please enter a valid email address" }),
 
-    confirmPassword: z
-      .string()
-      .min(1, { message: "Confirm password is required" }),
+  password: z
+    .string()
+    .min(6, { message: "Password must be at least 6 characters long" }),
 
-    employeeId: z.string().min(1, { message: "Employee ID is required" }),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"], // error shows under confirmPassword field
-  });
+  employeeId: z.string().min(1, { message: "Employee ID is required" }),
+
+  role: z.enum(["OPERATION_MEMBER", "SALES_MEMBER"], {
+    message: "Role must be either OPERATION_MEMBER or SALES_MEMBER",
+  }),
+});
 
 export type RegistrationSchemaValues = z.infer<typeof registrationSchema>;
