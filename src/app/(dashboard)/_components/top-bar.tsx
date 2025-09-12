@@ -9,7 +9,7 @@ interface Props {
 
 const Topbar = ({ name }: Props) => {
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b dark:border-white/20  px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background dark:border-white/20  px-6">
       <div>
         <h1 className="text-lg font-semibold">SAA (Dashboard)</h1>
         <p className="text-sm text-muted-foreground">{name}</p>
