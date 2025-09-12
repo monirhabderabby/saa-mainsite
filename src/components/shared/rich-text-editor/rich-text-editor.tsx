@@ -1,5 +1,6 @@
 "use client";
 
+import CharacterCount from "@tiptap/extension-character-count";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import RestrictedWords from "./restricted-words-extension";
@@ -21,13 +22,10 @@ export default function RichTextEditor({
     extensions: [
       StarterKit.configure({}),
       RestrictedWords.configure({ words: restrictedWords }),
+      CharacterCount.configure({ limit: maxChars }),
     ],
     content: value,
     immediatelyRender: false,
-    onUpdate: ({ editor }) => {
-      const text = editor.getText();
-      if (onChange) onChange(text);
-    },
     editorProps: {
       handlePaste: (view, event) => {
         const clipboardData = event.clipboardData;
@@ -36,19 +34,56 @@ export default function RichTextEditor({
         const html = clipboardData.getData("text/html");
         const text = clipboardData.getData("text/plain");
 
-        // ✅ If HTML exists, let ProseMirror handle it (don’t force insertContent)
+        let cleanText = text;
+
         if (html) {
-          return false; // allow default Tiptap handling
+          // Convert HTML to plain text while preserving line breaks
+          const tempDiv = document.createElement("div");
+          tempDiv.innerHTML = html;
+
+          // Replace <div>, <br>, <p> with newlines
+          const walk = (node: HTMLElement | ChildNode): string => {
+            if (node.nodeType === Node.TEXT_NODE) return node.textContent || "";
+            if (node.nodeType !== Node.ELEMENT_NODE) return "";
+
+            const el = node as HTMLElement;
+            let content = "";
+            el.childNodes.forEach((child) => {
+              content += walk(child);
+            });
+
+            if (el.tagName === "BR") return content + "\n";
+            if (el.tagName === "P" || el.tagName === "DIV")
+              return content + "\n";
+            return content;
+          };
+
+          cleanText = walk(tempDiv);
         }
 
-        // ✅ If only plain text, insert safely
-        if (text) {
-          editor?.commands.insertContent(text);
-          return true;
+        if (cleanText) {
+          // Split into paragraphs, trim, remove empty lines
+          const paragraphs = cleanText
+            .split(/\n+/)
+            .map((p) => p.trim())
+            .filter(Boolean);
+
+          // Wrap each paragraph in <p> for proper spacing
+          const content = paragraphs.map((p) => `<p>${p}</p>`).join("");
+
+          editor?.commands.insertContent(content);
+          return true; // Prevent default paste handling
         }
 
         return false;
       },
+    },
+    onUpdate: ({ editor }) => {
+      const text = editor.getText();
+      if (text.length > maxChars) {
+        editor.commands.setContent(text.slice(0, maxChars));
+      }
+      onChange?.(text.slice(0, maxChars));
     },
   });
 
@@ -59,6 +94,7 @@ export default function RichTextEditor({
       <style jsx global>{`
         .ProseMirror {
           min-height: 150px;
+          white-space: pre-wrap; /* preserve spacing */
         }
         .ProseMirror:focus {
           outline: none;
@@ -69,8 +105,15 @@ export default function RichTextEditor({
         editor={editor}
         className="border rounded-md p-3 min-h-[150px] prose prose-sm max-w-none"
       />
-      <p className="text-sm text-muted-foreground">
-        {editor.storage.characterCount?.characters() ?? 0}/{maxChars}
+      <p
+        className={`text-sm ${
+          (editor.storage.characterCount?.characters() ?? 0) > maxChars * 0.9
+            ? "text-red-500"
+            : "text-muted-foreground"
+        }`}
+      >
+        {editor.storage.characterCount?.characters() ?? 0} of {maxChars}{" "}
+        characters used
       </p>
     </div>
   );
