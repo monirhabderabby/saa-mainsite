@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import TanstackProvider from "@/providers/tanstack/tanstack-provider";
 import { ThemeProvider } from "@/providers/theme/theme-provider";
 import type { Metadata } from "next";
 import { Raleway } from "next/font/google";
@@ -30,10 +31,9 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <TanstackProvider>{children}</TanstackProvider>
         </ThemeProvider>{" "}
         <Toaster />
-
         <NextTopLoader showSpinner={false} color="#FFC300" />
       </body>
     </html>

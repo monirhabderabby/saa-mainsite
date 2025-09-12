@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import FilterContainer from "./_components/filter-container";
+import TableContainer from "./_components/tables/table-container";
 
 const Page = async () => {
   return (
@@ -31,7 +32,9 @@ const Page = async () => {
           </div>
         </div>
       </CardHeader>
-      <CardContent>fsdf</CardContent>
+      <CardContent>
+        <TableContainer />
+      </CardContent>
     </Card>
   );
 };
