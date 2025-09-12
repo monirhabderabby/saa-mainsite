@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import CharacterCount from "@tiptap/extension-character-count";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -22,7 +23,7 @@ export default function RichTextEditor({
     extensions: [
       StarterKit.configure({}),
       RestrictedWords.configure({ words: restrictedWords }),
-      CharacterCount.configure({ limit: maxChars }),
+      CharacterCount.configure({}),
     ],
     content: value,
     immediatelyRender: false,
@@ -80,14 +81,14 @@ export default function RichTextEditor({
     },
     onUpdate: ({ editor }) => {
       const text = editor.getText();
-      if (text.length > maxChars) {
-        editor.commands.setContent(text.slice(0, maxChars));
-      }
-      onChange?.(text.slice(0, maxChars));
+      onChange?.(text); // allow full text, even beyond maxChars
+      //   onCharCountChange?.(editor.storage.characterCount?.characters() ?? 0);
     },
   });
 
   if (!editor) return null;
+
+  const currentCount = editor.storage.characterCount?.characters() ?? 0;
 
   return (
     <div className="space-y-2">
@@ -103,17 +104,18 @@ export default function RichTextEditor({
 
       <EditorContent
         editor={editor}
-        className="border rounded-md p-3 min-h-[150px] prose prose-sm max-w-none"
+        className={cn(
+          "border rounded-md p-3 min-h-[150px] prose prose-sm max-w-none",
+          currentCount > maxChars && "border-red-500"
+        )}
       />
       <p
         className={`text-sm ${
-          (editor.storage.characterCount?.characters() ?? 0) > maxChars * 0.9
-            ? "text-red-500"
-            : "text-muted-foreground"
+          currentCount > maxChars ? "text-red-500" : "text-muted-foreground"
         }`}
       >
-        {editor.storage.characterCount?.characters() ?? 0} of {maxChars}{" "}
-        characters used
+        {currentCount} of {maxChars} characters used
+        {currentCount > maxChars && " - Limit exceeded!"}
       </p>
     </div>
   );

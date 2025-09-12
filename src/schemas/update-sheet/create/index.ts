@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const restrictedWords = ["pay", "email", "gmail", "phone"];
+export const restrictedWords = ["pay", "email", "gmail", "mobile"];
 
 export const updateSheetCreateSchema = z.object({
   profileId: z
@@ -32,13 +32,9 @@ export const updateSheetCreateSchema = z.object({
       message: "You must select an update status",
     })
     .min(1),
-  message: z
-    .string()
-    .max(2500, "Message cannot exceed 2500 characters")
-    .refine(
-      (val) => !restrictedWords.some((w) => val.toLowerCase().includes(w)),
-      { message: "Message contains restricted words." }
-    ),
+  message: z.string().refine((val) => val.length <= 2500, {
+    message: "Message cannot exceed 2500 characters",
+  }),
 });
 
 export type UpdateSheetCreateSchema = z.infer<typeof updateSheetCreateSchema>;
