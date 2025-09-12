@@ -1,5 +1,4 @@
 import { auth } from "@/auth";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 import Sidebar from "./_components/sidebar";
@@ -22,10 +21,8 @@ const SiteLayout = async ({ children }: Props) => {
         {/* Top Bar */}
         <Topbar name={"Monir Hossain Rabby" as string} />
 
-        <div className=" bg-[#F5F7FA] dark:bg-background p-0">
-          <ScrollArea className="h-[calc(100vh-65px)] p-0">
-            <div className="p-6">{children}</div>
-          </ScrollArea>
+        <div className=" bg-[#F5F7FA] dark:bg-background p-6 min-h-[calc(100vh-65px)]">
+          {children}
         </div>
       </div>
     </div>

@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getTextFromHtml } from "@/lib/utils";
 import {
   restrictedWords,
   UpdateSheetCreateSchema,
@@ -32,7 +33,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Profile, UpdateTo } from "@prisma/client";
 import { Loader2 } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useTransition } from "react";
+import { useMemo, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -71,6 +72,21 @@ export default function AddUpdateForm({ profiles }: Props) {
     resolver: zodResolver(updateSheetCreateSchema),
     defaultValues: {},
   });
+
+  const messageHtml = form.watch("message");
+
+  // convert to plain text
+  const messageText = useMemo(() => {
+    return getTextFromHtml(messageHtml || "").toLowerCase();
+  }, [messageHtml]);
+
+  // check restricted words
+  const restrictedFound = useMemo(() => {
+    if (!messageText) return [];
+    return restrictedWords.filter((word) =>
+      messageText.includes(word.toLowerCase())
+    );
+  }, [messageText]);
 
   function onSubmit(values: UpdateSheetCreateSchema) {
     startTransition(() => {
@@ -251,7 +267,6 @@ export default function AddUpdateForm({ profiles }: Props) {
             <FormItem>
               <FormLabel>Message</FormLabel>
               <RichTextEditor
-                key={form.getValues("message")}
                 value={form.watch("message")}
                 onChange={field.onChange}
                 restrictedWords={restrictedWords}
@@ -260,8 +275,18 @@ export default function AddUpdateForm({ profiles }: Props) {
             </FormItem>
           )}
         />
+
+        {restrictedFound.length > 0 && (
+          <div className="text-red-500 text-sm mt-2">
+            ⚠️ Warning: Your message contains restricted words:{" "}
+            <strong>{restrictedFound.join(", ")}</strong>
+          </div>
+        )}
         <div className="w-full flex justify-end">
-          <Button type="submit" disabled={pending}>
+          <Button
+            type="submit"
+            disabled={pending || restrictedFound.length > 0}
+          >
             Submit {pending && <Loader2 className="animate-spin" />}
           </Button>
         </div>

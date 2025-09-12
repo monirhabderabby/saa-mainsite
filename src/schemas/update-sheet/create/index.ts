@@ -32,15 +32,21 @@ export const updateSheetCreateSchema = z.object({
   updateTo: z.enum(Object.values(UpdateTo) as [UpdateTo, ...UpdateTo[]], {
     message: "You must select a valid update status",
   }),
-  message: z.string().refine(
-    (val) => {
-      const text = getTextFromHtml(val); // convert HTML -> plain text
-      return text.length <= 2500;
-    },
-    {
-      message: "Message cannot exceed 2500 characters",
-    }
-  ),
+  message: z
+    .string()
+    .refine(
+      (val) => {
+        const text = getTextFromHtml(val); // convert HTML -> plain text
+        return text.length <= 2500;
+      },
+      {
+        message: "Message cannot exceed 2500 characters",
+      }
+    )
+    .refine((val) => {
+      const text = getTextFromHtml(val).toLowerCase();
+      return !restrictedWords.some((word) => text.includes(word.toLowerCase()));
+    }),
 });
 
 export type UpdateSheetCreateSchema = z.infer<typeof updateSheetCreateSchema>;
