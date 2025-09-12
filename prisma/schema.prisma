@@ -39,14 +39,17 @@ model User {
     serviceId String?   @db.ObjectId
     service   Services? @relation(fields: [serviceId], references: [id])
 
-    accounts      Account[]
-    sessions      Session[]
-    permissions   Permissions[]
-    userTeams     UserTeam[]
-    Authenticator Authenticator[]
+    accounts            Account[]
+    sessions            Session[]
+    permissions         Permissions[]
+    userTeams           UserTeam[]
+    Authenticator       Authenticator[]
+    updateSheetsEntries UpdateSheet[]   @relation("UpdateEntries")
+    tlCheckEntries      UpdateSheet[]   @relation("TLChecks")
+    doneByEntries       UpdateSheet[]   @relation("DoneByChecks")
 
     createdAt DateTime @default(now())
-    updatedAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model UserVerification {
@@ -56,7 +59,7 @@ model UserVerification {
     token    String   @unique
 
     createdAt DateTime @default(now())
-    updatedAt DateTime
+    updatedAt DateTime @updatedAt
 }
 
 model Services {
@@ -67,14 +70,18 @@ model Services {
     users User[]
 
     createdAt DateTime @default(now())
-    updatedAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model Profile {
-    id        String   @id @default(auto()) @map("_id") @db.ObjectId
-    name      String
+    id   String @id @default(auto()) @map("_id") @db.ObjectId
+    name String
+
+    // ref
+    updateSheets UpdateSheet[]
+
     createdAt DateTime @default(now())
-    updatedAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model Team {
@@ -87,7 +94,7 @@ model Team {
     service   Services?  @relation(fields: [serviceId], references: [id])
 
     createdAt DateTime @default(now())
-    updatedAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model Permissions {
@@ -107,7 +114,7 @@ model Permissions {
     isMessageDoneByAllowed  Boolean @default(false)
 
     createdAt DateTime @default(now())
-    updatedAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model Account {
@@ -125,7 +132,7 @@ model Account {
     session_state     String?
 
     createdAt DateTime @default(now())
-    updatedAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -141,7 +148,7 @@ model Session {
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     createdAt DateTime @default(now())
-    updatedAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model VerificationToken {
@@ -176,4 +183,44 @@ model UserTeam {
 
     user User @relation(fields: [userId], references: [id])
     team Team @relation(fields: [teamId], references: [id])
+}
+
+enum UpdateTo {
+    ORDER_PAGE_UPDATE
+    INBOX_PAGE_UPDATE
+    DELIVERY
+    INBOX_AND_ORDER_PAGE_UPDATE
+    UPWORK_INBOX
+    REVIEW_RESPONSE
+    FIVERR_SUPPORT_REPLY
+}
+
+model UpdateSheet {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    clientName String
+    orderId    String @unique
+
+    message String
+
+    attachments          String
+    commentFromOperation String
+    commentFromSales     String
+    updateTo             UpdateTo
+
+    doneById String @db.ObjectId
+    doneBy   User   @relation("DoneByChecks", fields: [doneById], references: [id], onDelete: Cascade)
+
+    tlId String @db.ObjectId
+    tlBy User   @relation("TLChecks", fields: [tlId], references: [id], onDelete: Cascade)
+
+    updateById String @db.ObjectId
+    updateBy   User   @relation("UpdateEntries", fields: [updateById], references: [id], onDelete: Cascade)
+
+    profileId String  @db.ObjectId
+    profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    sendAt    DateTime
 }

@@ -8,8 +8,11 @@ const Page = async () => {
   const services = await prisma.profile.findMany();
   return (
     <div>
-      <div className="flex justify-between">
-        <h1 className="font-semibold leading-none tracking-tight"> Profiles</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="font-semibold leading-none tracking-tight text-[20px]">
+          {" "}
+          Profiles
+        </h1>
 
         <AddProfileDialog trigger={<Button>Create Profile</Button>} />
       </div>
