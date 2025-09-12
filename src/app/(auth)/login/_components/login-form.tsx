@@ -51,14 +51,14 @@ export default function LoginForm() {
         >
           <FormField
             control={form.control}
-            name="email"
+            name="employeeId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>Employee Id</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Enter email here..."
-                    type="email"
+                    placeholder="Enter employee id here..."
+                    type="text"
                     {...field}
                   />
                 </FormControl>

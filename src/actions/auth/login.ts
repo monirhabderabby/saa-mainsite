@@ -16,12 +16,12 @@ export async function loginAction(data: LoginSchemaValues) {
     };
   }
 
-  const { email, password } = parsed.data;
+  const { employeeId, password } = parsed.data;
 
   try {
     // 2. Find user by email
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: { employeeId },
     });
 
     if (!user) {
@@ -52,7 +52,7 @@ export async function loginAction(data: LoginSchemaValues) {
     // 4. Success – return user data (omit sensitive fields)
 
     await signIn("credentials", {
-      email: email,
+      email: user.email,
       password: password,
       redirect: false,
     });
