@@ -203,16 +203,16 @@ model UpdateSheet {
 
     message String
 
-    attachments          String
-    commentFromOperation String
-    commentFromSales     String
+    attachments          String?
+    commentFromOperation String?
+    commentFromSales     String?
     updateTo             UpdateTo
 
-    doneById String @db.ObjectId
-    doneBy   User   @relation("DoneByChecks", fields: [doneById], references: [id], onDelete: Cascade)
+    doneById String? @db.ObjectId
+    doneBy   User?   @relation("DoneByChecks", fields: [doneById], references: [id], onDelete: Cascade)
 
-    tlId String @db.ObjectId
-    tlBy User   @relation("TLChecks", fields: [tlId], references: [id], onDelete: Cascade)
+    tlId String? @db.ObjectId
+    tlBy User?   @relation("TLChecks", fields: [tlId], references: [id], onDelete: Cascade)
 
     updateById String @db.ObjectId
     updateBy   User   @relation("UpdateEntries", fields: [updateById], references: [id], onDelete: Cascade)

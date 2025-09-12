@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Link from "next/link";
 import FilterContainer from "./_components/filter-container";
 
 const Page = async () => {
@@ -22,11 +23,15 @@ const Page = async () => {
           </div>
           <div className="flex items-center gap-5">
             <FilterContainer />
-            <Button effect="gooeyLeft">Add Entry</Button>
+            <Button effect="gooeyLeft" asChild>
+              <Link href="/update-sheet/add-entry" className="w-full">
+                Add Entry
+              </Link>
+            </Button>
           </div>
         </div>
       </CardHeader>
-      <CardContent></CardContent>
+      <CardContent>fsdf</CardContent>
     </Card>
   );
 };
