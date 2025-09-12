@@ -1,3 +1,5 @@
+import { getTextFromHtml } from "@/lib/utils";
+import { UpdateTo } from "@prisma/client";
 import { z } from "zod";
 
 export const restrictedWords = ["pay", "email", "gmail", "mobile"];
@@ -27,14 +29,18 @@ export const updateSheetCreateSchema = z.object({
 
   commentFromSales: z.string().optional(), // totally optional
 
-  updateTo: z
-    .string({
-      message: "You must select an update status",
-    })
-    .min(1),
-  message: z.string().refine((val) => val.length <= 2500, {
-    message: "Message cannot exceed 2500 characters",
+  updateTo: z.enum(Object.values(UpdateTo) as [UpdateTo, ...UpdateTo[]], {
+    message: "You must select a valid update status",
   }),
+  message: z.string().refine(
+    (val) => {
+      const text = getTextFromHtml(val); // convert HTML -> plain text
+      return text.length <= 2500;
+    },
+    {
+      message: "Message cannot exceed 2500 characters",
+    }
+  ),
 });
 
 export type UpdateSheetCreateSchema = z.infer<typeof updateSheetCreateSchema>;

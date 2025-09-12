@@ -5,6 +5,7 @@ const RichTextEditor = dynamic(
     ssr: false,
   }
 );
+import { createUpdateSheetEntries } from "@/actions/update-sheet/create";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -28,8 +29,10 @@ import {
   updateSheetCreateSchema,
 } from "@/schemas/update-sheet/create";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Profile } from "@prisma/client";
+import { Profile, UpdateTo } from "@prisma/client";
+import { Loader2 } from "lucide-react";
 import dynamic from "next/dynamic";
+import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -37,32 +40,66 @@ interface Props {
   profiles: Profile[];
 }
 
+export const allowUpdateTo = [
+  { id: UpdateTo.ORDER_PAGE_UPDATE, name: "Order Page Update" },
+  { id: UpdateTo.INBOX_PAGE_UPDATE, name: "Inbox Page Update" },
+  {
+    id: UpdateTo.INBOX_AND_ORDER_PAGE_UPDATE,
+    name: "Inbox & Order Page Update",
+  },
+  {
+    id: UpdateTo.DELIVERY,
+    name: "Delivery",
+  },
+  {
+    id: UpdateTo.UPWORK_INBOX,
+    name: "Upwork Inbox",
+  },
+  {
+    id: UpdateTo.REVIEW_RESPONSE,
+    name: "Review Response",
+  },
+  {
+    id: UpdateTo.FIVERR_SUPPORT_REPLY,
+    name: "Fiverr Support Reply",
+  },
+];
+
 export default function AddUpdateForm({ profiles }: Props) {
+  const [pending, startTransition] = useTransition();
   const form = useForm<UpdateSheetCreateSchema>({
     resolver: zodResolver(updateSheetCreateSchema),
     defaultValues: {},
   });
 
   function onSubmit(values: UpdateSheetCreateSchema) {
-    try {
-      console.log(values);
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      );
-    } catch (error) {
-      console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
-    }
+    startTransition(() => {
+      createUpdateSheetEntries(values).then((res) => {
+        if (!res.success) {
+          toast.error(res.message);
+          return;
+        }
+
+        // handle success
+        form.reset({
+          profileId: "",
+          clientName: "",
+          orderId: "",
+          attachments: "",
+          commentFromOperation: "",
+          commentFromSales: "",
+          updateTo: undefined,
+          message: "",
+        });
+
+        toast.success(res.message);
+      });
+    });
   }
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-5 mx-auto pb-10"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5  pb-10">
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-4">
             <FormField
@@ -195,9 +232,11 @@ export default function AddUpdateForm({ profiles }: Props) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="m@example.com">m@example.com</SelectItem>
-                  <SelectItem value="m@google.com">m@google.com</SelectItem>
-                  <SelectItem value="m@support.com">m@support.com</SelectItem>
+                  {allowUpdateTo.map((item) => (
+                    <SelectItem value={item.id} key={item.id}>
+                      {item.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
 
@@ -212,16 +251,20 @@ export default function AddUpdateForm({ profiles }: Props) {
             <FormItem>
               <FormLabel>Message</FormLabel>
               <RichTextEditor
-                value={field.value}
+                key={form.getValues("message")}
+                value={form.watch("message")}
                 onChange={field.onChange}
                 restrictedWords={restrictedWords}
                 maxChars={2500}
               />
-              <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <div className="w-full flex justify-end">
+          <Button type="submit" disabled={pending}>
+            Submit {pending && <Loader2 className="animate-spin" />}
+          </Button>
+        </div>
       </form>
     </Form>
   );

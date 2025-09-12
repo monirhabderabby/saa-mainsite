@@ -35,53 +35,39 @@ export default function RichTextEditor({
         const html = clipboardData.getData("text/html");
         const text = clipboardData.getData("text/plain");
 
-        let cleanText = text;
-
         if (html) {
-          // Convert HTML to plain text while preserving line breaks
-          const tempDiv = document.createElement("div");
-          tempDiv.innerHTML = html;
+          // Use a DOM parser to clean up unwanted tags
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, "text/html");
 
-          // Replace <div>, <br>, <p> with newlines
-          const walk = (node: HTMLElement | ChildNode): string => {
-            if (node.nodeType === Node.TEXT_NODE) return node.textContent || "";
-            if (node.nodeType !== Node.ELEMENT_NODE) return "";
+          // Remove script/style tags
+          doc.querySelectorAll("script, style").forEach((el) => el.remove());
 
-            const el = node as HTMLElement;
-            let content = "";
-            el.childNodes.forEach((child) => {
-              content += walk(child);
+          // Optionally strip other unwanted attributes
+          doc.body.querySelectorAll("*").forEach((el) => {
+            Array.from(el.attributes).forEach((attr) => {
+              if (!["href", "src", "alt"].includes(attr.name))
+                el.removeAttribute(attr.name);
             });
+          });
 
-            if (el.tagName === "BR") return content + "\n";
-            if (el.tagName === "P" || el.tagName === "DIV")
-              return content + "\n";
-            return content;
-          };
-
-          cleanText = walk(tempDiv);
+          // Insert sanitized HTML into editor
+          editor?.commands.insertContent(doc.body.innerHTML);
+          return true;
         }
 
-        if (cleanText) {
-          // Split into paragraphs, trim, remove empty lines
-          const paragraphs = cleanText
-            .split(/\n+/)
-            .map((p) => p.trim())
-            .filter(Boolean);
-
-          // Wrap each paragraph in <p> for proper spacing
-          const content = paragraphs.map((p) => `<p>${p}</p>`).join("");
-
-          editor?.commands.insertContent(content);
-          return true; // Prevent default paste handling
+        if (text) {
+          editor?.commands.insertContent(text.replace(/\n+/g, "<p></p>"));
+          return true;
         }
 
         return false;
       },
     },
     onUpdate: ({ editor }) => {
-      const text = editor.getText();
-      onChange?.(text); // allow full text, even beyond maxChars
+      const html = editor.getHTML(); // gets full rich text content
+      // const text = editor.getText();
+      onChange?.(html); // allow full text, even beyond maxChars
       //   onCharCountChange?.(editor.storage.characterCount?.characters() ?? 0);
     },
   });

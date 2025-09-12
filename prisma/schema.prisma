@@ -199,7 +199,7 @@ model UpdateSheet {
     id String @id @default(auto()) @map("_id") @db.ObjectId
 
     clientName String
-    orderId    String @unique
+    orderId    String
 
     message String
 
@@ -220,7 +220,7 @@ model UpdateSheet {
     profileId String  @db.ObjectId
     profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    sendAt    DateTime
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    sendAt    DateTime?
 }
