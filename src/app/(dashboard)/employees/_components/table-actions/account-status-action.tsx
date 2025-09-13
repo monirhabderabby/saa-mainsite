@@ -45,39 +45,29 @@ const AccountStatusForm = ({ data }: Props) => {
   const [pending, startTransition] = useTransition();
   const [pendingValue, setPendingValue] = useState<AccountStatus | null>(null);
 
-  const handleChange = (value: AccountStatus) => {
-    setPendingValue(value);
-    setIsModalOpen(true); // open confirmation modal
-  };
-
   const handleConfirm = () => {
-    if (pendingValue) {
-      // update the form value and submit
-      form.setValue("accountStatus", pendingValue);
-      form.handleSubmit(onSubmit)();
-      setPendingValue(null);
-    }
-  };
+    if (!pendingValue) return;
 
-  const handleCancel = () => {
-    setPendingValue(null);
-    setIsModalOpen(false);
-  };
-
-  const onSubmit = (values: UserStatusSchemaType) => {
     startTransition(() => {
-      statusUpdate(values).then((res) => {
+      statusUpdate({ id: data.id, accountStatus: pendingValue }).then((res) => {
         if (!res.success) {
           toast.error(res.message);
           return;
         }
 
-        // handle success
+        // Success: update the form value
+        form.setValue("accountStatus", pendingValue);
+
         toast.success(res.message);
         setIsModalOpen(false);
+        setPendingValue(null);
       });
     });
-    // call your API to update user status here
+  };
+
+  const handleCancel = () => {
+    setPendingValue(null);
+    setIsModalOpen(false);
   };
 
   return (
@@ -89,7 +79,13 @@ const AccountStatusForm = ({ data }: Props) => {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Select value={field.value} onValueChange={handleChange}>
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => {
+                    setPendingValue(value as AccountStatus); // store for confirmation
+                    setIsModalOpen(true);
+                  }}
+                >
                   <SelectTrigger className="w-fit shadow-none">
                     <SelectValue
                       placeholder="Select account status"

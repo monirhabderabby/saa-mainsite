@@ -2,7 +2,7 @@ import { getTextFromHtml } from "@/lib/utils";
 import { UpdateTo } from "@prisma/client";
 import { z } from "zod";
 
-export const restrictedWords = ["pay", "email", "gmail", "mobile"];
+export const restrictedWords = ["pay", "email", "gmail", "mobile", "netlify"];
 
 export const updateSheetCreateSchema = z.object({
   profileId: z
