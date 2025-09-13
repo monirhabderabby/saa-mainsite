@@ -6,16 +6,31 @@ export async function getUpdateSheets(options: {
   page?: number;
   limit?: number;
   profileId?: string;
-  notTL?: boolean;
-  notDone?: boolean;
+  updateTo?: string;
+  tl?: "tlChecked" | "notTlCheck" | "All";
+  done?: "done" | "notDone" | "All";
 }) {
-  const { page = 1, limit = 10, profileId, notTL, notDone } = options;
+  const {
+    page = 1,
+    limit = 10,
+    profileId,
+    updateTo,
+    tl = "All",
+    done = "All",
+  } = options;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const filters: any = {};
-  if (profileId) filters.profileId = profileId;
-  if (notTL) filters.tlId = null;
-  if (notDone) filters.doneById = null;
+  if (profileId && profileId !== "All") filters.profileId = profileId;
+  if (updateTo && updateTo !== "All") filters.updateTo = updateTo;
+
+  // TL filter
+  if (tl === "tlChecked") filters.tlId = { not: null };
+  if (tl === "notTlCheck") filters.tlId = null;
+
+  // Done filter
+  if (done === "done") filters.doneById = { not: null };
+  if (done === "notDone") filters.doneById = null;
 
   const totalItems = await prisma.updateSheet.count({
     where: filters,

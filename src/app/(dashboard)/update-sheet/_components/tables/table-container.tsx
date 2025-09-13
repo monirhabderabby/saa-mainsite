@@ -16,12 +16,17 @@ import { AlertTriangle } from "lucide-react";
 import { updateSheetColumns } from "./update-sheet-columns";
 
 const TableContainer = () => {
-  const { page } = useUpdateSheetFilterState();
+  let { page, profileId, updateTo } = useUpdateSheetFilterState();
+
+  profileId = profileId ?? "All";
+  page = page ?? 1;
+  updateTo = updateTo ?? "All";
+
   const { data, isLoading, isError, error } = useQuery<GetUpdateSheetsReturn>({
-    queryKey: ["update-entries", page],
+    queryKey: ["update-entries", page, profileId, updateTo],
     queryFn: () =>
       fetch(
-        `/api/update-entries?profileId=&notTL=false&notDone=false&page=${page}&limit=1`
+        `/api/update-entries?profileId=${profileId}&updateTo=${updateTo}&page=${page}&limit=10`
       ).then((res) => res.json()),
   });
 
@@ -42,7 +47,7 @@ const TableContainer = () => {
       <Table
         columns={updateSheetColumns}
         data={data?.data ?? []}
-        totalPages={data?.pagination.totalPages ?? 1}
+        totalPages={data?.pagination?.totalPages ?? 1}
       />
     </SkeletonWrapper>
   );

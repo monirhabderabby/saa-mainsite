@@ -11,15 +11,18 @@ export async function GET(req: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
     const profileId = searchParams.get("profileId") || undefined;
-    const notTL = searchParams.get("notTL") === "true";
-    const notDone = searchParams.get("notDone") === "true";
+    const updateTo = searchParams.get("updateTo") || undefined;
+
+    const tl = searchParams.get("tl") || "All"; // tlChecked | notTlCheck | All
+    const done = searchParams.get("done") || "All"; // done | notDone | All
 
     const result = await getUpdateSheets({
       page,
       limit,
       profileId,
-      notTL,
-      notDone,
+      updateTo,
+      tl: tl as "tlChecked" | "notTlCheck" | "All",
+      done: done as "done" | "notDone" | "All",
     });
 
     return Response.json({ success: true, ...result });

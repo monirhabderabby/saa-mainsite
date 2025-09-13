@@ -22,15 +22,41 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { colorMap } from "@/components/ui/update-to-badge";
 import {
   updateSheetFilter,
   UpdateSheetFilter,
 } from "@/schemas/update-sheet/filter";
 import { useUpdateSheetFilterState } from "@/zustand/update-sheet";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Profile } from "@prisma/client";
+import { Profile, UpdateTo } from "@prisma/client";
 import { ReactNode, useState } from "react";
 import { useForm } from "react-hook-form";
+
+export const allowUpdateTo = [
+  { id: UpdateTo.ORDER_PAGE_UPDATE, name: "Order Page Update" },
+  { id: UpdateTo.INBOX_PAGE_UPDATE, name: "Inbox Page Update" },
+  {
+    id: UpdateTo.INBOX_AND_ORDER_PAGE_UPDATE,
+    name: "Inbox & Order Page Update",
+  },
+  {
+    id: UpdateTo.DELIVERY,
+    name: "Delivery",
+  },
+  {
+    id: UpdateTo.UPWORK_INBOX,
+    name: "Upwork Inbox",
+  },
+  {
+    id: UpdateTo.REVIEW_RESPONSE,
+    name: "Review Response",
+  },
+  {
+    id: UpdateTo.FIVERR_SUPPORT_REPLY,
+    name: "Fiverr Support Reply",
+  },
+];
 
 interface Props {
   trigger: ReactNode;
@@ -51,7 +77,10 @@ export default function AddFilterUpdateSheetEntries({
   });
 
   function onSubmit(values: UpdateSheetFilter) {
-    setAllValues(values);
+    setAllValues({
+      ...values,
+    });
+    setOpen(false);
   }
 
   return (
@@ -60,39 +89,72 @@ export default function AddFilterUpdateSheetEntries({
       <AlertDialogContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 s">
-            <FormField
-              control={form.control}
-              name="profileId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Profiles</FormLabel>
-                  <FormControl>
+            <div className="w-full grid grid-cols-2 gap-5">
+              <FormField
+                control={form.control}
+                name="profileId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Profiles</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        defaultValue={field.value}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select profile" />
+                        </SelectTrigger>
+
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectItem value="All">All</SelectItem>
+                            {profiles.map((p) => (
+                              <SelectItem value={p.id} key={p.id}>
+                                {p.name}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormDescription></FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="updateTo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Update To</FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      value={field.value}
                       defaultValue={field.value}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select profile" />
-                      </SelectTrigger>
-
+                      <FormControl>
+                        <SelectTrigger
+                          className={colorMap[field.value as UpdateTo] ?? ""}
+                        >
+                          <SelectValue placeholder="Where message should to go?" />
+                        </SelectTrigger>
+                      </FormControl>
                       <SelectContent>
-                        <SelectGroup>
-                          <SelectItem value="all">All</SelectItem>
-                          {profiles.map((p) => (
-                            <SelectItem value={p.id} key={p.id}>
-                              {p.name}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
+                        <SelectItem value="All">All</SelectItem>
+                        {allowUpdateTo.map((item) => (
+                          <SelectItem value={item.id} key={item.id}>
+                            {item.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
-                  </FormControl>
-                  <FormDescription></FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <div className="flex justify-end gap-x-4">
               <Button
                 variant="outline"

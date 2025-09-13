@@ -139,6 +139,7 @@ export default function AddUpdateForm({ profiles, initialData }: Props) {
             updateTo: undefined,
             message: "",
           });
+          router.refresh();
 
           toast.success(res.message);
         });
@@ -295,6 +296,7 @@ export default function AddUpdateForm({ profiles, initialData }: Props) {
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
+                  key={field.value}
                 >
                   <FormControl>
                     <SelectTrigger className={colorMap[field.value] ?? ""}>
@@ -321,6 +323,7 @@ export default function AddUpdateForm({ profiles, initialData }: Props) {
               <FormItem>
                 <FormLabel>Message</FormLabel>
                 <RichTextEditor
+                  key={field.value ?? "empty"}
                   value={field.value}
                   onChange={field.onChange}
                   restrictedWords={restrictedWords}
@@ -337,15 +340,17 @@ export default function AddUpdateForm({ profiles, initialData }: Props) {
             </div>
           )}
           <div className="w-full flex justify-end gap-5">
-            <Button
-              variant="destructive"
-              onClick={() => setDeleteModalOpen((p) => !p)}
-              type="button"
-              disabled={pending}
-            >
-              <Trash />
-              Delete
-            </Button>
+            {initialData && (
+              <Button
+                variant="destructive"
+                onClick={() => setDeleteModalOpen((p) => !p)}
+                type="button"
+                disabled={pending}
+              >
+                <Trash />
+                Delete
+              </Button>
+            )}
             <Button
               type="submit"
               disabled={pending || restrictedFound.length > 0}
