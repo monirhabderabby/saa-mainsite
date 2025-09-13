@@ -1,3 +1,4 @@
+import { markAsSent } from "@/actions/update-sheet/update";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -5,16 +6,19 @@ import {
   AlertDialogFooter,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { ClipboardCopy } from "@/components/ui/custom/clipboard-copy";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import UpdateToBadge from "@/components/ui/update-to-badge";
 import { UpdateSheetData } from "@/helper/update-sheet";
 import { cn } from "@/lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
 import DOMPurify from "dompurify";
 import { htmlToText } from "html-to-text";
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, Loader, Send } from "lucide-react";
 import moment from "moment";
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useTransition } from "react";
+import { toast } from "sonner";
 
 interface Props {
   data: UpdateSheetData;
@@ -24,6 +28,9 @@ interface Props {
 const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [pending, startTransition] = useTransition();
+
+  const queryClient = useQueryClient();
 
   // Sanitize the HTML content
   const sanitizedHtml = DOMPurify.sanitize(data.message);
@@ -37,6 +44,23 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
       console.error("Failed to copy text: ", err);
     }
   };
+
+  const onMarkedAsSend = () => {
+    startTransition(async () => {
+      const res = await markAsSent(data.id);
+      if (!res.success) {
+        toast.error(res.message);
+        return;
+      }
+
+      toast.success(res.message, {
+        icon: "✅",
+      });
+      queryClient.invalidateQueries({ queryKey: ["update-entries"] });
+    });
+  };
+
+  console.log(data);
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
@@ -117,9 +141,9 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
             />
           </div>
           {data.sendAt && (
-            <p className="mt-3 text-[14px] text-muted-foreground">
+            <p className="mt-5 text-[14px] text-muted-foreground">
               This message was sent to the client on{" "}
-              <span className="font-medium">
+              <span className="font-medium text-green-500">
                 {moment(data.sendAt).format("DD MMMM YYYY [at] hh:mm A")}
               </span>
             </p>
@@ -127,7 +151,17 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
         </ScrollArea>
 
         <AlertDialogFooter className="px-5 pb-5">
-          <AlertDialogCancel>Cancle</AlertDialogCancel>
+          <AlertDialogCancel>Close</AlertDialogCancel>
+          {data.doneById ? (
+            <Button disabled variant="outline">
+              Sent ✅
+            </Button>
+          ) : (
+            <Button onClick={onMarkedAsSend} disabled={pending}>
+              Mark as Sent{" "}
+              {pending ? <Loader className="animate-spin" /> : <Send />}
+            </Button>
+          )}
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
