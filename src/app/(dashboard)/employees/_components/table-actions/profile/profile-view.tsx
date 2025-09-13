@@ -62,7 +62,7 @@ export function ProfileView({ trigger, user }: ProfileViewProps) {
           </div>
 
           {/* Profile Information */}
-          <Card>
+          <Card className="dark:bg-white/5">
             <CardContent className="pt-6 space-y-4">
               <div className="flex items-center space-x-3">
                 <Hash className="h-4 w-4 text-muted-foreground" />
@@ -105,7 +105,7 @@ export function ProfileView({ trigger, user }: ProfileViewProps) {
           {/* Access Permissions */}
           <div className="grid grid-cols-2 gap-5">
             {user.permissions.map((p) => (
-              <Card key={p.id}>
+              <Card key={p.id} className="bg-white/5">
                 <CardContent className="pt-6">
                   <h4 className="text-lg font-semibold mb-4 text-center">
                     {p.name} Permissions

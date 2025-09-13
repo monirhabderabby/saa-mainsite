@@ -73,3 +73,10 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* globals.css */
+.prose p:empty::before {
+  content: " ";
+  display: block;
+  height: 1em; /* controls extra gap size */
+}

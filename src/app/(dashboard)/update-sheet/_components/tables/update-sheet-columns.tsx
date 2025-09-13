@@ -2,10 +2,14 @@ import { Button } from "@/components/ui/button";
 import { UpdateSheetData } from "@/helper/update-sheet";
 import { ColumnDef } from "@tanstack/react-table";
 import { Pencil } from "lucide-react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import TlCheckComponent from "./tl-check-component";
 import UpdateToComponents from "./update-to";
+const ViewUpdateSheetModal = dynamic(() => import("./view-modal"), {
+  ssr: false,
+});
 
 export const updateSheetColumns: ColumnDef<UpdateSheetData>[] = [
   {
@@ -42,10 +46,15 @@ export const updateSheetColumns: ColumnDef<UpdateSheetData>[] = [
   {
     accessorKey: "message",
     header: "Message",
-    cell: ({}) => (
-      <Button variant="outline" size="sm">
-        View
-      </Button>
+    cell: ({ row }) => (
+      <ViewUpdateSheetModal
+        trigger={
+          <Button variant="outline" size="sm">
+            View
+          </Button>
+        }
+        data={row.original}
+      />
     ),
   },
   {

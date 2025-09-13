@@ -81,7 +81,7 @@ const Table = ({ data, columns, totalPages }: TableProps) => {
   });
   return (
     <>
-      <div className="bg-white">
+      <div className="bg-background">
         <DataTable table={table} columns={columns} />
       </div>
       {totalPages > 1 && (
