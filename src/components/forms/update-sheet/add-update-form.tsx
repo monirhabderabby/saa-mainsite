@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { colorMap } from "@/components/ui/update-to-badge";
 import { getTextFromHtml } from "@/lib/utils";
 import {
   restrictedWords,
@@ -30,7 +31,7 @@ import {
   updateSheetCreateSchema,
 } from "@/schemas/update-sheet/create";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Profile, UpdateTo } from "@prisma/client";
+import { Profile, UpdateSheet, UpdateTo } from "@prisma/client";
 import { Loader2 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useMemo, useTransition } from "react";
@@ -39,6 +40,7 @@ import { toast } from "sonner";
 
 interface Props {
   profiles: Profile[];
+  initialData?: UpdateSheet;
 }
 
 export const allowUpdateTo = [
@@ -66,11 +68,20 @@ export const allowUpdateTo = [
   },
 ];
 
-export default function AddUpdateForm({ profiles }: Props) {
+export default function AddUpdateForm({ profiles, initialData }: Props) {
   const [pending, startTransition] = useTransition();
   const form = useForm<UpdateSheetCreateSchema>({
     resolver: zodResolver(updateSheetCreateSchema),
-    defaultValues: {},
+    defaultValues: {
+      profileId: initialData?.profileId ?? undefined,
+      clientName: initialData?.clientName ?? undefined,
+      orderId: initialData?.orderId ?? undefined,
+      attachments: initialData?.attachments ?? undefined,
+      commentFromOperation: initialData?.commentFromOperation ?? undefined,
+      commentFromSales: initialData?.commentFromSales ?? undefined,
+      updateTo: initialData?.updateTo ?? undefined,
+      message: initialData?.message ?? undefined,
+    },
   });
 
   const messageHtml = form.watch("message");
@@ -243,8 +254,8 @@ export default function AddUpdateForm({ profiles }: Props) {
               <FormLabel>Update To</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="" />
+                  <SelectTrigger className={colorMap[field.value]}>
+                    <SelectValue placeholder="Where message should to go?" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>

@@ -1,7 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { UpdateSheetData } from "@/helper/update-sheet";
 import { ColumnDef } from "@tanstack/react-table";
+import { Pencil } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import UpdateToComponents from "./update-to";
 
 export const updateSheetColumns: ColumnDef<UpdateSheetData>[] = [
   {
@@ -64,5 +67,20 @@ export const updateSheetColumns: ColumnDef<UpdateSheetData>[] = [
   {
     accessorKey: "commentFromSales",
     header: "Comment (Sales)",
+  },
+  {
+    accessorKey: "updateTo",
+    header: "Update To",
+    cell: ({ row }) => <UpdateToComponents data={row.original} />,
+  },
+  {
+    header: "Action",
+    cell: ({ row }) => (
+      <Button size="icon" variant="ghost" asChild>
+        <Link href={`/update-sheet/edit/${row.original.id}`}>
+          <Pencil />
+        </Link>
+      </Button>
+    ),
   },
 ];
