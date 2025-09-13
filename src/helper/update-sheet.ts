@@ -7,6 +7,8 @@ export async function getUpdateSheets(options: {
   limit?: number;
   profileId?: string;
   updateTo?: string;
+  clientName?: string;
+  orderId?: string;
   tl?: "tlChecked" | "notTlCheck" | "All";
   done?: "done" | "notDone" | "All";
 }) {
@@ -15,6 +17,8 @@ export async function getUpdateSheets(options: {
     limit = 10,
     profileId,
     updateTo,
+    clientName,
+    orderId,
     tl = "All",
     done = "All",
   } = options;
@@ -23,6 +27,11 @@ export async function getUpdateSheets(options: {
   const filters: any = {};
   if (profileId && profileId !== "All") filters.profileId = profileId;
   if (updateTo && updateTo !== "All") filters.updateTo = updateTo;
+
+  // New filters
+  if (clientName)
+    filters.clientName = { contains: clientName, mode: "insensitive" };
+  if (orderId) filters.orderId = { contains: orderId, mode: "insensitive" };
 
   // TL filter
   if (tl === "tlChecked") filters.tlId = { not: null };

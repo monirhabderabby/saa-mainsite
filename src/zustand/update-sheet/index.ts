@@ -1,3 +1,4 @@
+// Updated Zustand store
 import { UpdateSheetFilter } from "@/schemas/update-sheet/filter";
 import { UpdateTo } from "@prisma/client";
 import { create } from "zustand";
@@ -14,6 +15,7 @@ type ProfileState = {
   sendAt?: string;
   createdAt?: string;
   clientName?: string;
+  orderId?: string; // <-- Added orderId
 
   setProfileId: (id: string) => void;
   setPage: (page: number) => void;
@@ -43,5 +45,6 @@ export const useUpdateSheetFilterState = create<ProfileState>((set) => ({
       sendAt: data.sendAt ?? state.sendAt,
       createdAt: data.createdAt ?? state.createdAt,
       clientName: data.clientName ?? state.clientName,
+      orderId: data.orderId ?? state.orderId, // <-- Set orderId
     })),
 }));

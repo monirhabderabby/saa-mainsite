@@ -12,6 +12,8 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "10", 10);
     const profileId = searchParams.get("profileId") || undefined;
     const updateTo = searchParams.get("updateTo") || undefined;
+    const clientName = searchParams.get("clientName") || undefined;
+    const orderId = searchParams.get("orderId") || undefined;
 
     const tl = searchParams.get("tl") || "All"; // tlChecked | notTlCheck | All
     const done = searchParams.get("done") || "All"; // done | notDone | All
@@ -21,6 +23,8 @@ export async function GET(req: NextRequest) {
       limit,
       profileId,
       updateTo,
+      clientName,
+      orderId,
       tl: tl as "tlChecked" | "notTlCheck" | "All",
       done: done as "done" | "notDone" | "All",
     });

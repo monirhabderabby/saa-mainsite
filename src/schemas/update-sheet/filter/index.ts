@@ -1,3 +1,4 @@
+// Updated Zod schema
 import { UpdateTo } from "@prisma/client";
 import * as z from "zod";
 
@@ -22,6 +23,7 @@ export const updateSheetFilter = z.object({
   sendAt: z.string().datetime().optional(),
   createdAt: z.string().datetime().optional(),
   clientName: z.string().optional(),
+  orderId: z.string().optional(), // <-- Added orderId
 });
 
 export type UpdateSheetFilter = z.infer<typeof updateSheetFilter>;

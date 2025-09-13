@@ -16,17 +16,27 @@ import { AlertTriangle } from "lucide-react";
 import { updateSheetColumns } from "./update-sheet-columns";
 
 const TableContainer = () => {
-  let { page, profileId, updateTo } = useUpdateSheetFilterState();
+  let { page, profileId, updateTo, clientName, orderId } =
+    useUpdateSheetFilterState();
 
   profileId = profileId ?? "All";
   page = page ?? 1;
   updateTo = updateTo ?? "All";
+  clientName = clientName ?? "";
+  orderId = orderId ?? "";
 
   const { data, isLoading, isError, error } = useQuery<GetUpdateSheetsReturn>({
-    queryKey: ["update-entries", page, profileId, updateTo],
+    queryKey: [
+      "update-entries",
+      page,
+      profileId,
+      updateTo,
+      clientName,
+      orderId,
+    ],
     queryFn: () =>
       fetch(
-        `/api/update-entries?profileId=${profileId}&updateTo=${updateTo}&page=${page}&limit=10`
+        `/api/update-entries?profileId=${profileId}&updateTo=${updateTo}&clientName=${clientName}&orderId=${orderId}&page=${page}&limit=10`
       ).then((res) => res.json()),
   });
 

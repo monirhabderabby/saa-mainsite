@@ -14,6 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -89,6 +90,35 @@ export default function AddFilterUpdateSheetEntries({
       <AlertDialogContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 s">
+            <div className="grid grid-cols-2 gap-5">
+              <FormField
+                control={form.control}
+                name="clientName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Client Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="You can write client name ex: Ashanti, rafarraveria"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="orderId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Order ID</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="ex: FO321834E7607" />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
             <div className="w-full grid grid-cols-2 gap-5">
               <FormField
                 control={form.control}
