@@ -298,7 +298,8 @@ export default function AddUpdateForm({ profiles, initialData }: Props) {
             type="submit"
             disabled={pending || restrictedFound.length > 0}
           >
-            Submit {pending && <Loader2 className="animate-spin" />}
+            {initialData ? "Save Now" : "Submit"}{" "}
+            {pending && <Loader2 className="animate-spin" />}
           </Button>
         </div>
       </form>
