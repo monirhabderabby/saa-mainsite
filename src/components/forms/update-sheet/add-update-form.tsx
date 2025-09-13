@@ -6,7 +6,10 @@ const RichTextEditor = dynamic(
   }
 );
 import { createUpdateSheetEntries } from "@/actions/update-sheet/create";
+import { deleteUpdateSheetEntry } from "@/actions/update-sheet/delete";
+import { updateUpdateSheetEntry } from "@/actions/update-sheet/update";
 import { Button } from "@/components/ui/button";
+import AlertModal from "@/components/ui/custom/alert-modal";
 import {
   Form,
   FormControl,
@@ -32,9 +35,10 @@ import {
 } from "@/schemas/update-sheet/create";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Profile, UpdateSheet, UpdateTo } from "@prisma/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, Trash } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useMemo, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -69,7 +73,10 @@ export const allowUpdateTo = [
 ];
 
 export default function AddUpdateForm({ profiles, initialData }: Props) {
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [pending, startTransition] = useTransition();
+  const router = useRouter();
+
   const form = useForm<UpdateSheetCreateSchema>({
     resolver: zodResolver(updateSheetCreateSchema),
     defaultValues: {
@@ -100,209 +107,264 @@ export default function AddUpdateForm({ profiles, initialData }: Props) {
   }, [messageText]);
 
   function onSubmit(values: UpdateSheetCreateSchema) {
-    startTransition(() => {
-      createUpdateSheetEntries(values).then((res) => {
-        if (!res.success) {
-          toast.error(res.message);
+    if (initialData) {
+      startTransition(() => {
+        updateUpdateSheetEntry(initialData.id, values).then((res) => {
+          if (!res.success) {
+            toast.error(res.message);
+            return;
+          }
+
+          toast.success(res.message);
+          router.back();
           return;
-        }
-
-        // handle success
-        form.reset({
-          profileId: "",
-          clientName: "",
-          orderId: "",
-          attachments: "",
-          commentFromOperation: "",
-          commentFromSales: "",
-          updateTo: undefined,
-          message: "",
         });
-
-        toast.success(res.message);
       });
+    } else {
+      startTransition(() => {
+        createUpdateSheetEntries(values).then((res) => {
+          if (!res.success) {
+            toast.error(res.message);
+            return;
+          }
+
+          // handle success
+          form.reset({
+            profileId: "",
+            clientName: "",
+            orderId: "",
+            attachments: "",
+            commentFromOperation: "",
+            commentFromSales: "",
+            updateTo: undefined,
+            message: "",
+          });
+
+          toast.success(res.message);
+        });
+      });
+    }
+  }
+
+  function handleDelete() {
+    if (!initialData) return;
+    startTransition(async () => {
+      const res = await deleteUpdateSheetEntry(initialData.id);
+
+      if (!res.success) {
+        toast.error(res.message);
+        return;
+      }
+
+      router.back();
     });
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5  pb-10">
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-4">
-            <FormField
-              control={form.control}
-              name="profileId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Profile</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    value={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a profile" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {profiles.map((p) => (
-                        <SelectItem value={p.id} key={p.id}>
-                          {p.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+    <>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-5  pb-10"
+        >
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-4">
+              <FormField
+                control={form.control}
+                name="profileId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Profile</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      value={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a profile" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {profiles.map((p) => (
+                          <SelectItem value={p.id} key={p.id}>
+                            {p.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="col-span-4">
-            <FormField
-              control={form.control}
-              name="clientName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Client Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="" type="" {...field} />
-                  </FormControl>
-
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="col-span-4">
-            <FormField
-              control={form.control}
-              name="orderId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Order Id</FormLabel>
-                  <FormControl>
-                    <Input placeholder="" type="" {...field} />
-                  </FormControl>
-
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
-
-        <FormField
-          control={form.control}
-          name="attachments"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Attachments</FormLabel>
-              <FormControl>
-                <Input placeholder="" type="" {...field} />
-              </FormControl>
-
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-6">
-            <FormField
-              control={form.control}
-              name="commentFromOperation"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Comment from Operation</FormLabel>
-                  <FormControl>
-                    <Input placeholder="" type="" {...field} />
-                  </FormControl>
-
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="col-span-6">
-            <FormField
-              control={form.control}
-              name="commentFromSales"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Comment from Sales</FormLabel>
-                  <FormControl>
-                    <Input placeholder="" type="" {...field} />
-                  </FormControl>
-
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
-
-        <FormField
-          control={form.control}
-          name="updateTo"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Update To</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger className={colorMap[field.value]}>
-                    <SelectValue placeholder="Where message should to go?" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {allowUpdateTo.map((item) => (
-                    <SelectItem value={item.id} key={item.id}>
-                      {item.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="message"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Message</FormLabel>
-              <RichTextEditor
-                value={form.watch("message")}
-                onChange={field.onChange}
-                restrictedWords={restrictedWords}
-                maxChars={2500}
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </FormItem>
-          )}
-        />
+            </div>
 
-        {restrictedFound.length > 0 && (
-          <div className="text-red-500 text-sm mt-2">
-            ⚠️ Warning: Your message contains restricted words:{" "}
-            <strong>{restrictedFound.join(", ")}</strong>
+            <div className="col-span-4">
+              <FormField
+                control={form.control}
+                name="clientName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Client Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="" type="" {...field} />
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="col-span-4">
+              <FormField
+                control={form.control}
+                name="orderId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Order Id</FormLabel>
+                    <FormControl>
+                      <Input placeholder="" type="" {...field} />
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
-        )}
-        <div className="w-full flex justify-end">
-          <Button
-            type="submit"
-            disabled={pending || restrictedFound.length > 0}
-          >
-            {initialData ? "Save Now" : "Submit"}{" "}
-            {pending && <Loader2 className="animate-spin" />}
-          </Button>
-        </div>
-      </form>
-    </Form>
+
+          <FormField
+            control={form.control}
+            name="attachments"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Attachments</FormLabel>
+                <FormControl>
+                  <Input placeholder="" type="" {...field} />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-6">
+              <FormField
+                control={form.control}
+                name="commentFromOperation"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Comment from Operation</FormLabel>
+                    <FormControl>
+                      <Input placeholder="" type="" {...field} />
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="col-span-6">
+              <FormField
+                control={form.control}
+                name="commentFromSales"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Comment from Sales</FormLabel>
+                    <FormControl>
+                      <Input placeholder="" type="" {...field} />
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+
+          <FormField
+            control={form.control}
+            name="updateTo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Update To</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger className={colorMap[field.value] ?? ""}>
+                      <SelectValue placeholder="Where message should to go?" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {allowUpdateTo.map((item) => (
+                      <SelectItem value={item.id} key={item.id}>
+                        {item.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="message"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Message</FormLabel>
+                <RichTextEditor
+                  value={field.value}
+                  onChange={field.onChange}
+                  restrictedWords={restrictedWords}
+                  maxChars={2500}
+                />
+              </FormItem>
+            )}
+          />
+
+          {restrictedFound.length > 0 && (
+            <div className="text-red-500 text-sm mt-2">
+              ⚠️ Warning: Your message contains restricted words:{" "}
+              <strong>{restrictedFound.join(", ")}</strong>
+            </div>
+          )}
+          <div className="w-full flex justify-end gap-5">
+            <Button
+              variant="destructive"
+              onClick={() => setDeleteModalOpen((p) => !p)}
+              type="button"
+              disabled={pending}
+            >
+              <Trash />
+              Delete
+            </Button>
+            <Button
+              type="submit"
+              disabled={pending || restrictedFound.length > 0}
+            >
+              {initialData ? "Save Now" : "Submit"}{" "}
+              {pending && <Loader2 className="animate-spin" />}
+            </Button>
+          </div>
+        </form>
+      </Form>
+
+      <AlertModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleDelete} // your delete handler
+        loading={pending}
+        title="Are you sure you want to delete this message?"
+        message="This action cannot be undone. The update entry will be permanently removed."
+      />
+    </>
   );
 }
