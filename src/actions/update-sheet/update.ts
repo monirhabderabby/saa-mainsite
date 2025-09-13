@@ -110,3 +110,62 @@ export async function updateUpdateSheetEntry(
     };
   }
 }
+
+export async function tlCheck(id: string) {
+  // Step 1: Authenticate the user
+  const session = await auth();
+  if (!session?.user) {
+    return {
+      success: false,
+      message: "Authentication required. Please log in to continue.",
+    };
+  }
+
+  const { user } = session;
+
+  // Step 2: Fetch existing entry with minimal data
+  const existingEntry = await prisma.updateSheet.findUnique({
+    where: { id },
+    select: { id: true, tlId: true }, // Select only necessary fields
+  });
+
+  if (!existingEntry) {
+    return {
+      success: false,
+      message: "Update sheet entry not found.",
+    };
+  }
+
+  // Step 3: Check user permission
+  const userPermission = await prisma.permissions.findFirst({
+    where: {
+      userId: user.id,
+      name: "UPDATE_SHEET",
+    },
+    select: { isMessageTLCheckAllowed: true }, // Select only the needed field
+  });
+
+  if (!userPermission?.isMessageTLCheckAllowed) {
+    return {
+      success: false,
+      message: "You are not allowed to perform TL Check on the update sheet.",
+    };
+  }
+
+  // Step 4: Toggle tlId (add if not set, remove if set to current user)
+  const isAlreadyChecked = existingEntry.tlId === user.id;
+  await prisma.updateSheet.update({
+    where: { id },
+    data: {
+      tlId: isAlreadyChecked ? null : user.id, // Remove if already set, else add
+    },
+    select: { id: true, tlId: true }, // Return minimal data
+  });
+
+  return {
+    success: true,
+    message: isAlreadyChecked
+      ? "TL Check removed successfully."
+      : "TL Check added successfully.",
+  };
+}

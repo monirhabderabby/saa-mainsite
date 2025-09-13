@@ -4,6 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Pencil } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import TlCheckComponent from "./tl-check-component";
 import UpdateToComponents from "./update-to";
 
 export const updateSheetColumns: ColumnDef<UpdateSheetData>[] = [
@@ -67,6 +68,11 @@ export const updateSheetColumns: ColumnDef<UpdateSheetData>[] = [
   {
     accessorKey: "commentFromSales",
     header: "Comment (Sales)",
+  },
+  {
+    accessorKey: "tlId",
+    header: "TL Check",
+    cell: ({ row }) => <TlCheckComponent data={row.original} />,
   },
   {
     accessorKey: "updateTo",
