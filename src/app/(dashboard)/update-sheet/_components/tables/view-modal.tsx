@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { ClipboardCopy } from "@/components/ui/custom/clipboard-copy";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import UpdateToBadge from "@/components/ui/update-to-badge";
-import { UpdateSheetData } from "@/helper/update-sheet";
+import { UpdateSheetData } from "@/helper/update-sheet/update-sheet";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import DOMPurify from "dompurify";

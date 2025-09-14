@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { UpdateSheetData } from "@/helper/update-sheet";
+import { UpdateSheetData } from "@/helper/update-sheet/update-sheet";
 import { ColumnDef } from "@tanstack/react-table";
 import { Pencil } from "lucide-react";
 import dynamic from "next/dynamic";

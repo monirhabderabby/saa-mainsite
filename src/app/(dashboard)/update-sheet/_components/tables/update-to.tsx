@@ -1,5 +1,5 @@
 import UpdateToBadge from "@/components/ui/update-to-badge";
-import { UpdateSheetData } from "@/helper/update-sheet";
+import { UpdateSheetData } from "@/helper/update-sheet/update-sheet";
 
 interface Props {
   data: UpdateSheetData;
