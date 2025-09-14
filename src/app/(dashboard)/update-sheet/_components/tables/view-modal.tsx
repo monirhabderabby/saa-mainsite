@@ -60,7 +60,6 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
     });
   };
 
-  console.log(data);
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>

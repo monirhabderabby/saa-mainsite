@@ -1,4 +1,3 @@
-// Updated Zustand store
 import { UpdateSheetFilter } from "@/schemas/update-sheet/filter";
 import { UpdateTo } from "@prisma/client";
 import { create } from "zustand";
@@ -12,14 +11,15 @@ type ProfileState = {
   updateById?: string;
   tlId?: string;
   doneById?: string;
-  sendAt?: string;
-  createdAt?: string;
+  sendFrom?: string;
+  sendTo?: string;
+  createdFrom?: string; // renamed
+  createdTo?: string; // optional range
   clientName?: string;
-  orderId?: string; // <-- Added orderId
+  orderId?: string;
 
   setProfileId: (id: string) => void;
   setPage: (page: number) => void;
-
   setAllValues: (data: UpdateSheetFilter & { page?: number }) => void;
 };
 
@@ -42,9 +42,12 @@ export const useUpdateSheetFilterState = create<ProfileState>((set) => ({
       updateById: data.updateById ?? state.updateById,
       tlId: data.tlId ?? state.tlId,
       doneById: data.doneById ?? state.doneById,
-      sendAt: data.sendAt ?? state.sendAt,
-      createdAt: data.createdAt ?? state.createdAt,
+      sendFrom: data.sendFrom ?? state.sendFrom,
+      sendTo: data.sendTo ?? state.sendTo,
+      createdFrom:
+        (data.createdFrom as string | undefined) ?? state.createdFrom, // ✅ cast
+      createdTo: (data.createdTo as string | undefined) ?? state.createdTo, // ✅ cast
       clientName: data.clientName ?? state.clientName,
-      orderId: data.orderId ?? state.orderId, // <-- Set orderId
+      orderId: data.orderId ?? state.orderId,
     })),
 }));

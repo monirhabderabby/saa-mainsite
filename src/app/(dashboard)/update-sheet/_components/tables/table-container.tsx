@@ -16,14 +16,27 @@ import { AlertTriangle } from "lucide-react";
 import { updateSheetColumns } from "./update-sheet-columns";
 
 const TableContainer = () => {
-  let { page, profileId, updateTo, clientName, orderId } =
-    useUpdateSheetFilterState();
+  let {
+    page,
+    profileId,
+    updateTo,
+    clientName,
+    orderId,
+    tl,
+    done,
+    createdFrom,
+  } = useUpdateSheetFilterState();
 
   profileId = profileId ?? "All";
   page = page ?? 1;
   updateTo = updateTo ?? "All";
   clientName = clientName ?? "";
   orderId = orderId ?? "";
+  tl = tl ?? "All";
+  done = done ?? "All";
+  createdFrom = createdFrom
+    ? new Date(createdFrom).toISOString().split("T")[0] // "2025-09-14"
+    : new Date().toISOString().split("T")[0];
 
   const { data, isLoading, isError, error } = useQuery<GetUpdateSheetsReturn>({
     queryKey: [
@@ -33,10 +46,13 @@ const TableContainer = () => {
       updateTo,
       clientName,
       orderId,
+      tl,
+      done,
+      createdFrom,
     ],
     queryFn: () =>
       fetch(
-        `/api/update-entries?profileId=${profileId}&updateTo=${updateTo}&clientName=${clientName}&orderId=${orderId}&page=${page}&limit=10`
+        `/api/update-entries?profileId=${profileId}&updateTo=${updateTo}&clientName=${clientName}&orderId=${orderId}&page=${page}&limit=10&tl=${tl}&done=${done}&createdFrom=${createdFrom}`
       ).then((res) => res.json()),
   });
 

@@ -74,6 +74,8 @@ export async function createUpdateSheetEntries(
       data: {
         ...validData,
         updateById: user.id as string,
+        tlId: null,
+        doneById: null,
       },
     });
 

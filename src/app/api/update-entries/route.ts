@@ -18,6 +18,12 @@ export async function GET(req: NextRequest) {
     const tl = searchParams.get("tl") || "All"; // tlChecked | notTlCheck | All
     const done = searchParams.get("done") || "All"; // done | notDone | All
 
+    // New date filters
+    const createdFrom = searchParams.get("createdFrom") || undefined;
+    const createdTo = searchParams.get("createdTo") || undefined;
+    const sendFrom = searchParams.get("sendFrom") || undefined;
+    const sendTo = searchParams.get("sendTo") || undefined;
+
     const result = await getUpdateSheets({
       page,
       limit,
@@ -27,6 +33,10 @@ export async function GET(req: NextRequest) {
       orderId,
       tl: tl as "tlChecked" | "notTlCheck" | "All",
       done: done as "done" | "notDone" | "All",
+      createdFrom,
+      createdTo,
+      sendFrom,
+      sendTo,
     });
 
     return Response.json({ success: true, ...result });

@@ -1,4 +1,5 @@
 // lib/updateSheets.ts
+import { getDayRange } from "@/lib/date";
 import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 
@@ -11,6 +12,10 @@ export async function getUpdateSheets(options: {
   orderId?: string;
   tl?: "tlChecked" | "notTlCheck" | "All";
   done?: "done" | "notDone" | "All";
+  createdFrom?: string; // ISO date string
+  createdTo?: string; // ISO date string
+  sendFrom?: string; // ISO date string
+  sendTo?: string; // ISO date string
 }) {
   const {
     page = 1,
@@ -21,25 +26,56 @@ export async function getUpdateSheets(options: {
     orderId,
     tl = "All",
     done = "All",
+    createdFrom,
+    createdTo,
+    sendFrom,
+    sendTo,
   } = options;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const filters: any = {};
+
   if (profileId && profileId !== "All") filters.profileId = profileId;
   if (updateTo && updateTo !== "All") filters.updateTo = updateTo;
 
-  // New filters
   if (clientName)
     filters.clientName = { contains: clientName, mode: "insensitive" };
   if (orderId) filters.orderId = { contains: orderId, mode: "insensitive" };
 
   // TL filter
   if (tl === "tlChecked") filters.tlId = { not: null };
-  if (tl === "notTlCheck") filters.tlId = null;
+  if (tl === "notTlCheck") filters.tlId = { equals: null };
 
   // Done filter
   if (done === "done") filters.doneById = { not: null };
-  if (done === "notDone") filters.doneById = null;
+  if (done === "notDone") filters.doneById = { equals: null };
+
+  // Date filters
+  // CreatedAt filter
+  if (createdFrom && createdTo) {
+    // Date range
+    filters.createdAt = {
+      gte: new Date(createdFrom),
+      lte: new Date(createdTo),
+    };
+  } else if (createdFrom && !createdTo) {
+    // Single date → exact day
+    const { start, end } = getDayRange(createdFrom);
+    filters.createdAt = { gte: start, lte: end };
+  } else if (!createdFrom && createdTo) {
+    // Only end date provided → all dates up to createdTo
+    filters.createdAt = { lte: new Date(createdTo) };
+  }
+
+  // sendAt filter
+  if (sendFrom && sendTo) {
+    filters.sendAt = { gte: new Date(sendFrom), lte: new Date(sendTo) };
+  } else if (sendFrom && !sendTo) {
+    const { start, end } = getDayRange(sendFrom);
+    filters.sendAt = { gte: start, lte: end };
+  } else if (!sendFrom && sendTo) {
+    filters.sendAt = { lte: new Date(sendTo) };
+  }
 
   const totalItems = await prisma.updateSheet.count({
     where: filters,

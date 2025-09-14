@@ -31,8 +31,15 @@ import {
 import { useUpdateSheetFilterState } from "@/zustand/update-sheet";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Profile, UpdateTo } from "@prisma/client";
+import dynamic from "next/dynamic";
 import { ReactNode, useState } from "react";
 import { useForm } from "react-hook-form";
+const SmartDatePicker = dynamic(
+  () => import("@/components/ui/custom/smart-date-picker"),
+  {
+    ssr: false,
+  }
+);
 
 export const allowUpdateTo = [
   { id: UpdateTo.ORDER_PAGE_UPDATE, name: "Order Page Update" },
@@ -89,7 +96,7 @@ export default function AddFilterUpdateSheetEntries({
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 s">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 ">
             <div className="grid grid-cols-2 gap-5">
               <FormField
                 control={form.control}
@@ -180,6 +187,78 @@ export default function AddFilterUpdateSheetEntries({
                       </SelectContent>
                     </Select>
 
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="w-full grid grid-cols-2 gap-5">
+              <FormField
+                control={form.control}
+                name="tl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>TL Check</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Filter by tl check" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="All">All</SelectItem>
+                        <SelectItem value="notTlCheck">No TL Check</SelectItem>
+                        <SelectItem value="tlChecked">TL Checked</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="done"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Done?</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger
+                          className={colorMap[field.value as UpdateTo] ?? ""}
+                        >
+                          <SelectValue placeholder="Filter by tl check" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="All">All</SelectItem>
+                        <SelectItem value="done">Sent ✅</SelectItem>
+                        <SelectItem value="notDone">Waiting ⏳</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-5">
+              <FormField
+                control={form.control}
+                name="createdFrom"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Created At</FormLabel>
+                    <SmartDatePicker
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
