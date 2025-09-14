@@ -19,7 +19,7 @@ export const updateSheetFilter = z.object({
   updateById: z.string().optional(),
   tlId: z.string().optional(),
   doneById: z.string().optional(),
-  sendFrom: z.string().datetime().optional(),
+  sendFrom: z.date().optional(),
   sendTo: z.string().datetime().optional(),
   createdFrom: z.date().optional(), // renamed
   createdTo: z.string().optional(), // optional end of range

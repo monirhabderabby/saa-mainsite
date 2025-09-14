@@ -263,6 +263,20 @@ export default function AddFilterUpdateSheetEntries({
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="sendFrom"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Send At</FormLabel>
+                    <SmartDatePicker
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
             <div className="flex justify-end gap-x-4">
               <Button

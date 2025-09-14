@@ -37,9 +37,9 @@ export async function getUpdateSheets(options: {
 
   if (profileId && profileId !== "All") filters.profileId = profileId;
   if (updateTo && updateTo !== "All") filters.updateTo = updateTo;
-
-  if (clientName)
-    filters.clientName = { contains: clientName, mode: "insensitive" };
+  if (sendFrom && sendFrom !== "All")
+    if (clientName)
+      filters.clientName = { contains: clientName, mode: "insensitive" };
   if (orderId) filters.orderId = { contains: orderId, mode: "insensitive" };
 
   // TL filter
@@ -50,30 +50,39 @@ export async function getUpdateSheets(options: {
   if (done === "done") filters.doneById = { not: null };
   if (done === "notDone") filters.doneById = { equals: null };
 
-  // Date filters
-  // CreatedAt filter
-  if (createdFrom && createdTo) {
-    // Date range
+  // Created At Filters
+  if (
+    createdFrom &&
+    createdFrom !== "All" &&
+    createdTo &&
+    createdTo !== "All"
+  ) {
     filters.createdAt = {
       gte: new Date(createdFrom),
       lte: new Date(createdTo),
     };
-  } else if (createdFrom && !createdTo) {
-    // Single date → exact day
+  } else if (
+    createdFrom &&
+    createdFrom !== "All" &&
+    (!createdTo || createdTo === "All")
+  ) {
     const { start, end } = getDayRange(createdFrom);
     filters.createdAt = { gte: start, lte: end };
-  } else if (!createdFrom && createdTo) {
-    // Only end date provided → all dates up to createdTo
+  } else if (
+    (!createdFrom || createdFrom === "All") &&
+    createdTo &&
+    createdTo !== "All"
+  ) {
     filters.createdAt = { lte: new Date(createdTo) };
   }
 
-  // sendAt filter
-  if (sendFrom && sendTo) {
+  // SendAt filter
+  if (sendFrom && sendFrom !== "All" && sendTo && sendTo !== "All") {
     filters.sendAt = { gte: new Date(sendFrom), lte: new Date(sendTo) };
-  } else if (sendFrom && !sendTo) {
+  } else if (sendFrom && sendFrom !== "All" && (!sendTo || sendTo === "All")) {
     const { start, end } = getDayRange(sendFrom);
     filters.sendAt = { gte: start, lte: end };
-  } else if (!sendFrom && sendTo) {
+  } else if ((!sendFrom || sendFrom === "All") && sendTo && sendTo !== "All") {
     filters.sendAt = { lte: new Date(sendTo) };
   }
 

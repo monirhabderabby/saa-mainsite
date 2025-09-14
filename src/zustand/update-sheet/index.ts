@@ -42,7 +42,7 @@ export const useUpdateSheetFilterState = create<ProfileState>((set) => ({
       updateById: data.updateById ?? state.updateById,
       tlId: data.tlId ?? state.tlId,
       doneById: data.doneById ?? state.doneById,
-      sendFrom: data.sendFrom ?? state.sendFrom,
+      sendFrom: (data.sendFrom as string | undefined) ?? state.sendFrom,
       sendTo: data.sendTo ?? state.sendTo,
       createdFrom:
         (data.createdFrom as string | undefined) ?? state.createdFrom, // ✅ cast

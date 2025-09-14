@@ -25,6 +25,7 @@ const TableContainer = () => {
     tl,
     done,
     createdFrom,
+    sendFrom,
   } = useUpdateSheetFilterState();
 
   profileId = profileId ?? "All";
@@ -36,7 +37,11 @@ const TableContainer = () => {
   done = done ?? "All";
   createdFrom = createdFrom
     ? new Date(createdFrom).toISOString().split("T")[0] // "2025-09-14"
-    : new Date().toISOString().split("T")[0];
+    : "All";
+
+  sendFrom = sendFrom
+    ? new Date(sendFrom).toISOString().split("T")[0] // "2025-09-14"
+    : "All";
 
   const { data, isLoading, isError, error } = useQuery<GetUpdateSheetsReturn>({
     queryKey: [
@@ -49,10 +54,11 @@ const TableContainer = () => {
       tl,
       done,
       createdFrom,
+      sendFrom,
     ],
     queryFn: () =>
       fetch(
-        `/api/update-entries?profileId=${profileId}&updateTo=${updateTo}&clientName=${clientName}&orderId=${orderId}&page=${page}&limit=10&tl=${tl}&done=${done}&createdFrom=${createdFrom}`
+        `/api/update-entries?profileId=${profileId}&updateTo=${updateTo}&clientName=${clientName}&orderId=${orderId}&page=${page}&limit=10&tl=${tl}&done=${done}&createdFrom=${createdFrom}&sendFroms=${sendFrom}`
       ).then((res) => res.json()),
   });
 

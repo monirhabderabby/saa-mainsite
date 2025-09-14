@@ -102,11 +102,11 @@ export default function DatePicker({
           </PopoverContent>
         </Popover>
       </div>
-      {value && (
+      {/* {value && (
         <div className="text-muted-foreground px-1 text-sm">
           Parsed date: <span className="font-medium">{formatDate(value)}</span>
         </div>
-      )}
+      )} */}
     </div>
   );
 }
