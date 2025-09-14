@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -6,11 +7,33 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import prisma from "@/lib/prisma";
+import dynamic from "next/dynamic";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import FilterContainer from "./_components/filter-container";
-import TableContainer from "./_components/tables/table-container";
+const TableContainer = dynamic(
+  () => import("./_components/tables/table-container"),
+  {
+    ssr: false,
+  }
+);
 
 const Page = async () => {
+  const cu = await auth();
+  if (!cu || !cu?.user || !cu.user.id) redirect("/login");
+
+  const permission = await prisma.permissions.findFirst({
+    where: {
+      userId: cu.user.id,
+      name: "UPDATE_SHEET",
+    },
+    select: {
+      isMessageCreateAllowed: true,
+    },
+  });
+
+  const isWriteAccess = permission?.isMessageCreateAllowed ?? false;
   return (
     <Card className="shadow-none ">
       <CardHeader>
@@ -24,11 +47,13 @@ const Page = async () => {
           </div>
           <div className="flex items-center gap-5">
             <FilterContainer />
-            <Button effect="gooeyLeft" asChild>
-              <Link href="/update-sheet/add-entry" className="w-full">
-                Add Entry
-              </Link>
-            </Button>
+            {isWriteAccess && (
+              <Button effect="gooeyLeft" asChild>
+                <Link href="/update-sheet/add-entry" className="w-full">
+                  Add Entry
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </CardHeader>
