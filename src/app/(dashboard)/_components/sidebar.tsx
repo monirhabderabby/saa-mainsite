@@ -61,7 +61,7 @@ const routes = [
     id: 5,
     label: "Teams",
     icon: Building,
-    href: "/dashboard/teams",
+    href: "/teams",
     access: ["ADMIN", "SUPER_ADMIN"] as Role[],
   },
   {
