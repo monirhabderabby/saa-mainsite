@@ -2,6 +2,9 @@
 import {
   AlertDialog,
   AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
@@ -31,6 +34,7 @@ import {
 import { useUpdateSheetFilterState } from "@/zustand/update-sheet";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Profile, UpdateTo } from "@prisma/client";
+import { Repeat } from "lucide-react";
 import dynamic from "next/dynamic";
 import { ReactNode, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -75,7 +79,7 @@ export default function AddFilterUpdateSheetEntries({
   profiles,
 }: Props) {
   const [open, setOpen] = useState(false);
-  const { profileId, setAllValues } = useUpdateSheetFilterState();
+  const { profileId, setAllValues, clearFilters } = useUpdateSheetFilterState();
 
   const form = useForm<UpdateSheetFilter>({
     resolver: zodResolver(updateSheetFilter),
@@ -95,6 +99,14 @@ export default function AddFilterUpdateSheetEntries({
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Filters</AlertDialogTitle>
+          <AlertDialogDescription>
+            Use these filters to narrow down the update sheet entries. You can
+            filter by profile, client, order ID, update type, TL check, status,
+            and dates. Click &quot;Reset&quot; to clear all filters.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 ">
             <div className="grid grid-cols-2 gap-5">
@@ -279,6 +291,9 @@ export default function AddFilterUpdateSheetEntries({
               />
             </div>
             <div className="flex justify-end gap-x-4">
+              <Button variant="outline" onClick={clearFilters} type="button">
+                <Repeat /> Reset
+              </Button>
               <Button
                 variant="outline"
                 className="text-primary hover:text-primary/80"
@@ -290,7 +305,7 @@ export default function AddFilterUpdateSheetEntries({
               >
                 Cancel
               </Button>
-              <Button type="submit">Save</Button>
+              <Button type="submit">Apply Filters</Button>
             </div>
           </form>
         </Form>

@@ -323,7 +323,6 @@ export default function AddUpdateForm({ profiles, initialData }: Props) {
               <FormItem>
                 <FormLabel>Message</FormLabel>
                 <RichTextEditor
-                  key={field.value ?? "empty"}
                   value={field.value}
                   onChange={field.onChange}
                   restrictedWords={restrictedWords}
