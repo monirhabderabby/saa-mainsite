@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import CharacterCount from "@tiptap/extension-character-count";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { useEffect } from "react";
 import RestrictedWords from "./restricted-words-extension";
 
 interface RichTextEditorProps {
@@ -71,6 +72,11 @@ export default function RichTextEditor({
       //   onCharCountChange?.(editor.storage.characterCount?.characters() ?? 0);
     },
   });
+  useEffect(() => {
+    if (editor && value !== editor.getHTML()) {
+      editor.commands.setContent(value || "");
+    }
+  }, [value, editor]);
 
   if (!editor) return null;
 

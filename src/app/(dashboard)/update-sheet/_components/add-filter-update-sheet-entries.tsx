@@ -79,12 +79,19 @@ export default function AddFilterUpdateSheetEntries({
   profiles,
 }: Props) {
   const [open, setOpen] = useState(false);
-  const { profileId, setAllValues, clearFilters } = useUpdateSheetFilterState();
+  const { setAllValues, clearFilters } = useUpdateSheetFilterState();
 
   const form = useForm<UpdateSheetFilter>({
     resolver: zodResolver(updateSheetFilter),
     defaultValues: {
-      profileId: profileId,
+      clientName: undefined,
+      orderId: undefined,
+      profileId: undefined,
+      updateTo: undefined,
+      tl: undefined,
+      done: undefined,
+      createdFrom: undefined,
+      sendFrom: undefined,
     },
   });
 
@@ -237,14 +244,9 @@ export default function AddFilterUpdateSheetEntries({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Done?</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger
-                          className={colorMap[field.value as UpdateTo] ?? ""}
-                        >
+                        <SelectTrigger>
                           <SelectValue placeholder="Filter by tl check" />
                         </SelectTrigger>
                       </FormControl>
@@ -291,7 +293,15 @@ export default function AddFilterUpdateSheetEntries({
               />
             </div>
             <div className="flex justify-end gap-x-4">
-              <Button variant="outline" onClick={clearFilters} type="button">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  clearFilters();
+
+                  form.reset();
+                }}
+                type="button"
+              >
                 <Repeat /> Reset
               </Button>
               <Button
