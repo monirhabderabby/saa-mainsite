@@ -69,6 +69,8 @@ model Services {
     teams Team[]
     users User[]
 
+    issues IssueSheet[]
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
@@ -79,6 +81,9 @@ model Profile {
 
     // ref
     updateSheets UpdateSheet[]
+
+    // 
+    issueSheets IssueSheet[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -223,4 +228,35 @@ model UpdateSheet {
     createdAt DateTime  @default(now())
     updatedAt DateTime  @updatedAt
     sendAt    DateTime?
+}
+
+enum IssueStatus {
+    open
+    wip
+    done
+    cancelled
+    dispute
+}
+
+model IssueSheet {
+    id         String @id @default(auto()) @map("_id") @db.ObjectId
+    clientName String
+    orderId    String
+
+    specialNotes      String?
+    orderPageUrl      String?
+    inboxPageUrl      String?
+    fileOrMeetingLink String?
+    noteForSales      String?
+
+    status IssueStatus @default(open)
+
+    serviceId String   @db.ObjectId
+    service   Services @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+    profileId String  @db.ObjectId
+    profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
