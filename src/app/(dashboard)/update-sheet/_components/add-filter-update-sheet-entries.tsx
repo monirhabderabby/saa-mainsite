@@ -126,6 +126,7 @@ export default function AddFilterUpdateSheetEntries({
                     <FormControl>
                       <Input
                         {...field}
+                        value={field.value ?? ""}
                         placeholder="You can write client name ex: Ashanti, rafarraveria"
                       />
                     </FormControl>
@@ -139,7 +140,11 @@ export default function AddFilterUpdateSheetEntries({
                   <FormItem>
                     <FormLabel>Order ID</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="ex: FO321834E7607" />
+                      <Input
+                        {...field}
+                        value={field.value ?? ""} // 👈 ensures always a string
+                        placeholder="ex: FO321834E7607"
+                      />
                     </FormControl>
                   </FormItem>
                 )}
@@ -156,7 +161,6 @@ export default function AddFilterUpdateSheetEntries({
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
-                        defaultValue={field.value}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select profile" />
@@ -187,13 +191,16 @@ export default function AddFilterUpdateSheetEntries({
                     <FormLabel>Update To</FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      value={field.value ?? undefined} // 👈 cast so TS is happy
                     >
                       <FormControl>
                         <SelectTrigger
                           className={colorMap[field.value as UpdateTo] ?? ""}
                         >
-                          <SelectValue placeholder="Where message should to go?" />
+                          <SelectValue
+                            defaultChecked
+                            placeholder="Where message should to go?"
+                          />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -218,10 +225,7 @@ export default function AddFilterUpdateSheetEntries({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>TL Check</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Filter by tl check" />
@@ -270,13 +274,14 @@ export default function AddFilterUpdateSheetEntries({
                   <FormItem>
                     <FormLabel>Created At</FormLabel>
                     <SmartDatePicker
-                      value={field.value}
+                      value={field.value} // 👈 force controlled, placeholder shows
                       onChange={field.onChange}
                     />
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="sendFrom"
@@ -284,7 +289,7 @@ export default function AddFilterUpdateSheetEntries({
                   <FormItem>
                     <FormLabel>Send At</FormLabel>
                     <SmartDatePicker
-                      value={field.value}
+                      value={field.value} // 👈 same fix
                       onChange={field.onChange}
                     />
                     <FormMessage />
@@ -298,7 +303,16 @@ export default function AddFilterUpdateSheetEntries({
                 onClick={() => {
                   clearFilters();
 
-                  form.reset();
+                  form.reset({
+                    clientName: "",
+                    orderId: "",
+                    profileId: "",
+                    updateTo: "", // 👈 must be string, not undefined
+                    tl: "",
+                    done: "",
+                    createdFrom: undefined,
+                    sendFrom: undefined,
+                  });
                 }}
                 type="button"
               >

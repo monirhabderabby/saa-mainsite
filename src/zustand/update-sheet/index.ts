@@ -5,9 +5,9 @@ import { create } from "zustand";
 type ProfileState = {
   profileId?: string;
   page: number;
-  updateTo: UpdateTo | "All" | undefined;
-  tl?: "tlChecked" | "notTlCheck" | "All";
-  done?: "done" | "notDone" | "All";
+  updateTo: UpdateTo | "All" | undefined | string;
+  tl?: string; // "tlChecked" | "notTlCheck" | "All";
+  done?: string; // "done" | "notDone" | "All";
   updateById?: string;
   tlId?: string;
   doneById?: string;
@@ -68,9 +68,9 @@ export const useUpdateSheetFilterState = create<ProfileState>((set) => ({
     set({
       profileId: undefined,
       page: 1,
-      updateTo: "All",
-      tl: "All",
-      done: "All",
+      updateTo: undefined,
+      tl: undefined,
+      done: undefined,
       updateById: undefined,
       tlId: undefined,
       doneById: undefined,

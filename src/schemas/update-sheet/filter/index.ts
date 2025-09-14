@@ -9,13 +9,14 @@ export const updateToSchema = z
       message: "You must select a valid update status",
     }
   )
+  .nullable()
   .optional();
 
 export const updateSheetFilter = z.object({
   profileId: z.string().optional(),
-  updateTo: updateToSchema,
-  tl: z.enum(["tlChecked", "notTlCheck", "All"]).optional(),
-  done: z.enum(["done", "notDone", "All"]).optional(),
+  updateTo: z.string().optional(),
+  tl: z.string().optional(),
+  done: z.string().optional(),
   updateById: z.string().optional(),
   tlId: z.string().optional(),
   doneById: z.string().optional(),

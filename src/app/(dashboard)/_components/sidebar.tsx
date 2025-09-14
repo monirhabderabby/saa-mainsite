@@ -58,14 +58,14 @@ const routes = [
     access: ["SUPER_ADMIN"] as Role[],
   },
   {
-    id: 4,
+    id: 5,
     label: "Teams",
     icon: Building,
     href: "/dashboard/teams",
     access: ["ADMIN", "SUPER_ADMIN"] as Role[],
   },
   {
-    id: 5,
+    id: 6,
     label: "Update Sheet",
     icon: Sheet,
     href: "/update-sheet",
@@ -78,7 +78,7 @@ const routes = [
   },
 
   {
-    id: 6,
+    id: 7,
     label: "Settings",
     icon: Settings,
     href: "/dashboard/settings",

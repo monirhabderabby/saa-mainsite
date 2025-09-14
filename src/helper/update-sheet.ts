@@ -37,9 +37,9 @@ export async function getUpdateSheets(options: {
 
   if (profileId && profileId !== "All") filters.profileId = profileId;
   if (updateTo && updateTo !== "All") filters.updateTo = updateTo;
-  if (sendFrom && sendFrom !== "All")
-    if (clientName)
-      filters.clientName = { contains: clientName, mode: "insensitive" };
+  if (clientName)
+    filters.clientName = { contains: clientName, mode: "insensitive" };
+
   if (orderId) filters.orderId = { contains: orderId, mode: "insensitive" };
 
   // TL filter
