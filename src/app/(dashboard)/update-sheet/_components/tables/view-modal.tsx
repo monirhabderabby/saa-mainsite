@@ -156,10 +156,14 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
             <Button disabled variant="outline">
               Sent ✅
             </Button>
-          ) : (
+          ) : data.tlId ? (
             <Button onClick={onMarkedAsSend} disabled={pending}>
               Mark as Sent{" "}
               {pending ? <Loader className="animate-spin" /> : <Send />}
+            </Button>
+          ) : (
+            <Button disabled variant="ghost">
+              Waiting for Tl Check....
             </Button>
           )}
         </AlertDialogFooter>

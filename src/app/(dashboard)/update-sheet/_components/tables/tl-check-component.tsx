@@ -1,6 +1,7 @@
 import { tlCheck } from "@/actions/update-sheet/update";
 import { Checkbox } from "@/components/ui/checkbox";
 import { UpdateSheetData } from "@/helper/update-sheet";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -11,6 +12,8 @@ interface Props {
 const TlCheckComponent = ({ data }: Props) => {
   const [pending, startTransition] = useTransition();
   const [isChecked, setIsChecked] = useState(!!data.tlId); // Initialize based on tlId presence
+
+  const queryClient = useQueryClient();
 
   const onChange = () => {
     const previousState = isChecked; // Store current state for revert
@@ -24,6 +27,7 @@ const TlCheckComponent = ({ data }: Props) => {
           toast.error(result.message);
         } else {
           toast.success(result.message);
+          queryClient.invalidateQueries({ queryKey: ["update-entries"] });
         }
       } catch {
         setIsChecked(previousState); // Revert state on unexpected error

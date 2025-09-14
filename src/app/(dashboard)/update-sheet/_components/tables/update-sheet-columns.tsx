@@ -91,11 +91,19 @@ export const updateSheetColumns: ColumnDef<UpdateSheetData>[] = [
   {
     header: "Action",
     cell: ({ row }) => (
-      <Button size="icon" variant="ghost" asChild>
-        <Link href={`/update-sheet/edit/${row.original.id}`}>
-          <Pencil />
-        </Link>
-      </Button>
+      <>
+        {row.original.sendAt ? (
+          <Button disabled variant="ghost" size="sm">
+            Sent ✅
+          </Button>
+        ) : (
+          <Button size="icon" variant="ghost" asChild>
+            <Link href={`/update-sheet/edit/${row.original.id}`}>
+              <Pencil />
+            </Link>
+          </Button>
+        )}
+      </>
     ),
   },
 ];

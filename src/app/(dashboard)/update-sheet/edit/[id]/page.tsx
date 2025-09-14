@@ -27,6 +27,15 @@ const Page = async ({ params }: { params: { id: string } }) => {
   const cu = await auth();
 
   if (!cu?.user.id) redirect("/login");
+  const cuPermission = await prisma.permissions.findFirst({
+    where: {
+      userId: cu.user.id,
+      name: "UPDATE_SHEET",
+    },
+    select: {
+      isMessageTLCheckAllowed: true,
+    },
+  });
   const profiles = await prisma.profile.findMany();
   const entry = await prisma.updateSheet.findUnique({
     where: { id: params.id },
@@ -37,7 +46,8 @@ const Page = async ({ params }: { params: { id: string } }) => {
   // ✅ Allow if user is the owner OR has an allowed role
   const canEdit =
     cu.user.id === entry.updateById ||
-    (cu.user.role && allowedRoles.includes(cu.user.role as Role));
+    (cu.user.role && allowedRoles.includes(cu.user.role as Role)) ||
+    cuPermission?.isMessageTLCheckAllowed;
 
   if (!canEdit) {
     return (
