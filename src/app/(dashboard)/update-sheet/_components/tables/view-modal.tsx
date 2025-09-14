@@ -64,43 +64,54 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent className="p-0">
-        <ScrollArea className="max-h-[70vh] p-5">
-          <div className="space-y-3">
-            <ClipboardCopy
-              label="Profile Name"
-              value={data.profile.name}
-              clipboard
-            />
-            <ClipboardCopy
-              label="Client Name"
-              value={data.clientName}
-              clipboard
-            />
-            <ClipboardCopy label="Order ID" value={data.orderId} clipboard />
-            <ClipboardCopy
-              label="Updated By"
-              value={data.updateBy.fullName as string}
-            />
-            {data.commentFromOperation && (
+        <ScrollArea className="max-h-[70vh] p-8">
+          <div className="flex items-start justify-between">
+            <div className="space-y-3">
+              <ClipboardCopy label="Profile Name" value={data.profile.name} />
               <ClipboardCopy
-                label="OP Comment"
-                value={data.commentFromOperation as string}
+                label="Client Name"
+                value={data.clientName}
+                clipboard
               />
-            )}
-            {data.commentFromSales && (
+              <ClipboardCopy label="Order ID" value={data.orderId} clipboard />
               <ClipboardCopy
-                label="Sales Comment"
-                value={data.commentFromSales as string}
+                label="Updated By"
+                value={data.updateBy.fullName as string}
               />
-            )}
-            {data.tlId && (
-              <ClipboardCopy
-                label="TL CHeck"
-                value={data.tlBy?.fullName as string}
-              />
-            )}
-            <p className="text-sm">
-              <span className="font-semibold">Update To: </span>
+              {data.commentFromOperation && (
+                <ClipboardCopy
+                  label="OP Comment"
+                  value={data.commentFromOperation as string}
+                />
+              )}
+              {data.commentFromSales && (
+                <ClipboardCopy
+                  label="Sales Comment"
+                  value={data.commentFromSales as string}
+                />
+              )}
+              {data.tlId && (
+                <ClipboardCopy
+                  label="TL Check"
+                  value={data.tlBy?.fullName as string}
+                />
+              )}
+              {/* <p className="text-sm">
+                <span className="font-semibold">Update To: </span>
+                <span className="text-muted-foreground">
+                  <UpdateToBadge updateTo={data.updateTo} />
+                </span>
+              </p> */}
+
+              {data.doneBy && (
+                <ClipboardCopy
+                  label="Done By"
+                  value={data.doneBy?.fullName as string}
+                />
+              )}
+            </div>
+            <p className="">
+              {/* <span className="font-semibold">Update To: </span> */}
               <span className="text-muted-foreground">
                 <UpdateToBadge updateTo={data.updateTo} />
               </span>
