@@ -33,8 +33,8 @@ export const EmailVerification = ({
         <Body className="bg-gray-100 my-auto mx-auto font-sans">
           <Container className="border border-solid border-gray-200 rounded my-10 mx-auto p-5 max-w-md bg-white">
             {/* Header with Logo */}
-            <Section className="mt-4 text-center flex justify-center">
-              <Img src={companyLogo} alt="Logo" width="160" height="60" />;
+            <Section className="mt-4 text-center flex justify-center mx-auto">
+              <Img src={companyLogo} alt="Logo" width="160" height="60" />
             </Section>
 
             {/* Title */}

@@ -1,35 +1,30 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { ServiceStats } from "@/types/services";
 import { Briefcase, Users } from "lucide-react";
 
 interface StatsOverviewProps {
-  totalServices: number;
-  totalTeams: number;
-  totalMembers: number;
+  stats: ServiceStats;
 }
 
-export default function TeamStatsOverview({
-  totalServices,
-  totalTeams,
-  totalMembers,
-}: StatsOverviewProps) {
-  const stats = [
+export default function TeamStatsOverview({ stats }: StatsOverviewProps) {
+  const statsConfig = [
     {
       title: "Total Services",
-      value: totalServices,
+      value: stats.totalServices,
       icon: Briefcase,
       color: "text-blue-600",
       bgColor: "bg-blue-50",
     },
     {
       title: "Active Teams",
-      value: totalTeams,
+      value: stats.totalTeams,
       icon: Users,
       color: "text-green-600",
       bgColor: "bg-green-50",
     },
     {
       title: "Team Members",
-      value: totalMembers,
+      value: stats.totalMembers,
       icon: Users,
       color: "text-purple-600",
       bgColor: "bg-purple-50",
@@ -38,11 +33,8 @@ export default function TeamStatsOverview({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-      {stats.map((stat, index) => (
-        <Card
-          key={index}
-          className="hover:shadow-md shadow-none transition-shadow"
-        >
+      {statsConfig.map((stat, index) => (
+        <Card key={index} className="hover:shadow-md transition-shadow">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
