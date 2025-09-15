@@ -2,21 +2,11 @@ import AddTeamModal from "@/components/shared/modal/add-team-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import prisma from "@/lib/prisma";
-import {
-  ArrowLeft,
-  MoreHorizontal,
-  Plus,
-  Settings,
-  UserPlus,
-} from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 import Link from "next/link";
+import TeamManageDropdown from "./_components/team-manage-dropdown";
 
 export default async function ManageTeamsPage({
   params,
@@ -81,26 +71,7 @@ export default async function ManageTeamsPage({
                       {team.userTeams.length} members
                     </Badge>
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
-                        <UserPlus className="w-4 h-4 mr-2" />
-                        Add Member
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Settings className="w-4 h-4 mr-2" />
-                        Team Settings
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-600">
-                        Delete Team
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <TeamManageDropdown teamId={team.id} />
                 </div>
               </CardHeader>
 

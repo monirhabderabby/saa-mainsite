@@ -78,14 +78,6 @@ export default function ServiTeaceCard({ service }: ServiceCardProps) {
                     {team.userTeams.length} members
                   </span>
                 </div>
-                <div className="flex gap-2 text-xs">
-                  <span className="text-orange-600">
-                    {Math.floor(Math.random() * 10) + 2} active
-                  </span>
-                  <span className="text-green-600">
-                    {Math.floor(Math.random() * 20) + 5} done
-                  </span>
-                </div>
               </div>
 
               <div className="flex items-center gap-2">
