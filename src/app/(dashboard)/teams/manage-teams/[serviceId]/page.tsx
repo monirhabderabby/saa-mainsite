@@ -3,8 +3,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import prisma from "@/lib/prisma";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, MoreHorizontal, Plus } from "lucide-react";
 import Link from "next/link";
 import TeamManageDropdown from "./_components/team-manage-dropdown";
 
@@ -19,7 +26,11 @@ export default async function ManageTeamsPage({
       serviceId: params.serviceId,
     },
     include: {
-      userTeams: true,
+      userTeams: {
+        include: {
+          user: true,
+        },
+      },
       service: {
         select: {
           name: true,
@@ -27,6 +38,7 @@ export default async function ManageTeamsPage({
       },
     },
   });
+
   return (
     <div className="min-h-screen ">
       <div className="">
@@ -71,7 +83,11 @@ export default async function ManageTeamsPage({
                       {team.userTeams.length} members
                     </Badge>
                   </div>
-                  <TeamManageDropdown teamId={team.id} />
+                  <TeamManageDropdown
+                    teamId={team.id}
+                    teamName={team.name}
+                    serviceId={params.serviceId}
+                  />
                 </div>
               </CardHeader>
 
@@ -81,7 +97,57 @@ export default async function ManageTeamsPage({
                   <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
                     Team Members
                   </h4>
-                  {/* add members here */}
+                  <div className="grid gap-3">
+                    {team.userTeams.map((member) => (
+                      <div
+                        key={member.id}
+                        className="flex items-center justify-between p-3 border border-border rounded-lg hover:bg-muted/30 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="relative">
+                            <Avatar className="w-10 h-10">
+                              <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                                {member.user.fullName}
+                              </AvatarFallback>
+                            </Avatar>
+                            {/* <div
+                              className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-background ${getStatusColor(member.status)}`}
+                            /> */}
+                          </div>
+                          <div>
+                            <div className="font-medium">
+                              {member.user.fullName}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              Full Stack Developer
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant="outline"
+                            className="text-xs capitalize"
+                          >
+                            Active
+                          </Badge>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreHorizontal className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem>View Profile</DropdownMenuItem>
+                              <DropdownMenuItem>Change Role</DropdownMenuItem>
+                              <DropdownMenuItem className="text-red-600">
+                                Remove from Team
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -91,53 +157,3 @@ export default async function ManageTeamsPage({
     </div>
   );
 }
-
-//  <div className="grid gap-3">
-//                     {team.members.map((member) => (
-//                       <div
-//                         key={member.id}
-//                         className="flex items-center justify-between p-3 border border-border rounded-lg hover:bg-muted/30 transition-colors"
-//                       >
-//                         <div className="flex items-center gap-3">
-//                           <div className="relative">
-//                             <Avatar className="w-10 h-10">
-//                               <AvatarFallback className="bg-primary/10 text-primary font-medium">
-//                                 {member.avatar}
-//                               </AvatarFallback>
-//                             </Avatar>
-//                             {/* <div
-//                               className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-background ${getStatusColor(member.status)}`}
-//                             /> */}
-//                           </div>
-//                           <div>
-//                             <div className="font-medium">{member.name}</div>
-//                             <div className="text-sm text-muted-foreground">
-//                               {member.role}
-//                             </div>
-//                           </div>
-//                         </div>
-//                         <div className="flex items-center gap-2">
-//                           <Badge
-//                             variant="outline"
-//                             className="text-xs capitalize"
-//                           >
-//                             {member.status}
-//                           </Badge>
-//                           <DropdownMenu>
-//                             <DropdownMenuTrigger asChild>
-//                               <Button variant="ghost" size="icon">
-//                                 <MoreHorizontal className="w-4 h-4" />
-//                               </Button>
-//                             </DropdownMenuTrigger>
-//                             <DropdownMenuContent align="end">
-//                               <DropdownMenuItem>View Profile</DropdownMenuItem>
-//                               <DropdownMenuItem>Change Role</DropdownMenuItem>
-//                               <DropdownMenuItem className="text-red-600">
-//                                 Remove from Team
-//                               </DropdownMenuItem>
-//                             </DropdownMenuContent>
-//                           </DropdownMenu>
-//                         </div>
-//                       </div>
-//                     ))}
-//                   </div>

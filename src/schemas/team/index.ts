@@ -10,3 +10,10 @@ export const teamSchema = z.object({
 });
 
 export type TeamSchemaType = z.infer<typeof teamSchema>;
+
+export const addMemberSchema = z.object({
+  teamId: z.string().min(1, "Team ID is required"),
+  members: z.array(z.string()).min(1, "Select at least one member"),
+});
+
+export type AddMemberSchema = z.infer<typeof addMemberSchema>;
