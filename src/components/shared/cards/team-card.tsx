@@ -9,28 +9,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ServiceWithTeamsAndUsers } from "@/types/services";
-import {
-  AlertCircle,
-  CheckCircle,
-  Clock,
-  MoreHorizontal,
-  Users,
-} from "lucide-react";
+import { MoreHorizontal, Users } from "lucide-react";
+import Link from "next/link";
 
 interface ServiceCardProps {
   service: ServiceWithTeamsAndUsers;
 }
 
-export function ServiceCard({ service }: ServiceCardProps) {
+export default function ServiTeaceCard({ service }: ServiceCardProps) {
   const totalMembers = service.users.length;
   const totalTeams = service.teams.length;
-
-  // In a real app, you'd fetch these from your task/project management system
-  const mockStats = {
-    active: Math.floor(Math.random() * 20) + 5,
-    completed: Math.floor(Math.random() * 50) + 20,
-    pending: Math.floor(Math.random() * 10) + 1,
-  };
 
   return (
     <Card className="hover:shadow-lg transition-shadow duration-200">
@@ -51,7 +39,9 @@ export function ServiceCard({ service }: ServiceCardProps) {
               </DropdownMenuItem>
               <DropdownMenuItem>Edit Service</DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <a href={`/manage-teams/${service.id}`}>Manage Teams</a>
+                <Link href={`/teams/manage-teams/${service.id}`}>
+                  Manage Teams
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -69,31 +59,6 @@ export function ServiceCard({ service }: ServiceCardProps) {
       </CardHeader>
 
       <CardContent className="space-y-6">
-        {/* Quick Stats */}
-        <div className="grid grid-cols-3 gap-3">
-          <div className="text-center p-3 bg-muted/50 rounded-lg">
-            <div className="flex items-center justify-center gap-1 mb-1">
-              <Clock className="w-3 h-3 text-orange-500" />
-              <span className="text-xs text-muted-foreground">Active</span>
-            </div>
-            <div className="text-lg font-semibold">{mockStats.active}</div>
-          </div>
-          <div className="text-center p-3 bg-muted/50 rounded-lg">
-            <div className="flex items-center justify-center gap-1 mb-1">
-              <CheckCircle className="w-3 h-3 text-green-500" />
-              <span className="text-xs text-muted-foreground">Done</span>
-            </div>
-            <div className="text-lg font-semibold">{mockStats.completed}</div>
-          </div>
-          <div className="text-center p-3 bg-muted/50 rounded-lg">
-            <div className="flex items-center justify-center gap-1 mb-1">
-              <AlertCircle className="w-3 h-3 text-yellow-500" />
-              <span className="text-xs text-muted-foreground">Pending</span>
-            </div>
-            <div className="text-lg font-semibold">{mockStats.pending}</div>
-          </div>
-        </div>
-
         {/* Teams */}
         <div className="space-y-4">
           <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">

@@ -1,4 +1,4 @@
-import { ServiceCard } from "@/components/shared/cards/team-card";
+import ServiceCard from "@/components/shared/cards/team-card";
 import prisma from "@/lib/prisma";
 import { ServiceStats, ServiceWithTeamsAndUsers } from "@/types/services";
 import TeamStatsOverview from "./_components/team-stats-overview";
