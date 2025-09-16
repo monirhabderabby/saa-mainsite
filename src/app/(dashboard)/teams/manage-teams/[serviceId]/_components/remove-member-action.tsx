@@ -27,12 +27,12 @@ const RemoveMemberAction = ({ userId, teamId }: Props) => {
   return (
     <Button
       variant="ghost"
-      className="text-red-600 hover:text-red-600 hover:bg-red-400/10 py-1 text-sm"
+      className="text-red-600 hover:text-red-600 hover:bg-red-400/10 py-1 text-sm "
       size="sm"
       disabled={pending}
       onClick={onDelete}
     >
-      Remove from Team
+      Remove from team
     </Button>
   );
 };

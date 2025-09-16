@@ -17,3 +17,28 @@ export const addMemberSchema = z.object({
 });
 
 export type AddMemberSchema = z.infer<typeof addMemberSchema>;
+
+export const responsibilityZodSchema = z.object({
+  responsibility: z
+    .string({
+      message: "Responsibility is required",
+    })
+    .min(1, "Responsibility cannot be empty")
+    .max(500, "Responsibility cannot exceed 500 characters")
+    .trim(),
+
+  teamId: z
+    .string({
+      message: "Team ID is required",
+    })
+    .min(1, "Team ID cannot be empty"),
+
+  userId: z
+    .string({
+      message: "Team ID is required",
+    })
+    .min(1, "Team ID cannot be empty"),
+});
+
+// Optional: You can also create a type from the schema
+export type ResponsibilitySchemaType = z.infer<typeof responsibilityZodSchema>;

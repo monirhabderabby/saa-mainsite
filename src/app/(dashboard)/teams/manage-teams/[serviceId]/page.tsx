@@ -7,13 +7,13 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import prisma from "@/lib/prisma";
 import { ArrowLeft, MoreHorizontal, Plus } from "lucide-react";
 import Link from "next/link";
 import RemoveMemberAction from "./_components/remove-member-action";
+import ResponsibilityAction from "./_components/responsibility-action";
 import TeamManageDropdown from "./_components/team-manage-dropdown";
 
 export default async function ManageTeamsPage({
@@ -137,13 +137,16 @@ export default async function ManageTeamsPage({
                                 <MoreHorizontal className="w-4 h-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem disabled>
-                                View Profile
-                              </DropdownMenuItem>
-                              <DropdownMenuItem disabled>
-                                Responsibility
-                              </DropdownMenuItem>
+                            <DropdownMenuContent
+                              align="end"
+                              className="flex flex-col justify-start items-start"
+                            >
+                              <ResponsibilityAction
+                                teamId={member.teamId}
+                                userId={member.userId}
+                                teamName={team.name}
+                                responsibility={member.responsibility}
+                              />
                               <RemoveMemberAction
                                 teamId={member.teamId}
                                 userId={member.userId}
