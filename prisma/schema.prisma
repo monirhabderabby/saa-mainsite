@@ -93,10 +93,11 @@ model Team {
     id   String @id @default(auto()) @map("_id") @db.ObjectId
     name String
 
-    userId    String?    @db.ObjectId
-    serviceId String?    @db.ObjectId
+    userId    String?      @db.ObjectId
+    serviceId String?      @db.ObjectId
     userTeams UserTeam[]
-    service   Services?  @relation(fields: [serviceId], references: [id])
+    issues    IssueSheet[]
+    service   Services?    @relation(fields: [serviceId], references: [id])
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -257,6 +258,9 @@ model IssueSheet {
     noteForSales      String?
 
     status IssueStatus @default(open)
+
+    teamId String? @db.ObjectId
+    team   Team?   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
     serviceId String   @db.ObjectId
     service   Services @relation(fields: [serviceId], references: [id], onDelete: Cascade)
