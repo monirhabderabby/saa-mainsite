@@ -1,4 +1,3 @@
-import { IssueStatus } from "@prisma/client";
 import { create } from "zustand";
 
 type IssueSheetFilterState = {
@@ -6,7 +5,7 @@ type IssueSheetFilterState = {
   serviceId?: string;
   teamId?: string;
   page: number;
-  status?: IssueStatus | "All" | undefined;
+  status?: string;
   clientName?: string;
   orderId?: string;
   createdFrom?: string;

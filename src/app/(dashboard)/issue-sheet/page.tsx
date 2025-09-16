@@ -8,13 +8,26 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import prisma from "@/lib/prisma";
+import { Filter } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import IssueTableContainer from "./_components/table-container";
+const AddFilterIssueSheetEntries = dynamic(
+  () => import("./_components/filter/add-filter-issue-sheet-entries"),
+  {
+    ssr: false,
+  }
+);
 
 const Page = async () => {
   const cu = await auth();
   if (!cu || !cu?.user || !cu.user.id) redirect("/login");
+
+  const [profiles, teams] = await prisma.$transaction([
+    prisma.profile.findMany(),
+    prisma.team.findMany(),
+  ]);
 
   const permission = await prisma.permissions.findFirst({
     where: {
@@ -40,7 +53,15 @@ const Page = async () => {
             </CardDescription>
           </div>
           <div className="flex items-center gap-5">
-            {/* <FilterContainer /> */}
+            <AddFilterIssueSheetEntries
+              profiles={profiles}
+              teams={teams}
+              trigger={
+                <Button variant="outline">
+                  <Filter /> Filter
+                </Button>
+              }
+            />
             {isWriteAccess && (
               <Button effect="gooeyLeft" asChild>
                 <Link href="/issue-sheet/add-entry" className="w-full">

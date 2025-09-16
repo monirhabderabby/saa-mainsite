@@ -18,9 +18,11 @@ import { AlertTriangle } from "lucide-react";
 import { issueSheetColumns } from "./issue-sheet-column";
 
 const IssueTableContainer = () => {
+  const { status } = useIssueSheetFilterState();
   const { data, isLoading, isError, error } = useQuery<GetIssueSheetsReturn>({
-    queryKey: ["issue-sheet"],
-    queryFn: () => fetch(`/api/issue-sheets`).then((res) => res.json()),
+    queryKey: ["issue-sheet", status],
+    queryFn: () =>
+      fetch(`/api/issue-sheets?status=${status}`).then((res) => res.json()),
   });
 
   if (isError) {
