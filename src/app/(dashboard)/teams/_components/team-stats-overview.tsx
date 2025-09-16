@@ -23,7 +23,7 @@ export default function TeamStatsOverview({ stats }: StatsOverviewProps) {
       bgColor: "bg-green-50",
     },
     {
-      title: "Team Members",
+      title: "Total Employees",
       value: stats.totalMembers,
       icon: Users,
       color: "text-purple-600",
