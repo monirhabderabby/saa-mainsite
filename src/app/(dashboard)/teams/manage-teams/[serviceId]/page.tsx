@@ -1,4 +1,3 @@
-import AddTeamModal from "@/components/shared/modal/add-team-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,11 +9,31 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import prisma from "@/lib/prisma";
+import { TeamResponsibility } from "@prisma/client";
 import { ArrowLeft, MoreHorizontal, Plus } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import RemoveMemberAction from "./_components/remove-member-action";
 import ResponsibilityAction from "./_components/responsibility-action";
-import TeamManageDropdown from "./_components/team-manage-dropdown";
+const TeamManageDropdown = dynamic(
+  () => import("./_components/team-manage-dropdown"),
+  {
+    ssr: false,
+  }
+);
+
+const AddTeamModal = dynamic(
+  () => import("@/components/shared/modal/add-team-modal"),
+  {
+    ssr: false,
+  }
+);
+
+const responsibilityLabels: Record<TeamResponsibility, string> = {
+  [TeamResponsibility.Leader]: "Team Leader",
+  [TeamResponsibility.Coleader]: "Co-Leader",
+  [TeamResponsibility.Member]: "Member",
+};
 
 export default async function ManageTeamsPage({
   params,
@@ -38,6 +57,19 @@ export default async function ManageTeamsPage({
         },
       },
     },
+  });
+
+  // sort userTeams manually
+  const priority: Record<string, number> = {
+    Leader: 1,
+    Coleader: 2,
+    Member: 3,
+  };
+
+  teams.forEach((team) => {
+    team.userTeams.sort(
+      (a, b) => priority[a.responsibility] - priority[b.responsibility]
+    );
   });
 
   return (
@@ -129,7 +161,7 @@ export default async function ManageTeamsPage({
                             variant="outline"
                             className="text-xs capitalize"
                           >
-                            {member.responsibility}
+                            {responsibilityLabels[member.responsibility]}
                           </Badge>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>

@@ -37,7 +37,7 @@ interface AddMemberModalProps {
   responsibility: TeamResponsibility;
 }
 
-const responsibilityLabels: Record<TeamResponsibility, string> = {
+export const responsibilityLabels: Record<TeamResponsibility, string> = {
   [TeamResponsibility.Leader]: "Team Leader",
   [TeamResponsibility.Coleader]: "Co-Leader",
   [TeamResponsibility.Member]: "Team Member",
