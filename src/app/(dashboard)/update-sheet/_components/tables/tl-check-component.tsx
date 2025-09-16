@@ -1,9 +1,17 @@
 import { tlCheck } from "@/actions/update-sheet/update";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { UpdateSheetData } from "@/helper/update-sheet/update-sheet";
 import { useQueryClient } from "@tanstack/react-query";
+import dynamic from "next/dynamic";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
+const ProfileToolTip = dynamic(
+  () => import("@/components/ui/profile-tooltip"),
+  {
+    ssr: false,
+  }
+);
 
 interface Props {
   data: UpdateSheetData;
@@ -37,12 +45,26 @@ const TlCheckComponent = ({ data }: Props) => {
   };
 
   return (
-    <Checkbox
-      checked={isChecked}
-      onCheckedChange={onChange}
-      disabled={pending}
-      aria-label="TL Check"
-    />
+    <div className="flex justify-center items-center">
+      {data.doneById ? (
+        <ProfileToolTip
+          trigger={
+            <Button variant="link">
+              @{data.tlBy?.fullName?.split(" ")[0]}
+            </Button>
+          }
+          fullName={data.tlBy?.fullName ?? ""}
+          joiningDate={data.tlBy?.emailVerified}
+        />
+      ) : (
+        <Checkbox
+          checked={isChecked}
+          onCheckedChange={onChange}
+          disabled={pending}
+          aria-label="TL Check"
+        />
+      )}
+    </div>
   );
 };
 

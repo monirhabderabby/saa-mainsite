@@ -95,9 +95,11 @@ export async function getUpdateSheets(options: {
   const data = await prisma.updateSheet.findMany({
     where: filters,
     include: {
-      doneBy: { select: { fullName: true, image: true } },
-      tlBy: { select: { fullName: true, image: true } },
-      updateBy: { select: { fullName: true, image: true } },
+      doneBy: { select: { fullName: true, image: true, emailVerified: true } },
+      tlBy: { select: { fullName: true, image: true, emailVerified: true } },
+      updateBy: {
+        select: { fullName: true, image: true, emailVerified: true },
+      },
       profile: true,
     },
     skip: (page - 1) * limit,
@@ -124,9 +126,9 @@ export type GetUpdateSheetsReturn = Awaited<ReturnType<typeof getUpdateSheets>>;
 // Type for a single UpdateSheet including the relations
 export type UpdateSheetData = Prisma.UpdateSheetGetPayload<{
   include: {
-    tlBy: { select: { fullName: true; image: true } };
-    doneBy: { select: { fullName: true; image: true } };
-    updateBy: { select: { fullName: true; image: true } };
+    tlBy: { select: { fullName: true; image: true; emailVerified: true } };
+    doneBy: { select: { fullName: true; image: true; emailVerified: true } };
+    updateBy: { select: { fullName: true; image: true; emailVerified: true } };
     profile: true;
   };
 }>;

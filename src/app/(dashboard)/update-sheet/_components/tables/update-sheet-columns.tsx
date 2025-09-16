@@ -5,6 +5,7 @@ import { Pencil } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
+import DoneByComponent from "./done-by-component";
 import TlCheckComponent from "./tl-check-component";
 import UpdateToComponents from "./update-to";
 const ViewUpdateSheetModal = dynamic(() => import("./view-modal"), {
@@ -91,20 +92,7 @@ export const updateSheetColumns: ColumnDef<UpdateSheetData>[] = [
   {
     accessorKey: "doneBy",
     header: "Done By",
-    cell: ({ row }) => {
-      return (
-        <div className="flex justify-start items-center gap-x-2">
-          {" "}
-          <Image
-            src="/placeholder.avif"
-            height={20}
-            width={20}
-            alt={row.original.doneBy?.fullName as string}
-          />
-          {row.original.doneBy?.fullName}
-        </div>
-      );
-    },
+    cell: ({ row }) => <DoneByComponent data={row.original} />,
   },
   {
     header: "Action",
