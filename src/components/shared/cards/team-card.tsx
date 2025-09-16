@@ -34,10 +34,10 @@ export default function ServiTeaceCard({ service }: ServiceCardProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem asChild>
-                <a href={`/service/${service.id}`}>View Details</a>
+              <DropdownMenuItem disabled>
+                <Link href={`/services/${service.id}`}>View Details</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>Edit Service</DropdownMenuItem>
+              {/* <DropdownMenuItem>Edit Service</DropdownMenuItem> */}
               <DropdownMenuItem asChild>
                 <Link href={`/teams/manage-teams/${service.id}`}>
                   Manage Teams

@@ -13,6 +13,7 @@ import {
 import prisma from "@/lib/prisma";
 import { ArrowLeft, MoreHorizontal, Plus } from "lucide-react";
 import Link from "next/link";
+import RemoveMemberAction from "./_components/remove-member-action";
 import TeamManageDropdown from "./_components/team-manage-dropdown";
 
 export default async function ManageTeamsPage({
@@ -128,7 +129,7 @@ export default async function ManageTeamsPage({
                             variant="outline"
                             className="text-xs capitalize"
                           >
-                            Active
+                            {member.responsibility}
                           </Badge>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -138,10 +139,13 @@ export default async function ManageTeamsPage({
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem>View Profile</DropdownMenuItem>
-                              <DropdownMenuItem>Change Role</DropdownMenuItem>
-                              <DropdownMenuItem className="text-red-600">
-                                Remove from Team
+                              <DropdownMenuItem>
+                                Responsibility
                               </DropdownMenuItem>
+                              <RemoveMemberAction
+                                teamId={member.teamId}
+                                userId={member.userId}
+                              />
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
