@@ -99,7 +99,7 @@ export default function AddMemberModal({
                   <FormControl>
                     <MultiSelect
                       options={users.map((u) => ({
-                        label: `${u.fullName} (${u.email})`,
+                        label: `${u.fullName} (${u.employeeId})`,
                         value: u.id,
                       }))}
                       value={field.value}

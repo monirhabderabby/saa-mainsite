@@ -138,8 +138,10 @@ export default async function ManageTeamsPage({
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem>View Profile</DropdownMenuItem>
-                              <DropdownMenuItem>
+                              <DropdownMenuItem disabled>
+                                View Profile
+                              </DropdownMenuItem>
+                              <DropdownMenuItem disabled>
                                 Responsibility
                               </DropdownMenuItem>
                               <RemoveMemberAction
