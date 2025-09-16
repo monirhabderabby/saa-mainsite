@@ -1,5 +1,6 @@
 "use client";
 import { createIssueAction } from "@/actions/issue-sheet/create";
+import { editIssueAction } from "@/actions/issue-sheet/update";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -21,6 +22,7 @@ import { issueSheetSchema, IssueSheetSchemaType } from "@/schemas/issue-sheet";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IssueSheet, Profile, Services } from "@prisma/client";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -37,6 +39,7 @@ export default function AddIssueForm({
   initianData,
 }: Props) {
   const [pending, startTransition] = useTransition();
+  const router = useRouter();
   const form = useForm<IssueSheetSchemaType>({
     resolver: zodResolver(issueSheetSchema),
     defaultValues: {
@@ -52,18 +55,33 @@ export default function AddIssueForm({
   });
 
   function onSubmit(values: IssueSheetSchemaType) {
-    startTransition(() => {
-      createIssueAction(values).then((res) => {
-        if (!res.success) {
-          toast.error(res.message);
-          return;
-        }
+    if (initianData) {
+      startTransition(() => {
+        editIssueAction(initianData.id, values).then((res) => {
+          if (!res.success) {
+            toast.error(res.message);
+            return;
+          }
 
-        // handle successfull
-        toast.success(res.message);
-        form.reset();
+          // handle successfull
+          toast.success(res.message);
+          router.back();
+        });
       });
-    });
+    } else {
+      startTransition(() => {
+        createIssueAction(values).then((res) => {
+          if (!res.success) {
+            toast.error(res.message);
+            return;
+          }
+
+          // handle successfull
+          toast.success(res.message);
+          form.reset();
+        });
+      });
+    }
   }
 
   return (
@@ -263,7 +281,8 @@ export default function AddIssueForm({
         />
         <div className="w-full flex items-center justify-end">
           <Button type="submit" disabled={pending}>
-            Add New Issue {pending && <Loader2 className="animate-spin" />}
+            {initianData ? "Save Now" : "Add New Issue"}{" "}
+            {pending && <Loader2 className="animate-spin" />}
           </Button>
         </div>
       </form>

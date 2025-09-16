@@ -96,7 +96,7 @@ export const issueSheetColumns: ColumnDef<IssueSheetData>[] = [
     cell: ({ row }) => (
       <>
         <Button size="icon" variant="ghost" asChild>
-          <Link href={`/update-sheet/edit/${row.original.id}`}>
+          <Link href={`/issue-sheet/edit/${row.original.id}`}>
             <Pencil />
           </Link>
         </Button>

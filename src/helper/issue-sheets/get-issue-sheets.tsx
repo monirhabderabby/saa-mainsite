@@ -68,6 +68,12 @@ export async function getIssueSheets(options: {
       team: { select: { name: true, id: true } },
       service: { select: { name: true, id: true } },
       profile: true,
+      statusChangedBy: {
+        select: {
+          fullName: true,
+          image: true,
+        },
+      },
     },
     skip: (page - 1) * limit,
     take: limit,
