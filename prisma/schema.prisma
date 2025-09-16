@@ -48,7 +48,8 @@ model User {
     tlCheckEntries      UpdateSheet[]   @relation("TLChecks")
     doneByEntries       UpdateSheet[]   @relation("DoneByChecks")
 
-    issueSheets IssueSheet[]
+    issueSheets         IssueSheet[]
+    statusChangeOnIssue IssueSheet[] @relation("issueShetStatusChange")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -260,6 +261,11 @@ model IssueSheet {
     noteForSales      String?
 
     status IssueStatus @default(open)
+
+    statusChangedAt   DateTime?
+    statusChangedById String?   @db.ObjectId
+
+    statusChangedBy User? @relation("issueShetStatusChange", fields: [statusChangedById], references: [id], onDelete: Cascade)
 
     creatorId String @db.ObjectId
     creator   User   @relation(fields: [creatorId], references: [id], onDelete: Cascade)

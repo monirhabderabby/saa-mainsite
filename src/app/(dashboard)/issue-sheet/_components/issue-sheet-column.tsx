@@ -2,7 +2,14 @@ import { Button } from "@/components/ui/button";
 import { IssueSheetData } from "@/helper/issue-sheets/get-issue-sheets";
 import { ColumnDef } from "@tanstack/react-table";
 import { Pencil } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
+const IssueSheetStatusAction = dynamic(
+  () => import("./action/issue-sheet-status-action"),
+  {
+    ssr: false,
+  }
+);
 
 export const issueSheetColumns: ColumnDef<IssueSheetData>[] = [
   {
@@ -81,6 +88,8 @@ export const issueSheetColumns: ColumnDef<IssueSheetData>[] = [
   },
   {
     accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => <IssueSheetStatusAction data={row.original} />,
   },
   {
     header: "Action",
