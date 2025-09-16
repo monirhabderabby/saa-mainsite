@@ -70,6 +70,7 @@ export async function createIssueAction(data: IssueSheetSchemaType) {
       inboxPageUrl,
       specialNotes,
       noteForSales,
+      fileOrMeetingLink,
     } = parsed.data;
 
     // ✅ Create issue
@@ -83,6 +84,7 @@ export async function createIssueAction(data: IssueSheetSchemaType) {
         inboxPageUrl: inboxPageUrl || null,
         specialNotes: specialNotes || null,
         noteForSales: noteForSales || null,
+        fileOrMeetingLink: fileOrMeetingLink || null,
         creatorId: session.user.id as string,
       },
     });

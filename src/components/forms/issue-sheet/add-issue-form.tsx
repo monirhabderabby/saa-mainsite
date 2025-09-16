@@ -243,6 +243,24 @@ export default function AddIssueForm({
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="fileOrMeetingLink"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>File/Meeting Link (If any)</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="ex: Paste google file url "
+                  type=""
+                  {...field}
+                />
+              </FormControl>
+
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <div className="w-full flex items-center justify-end">
           <Button type="submit" disabled={pending}>
             Add New Issue {pending && <Loader2 className="animate-spin" />}

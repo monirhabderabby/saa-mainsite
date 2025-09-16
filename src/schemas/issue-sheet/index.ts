@@ -33,6 +33,11 @@ export const issueSheetSchema = z.object({
 
     .optional()
     .or(z.literal("")),
+  fileOrMeetingLink: z
+    .string()
+
+    .optional()
+    .or(z.literal("")),
 });
 
 export type IssueSheetSchemaType = z.infer<typeof issueSheetSchema>;

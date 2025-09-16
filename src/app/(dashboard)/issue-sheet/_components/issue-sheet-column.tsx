@@ -19,6 +19,70 @@ export const issueSheetColumns: ColumnDef<IssueSheetData>[] = [
     header: "Order ID",
   },
   {
+    accessorKey: "teamId",
+  },
+  {
+    accessorKey: "specialNotes",
+  },
+  {
+    accessorKey: "orderPageUrl",
+    cell: ({ row }) => (
+      <>
+        {row.original.orderPageUrl && (
+          <Button
+            asChild
+            variant="link"
+            className="cursor-pointer hover:text-blue-500"
+          >
+            <a href={row.original.orderPageUrl as string} target="_blank">
+              check
+            </a>
+          </Button>
+        )}
+      </>
+    ),
+  },
+  {
+    accessorKey: "inboxPageUrl",
+    cell: ({ row }) => (
+      <>
+        {row.original.inboxPageUrl && (
+          <Button
+            asChild
+            variant="link"
+            className="cursor-pointer hover:text-blue-500"
+          >
+            <a href={row.original.inboxPageUrl as string} target="_blank">
+              check
+            </a>
+          </Button>
+        )}
+      </>
+    ),
+  },
+  {
+    accessorKey: "fileOrMeetingLink",
+    header: "File/Meeting Link (If any)",
+    cell: ({ row }) => (
+      <>
+        {row.original.fileOrMeetingLink && (
+          <Button
+            asChild
+            variant="link"
+            className="cursor-pointer hover:text-blue-500"
+          >
+            <a href={row.original.fileOrMeetingLink as string} target="_blank">
+              check
+            </a>
+          </Button>
+        )}
+      </>
+    ),
+  },
+  {
+    accessorKey: "status",
+  },
+  {
     header: "Action",
     cell: ({ row }) => (
       <>
