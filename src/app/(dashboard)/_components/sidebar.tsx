@@ -7,6 +7,7 @@ import { logoSrcBlack, logoSrcWhite } from "@/constants/assets";
 import { Role } from "@prisma/client";
 import {
   Building,
+  CircleQuestionMark,
   FileText,
   Laptop,
   LayoutDashboard,
@@ -66,6 +67,18 @@ const routes = [
   },
   {
     id: 6,
+    label: "Issue Sheet",
+    icon: CircleQuestionMark,
+    href: "/issue-sheet",
+    access: [
+      "ADMIN",
+      "SUPER_ADMIN",
+      "OPERATION_MEMBER",
+      "SALES_MEMBER",
+    ] as Role[],
+  },
+  {
+    id: 7,
     label: "Update Sheet",
     icon: Sheet,
     href: "/update-sheet",
@@ -78,7 +91,7 @@ const routes = [
   },
 
   {
-    id: 7,
+    id: 8,
     label: "Settings",
     icon: Settings,
     href: "/dashboard/settings",
