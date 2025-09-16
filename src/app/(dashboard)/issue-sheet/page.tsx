@@ -10,6 +10,7 @@ import {
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import IssueTableContainer from "./_components/table-container";
 
 const Page = async () => {
   const cu = await auth();
@@ -50,7 +51,9 @@ const Page = async () => {
           </div>
         </div>
       </CardHeader>
-      <CardContent></CardContent>
+      <CardContent>
+        <IssueTableContainer />
+      </CardContent>
     </Card>
   );
 };

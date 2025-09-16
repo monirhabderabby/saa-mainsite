@@ -11,7 +11,7 @@ export async function createIssueAction(data: IssueSheetSchemaType) {
   const session = await auth();
 
   // 🔒 Authentication
-  if (!session || !session.user) {
+  if (!session || !session.user || !session.user.id) {
     return {
       success: false,
       message: "You must be logged in to create an issue.",
@@ -23,6 +23,31 @@ export async function createIssueAction(data: IssueSheetSchemaType) {
     return {
       success: false,
       message: "You don't have permission to create an issue.",
+    };
+  }
+
+  const permission = await prisma.permissions.findFirst({
+    where: {
+      name: "ISSUE_SHEET",
+    },
+    select: {
+      isIssueCreateAllowed: true,
+    },
+  });
+
+  // Check if permission exists
+  if (!permission) {
+    return {
+      success: false,
+      message: "Permission for issue sheet not found. Contact admin.",
+    };
+  }
+
+  // Optionally, also check if creation is allowed
+  if (!permission.isIssueCreateAllowed) {
+    return {
+      success: false,
+      message: "You do not have permission to create issue sheets.",
     };
   }
 
@@ -58,6 +83,7 @@ export async function createIssueAction(data: IssueSheetSchemaType) {
         inboxPageUrl: inboxPageUrl || null,
         specialNotes: specialNotes || null,
         noteForSales: noteForSales || null,
+        creatorId: session.user.id as string,
       },
     });
 

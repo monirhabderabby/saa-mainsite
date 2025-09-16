@@ -1,0 +1,82 @@
+"use client";
+import { DataTable } from "@/components/ui/data-table";
+import { PaginationControls } from "@/components/ui/pagination-controls";
+import SkeletonWrapper from "@/components/ui/skeleton-wrapper";
+import {
+  GetIssueSheetsReturn,
+  IssueSheetData,
+} from "@/helper/issue-sheets/get-issue-sheets";
+import { useIssueSheetFilterState } from "@/zustand/issue-sheet";
+import { useQuery } from "@tanstack/react-query";
+import {
+  ColumnDef,
+  getCoreRowModel,
+  getPaginationRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { AlertTriangle } from "lucide-react";
+import { issueSheetColumns } from "./issue-sheet-column";
+
+const IssueTableContainer = () => {
+  const { data, isLoading, isError, error } = useQuery<GetIssueSheetsReturn>({
+    queryKey: ["issue-sheet"],
+    queryFn: () => fetch(`/api/issue-sheets`).then((res) => res.json()),
+  });
+
+  if (isError) {
+    return (
+      <div className="min-h-[300px] flex flex-col items-center justify-center text-red-600 dark:text-red-400 text-center space-y-2">
+        <AlertTriangle size={32} />
+        <p className="text-lg font-medium">Failed to load issue sheets</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          {error?.message || "Something went wrong. Please try again later."}
+        </p>
+      </div>
+    );
+  }
+  return (
+    <SkeletonWrapper isLoading={isLoading}>
+      <Table
+        columns={issueSheetColumns}
+        data={data?.data ?? []}
+        totalPages={data?.pagination?.totalPages ?? 1}
+      />
+    </SkeletonWrapper>
+  );
+};
+
+export default IssueTableContainer;
+
+interface TableProps {
+  data: IssueSheetData[];
+  columns: ColumnDef<IssueSheetData>[];
+  totalPages: number;
+}
+
+const Table = ({ data, columns, totalPages }: TableProps) => {
+  const { setPage, page } = useIssueSheetFilterState();
+  const table = useReactTable({
+    data,
+    columns: columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  });
+  return (
+    <>
+      <div className="bg-background">
+        <DataTable table={table} columns={columns} />
+      </div>
+      {totalPages > 1 && (
+        <div className="mt-4 w-full  flex justify-end">
+          <div>
+            <PaginationControls
+              currentPage={page}
+              onPageChange={(page) => setPage(page)}
+              totalPages={totalPages}
+            />
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
