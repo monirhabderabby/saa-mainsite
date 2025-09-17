@@ -18,16 +18,16 @@ const Page = async () => {
       <CardHeader>
         <div className="flex justify-between">
           <div>
-            <CardTitle>Raise a New Issue</CardTitle>
+            <CardTitle>Add Entry</CardTitle>
             <CardDescription className="max-w-[500px] mt-2">
-              Use this form to report a new issue from the sales side. Provide
-              clear details so the operations team can review, take action, and
-              resolve the issue efficiently.
+              Use this form to create a new update sheet entry. Select a profile
+              and provide the necessary details to keep the update sheet current
+              and accurate.
             </CardDescription>
           </div>
           <Button variant="link" effect="hoverUnderline" asChild>
             <Link href="/update-sheet">
-              <MoveLeft /> Back to Issue Sheet
+              <MoveLeft /> Back to Sheet
             </Link>
           </Button>
         </div>
