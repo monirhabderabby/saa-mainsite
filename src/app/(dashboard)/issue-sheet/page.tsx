@@ -12,7 +12,12 @@ import { Filter } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import IssueTableContainer from "./_components/table-container";
+const IssueTableContainer = dynamic(
+  () => import("./_components/table-container"),
+  {
+    ssr: false,
+  }
+);
 const AddFilterIssueSheetEntries = dynamic(
   () => import("./_components/filter/add-filter-issue-sheet-entries"),
   {

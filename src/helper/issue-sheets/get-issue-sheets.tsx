@@ -1,4 +1,3 @@
-import { getDayRange } from "@/lib/date";
 import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 
@@ -47,13 +46,21 @@ export async function getIssueSheets(options: {
   ) {
     filters.createdAt = {
       gte: new Date(createdFrom),
-      lte: new Date(createdTo),
+      lte: new Date(new Date(createdTo).setHours(23, 59, 59, 999)),
     };
-  } else if (createdFrom && createdFrom !== "All") {
-    const { start, end } = getDayRange(createdFrom);
-    filters.createdAt = { gte: start, lte: end };
+  } else if (
+    createdFrom &&
+    createdFrom !== "All" &&
+    (!createdTo || createdTo === "All")
+  ) {
+    filters.createdAt = {
+      gte: new Date(createdFrom),
+      lte: new Date(), // up to right now
+    };
   } else if (createdTo && createdTo !== "All") {
-    filters.createdAt = { lte: new Date(createdTo) };
+    filters.createdAt = {
+      lte: new Date(new Date(createdTo).setHours(23, 59, 59, 999)), // include full day
+    };
   }
 
   const totalItems = await prisma.issueSheet.count({

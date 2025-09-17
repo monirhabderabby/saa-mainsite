@@ -18,8 +18,17 @@ import { AlertTriangle } from "lucide-react";
 import { issueSheetColumns } from "./issue-sheet-column";
 
 const IssueTableContainer = () => {
-  let { status, page, profileId, serviceId, teamId, clientName, orderId } =
-    useIssueSheetFilterState();
+  let {
+    status,
+    page,
+    profileId,
+    serviceId,
+    teamId,
+    clientName,
+    orderId,
+    createdFrom,
+    createdTo,
+  } = useIssueSheetFilterState();
   page = page ?? 1;
   profileId = profileId ?? "";
   status = status ?? "All";
@@ -27,6 +36,8 @@ const IssueTableContainer = () => {
   teamId = teamId ?? "All";
   clientName = clientName ?? "";
   orderId = orderId ?? "";
+  createdFrom = createdFrom ?? "";
+  createdTo = createdTo ?? "";
 
   const { data, isLoading, isError, error } = useQuery<GetIssueSheetsReturn>({
     queryKey: [
@@ -38,10 +49,12 @@ const IssueTableContainer = () => {
       teamId,
       clientName,
       orderId,
+      createdFrom,
+      createdTo,
     ],
     queryFn: () =>
       fetch(
-        `/api/issue-sheets?status=${status}&page=${page}&limit=10&profileId=${profileId}&serviceId=${serviceId}&teamId=${teamId}&clientName=${clientName}&orderId=${orderId}`
+        `/api/issue-sheets?status=${status}&page=${page}&limit=10&profileId=${profileId}&serviceId=${serviceId}&teamId=${teamId}&clientName=${clientName}&orderId=${orderId}&createdFrom=${createdFrom}&createdTo=${createdTo}`
       ).then((res) => res.json()),
   });
 

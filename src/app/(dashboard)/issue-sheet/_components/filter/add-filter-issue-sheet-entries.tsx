@@ -282,7 +282,7 @@ export default function AddFilterIssueSheetEntries({
                 name="createdFrom"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Created At</FormLabel>
+                    <FormLabel>Created From</FormLabel>
                     <SmartDatePicker
                       value={field.value} // 👈 force controlled, placeholder shows
                       onChange={field.onChange}
@@ -297,7 +297,7 @@ export default function AddFilterIssueSheetEntries({
                 name="createdTo"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Send At</FormLabel>
+                    <FormLabel>Created To</FormLabel>
                     <SmartDatePicker
                       value={field.value} // 👈 same fix
                       onChange={field.onChange}
