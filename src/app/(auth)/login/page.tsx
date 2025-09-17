@@ -6,7 +6,7 @@ import LoginForm from "./_components/login-form";
 const Page = () => {
   return (
     <MotionProvider>
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-white/5">
         <Card className="w-full max-w-md shadow-lg">
           <CardHeader>
             <div className="flex flex-col justify-center items-center">

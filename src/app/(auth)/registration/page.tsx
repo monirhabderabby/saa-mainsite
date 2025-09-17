@@ -13,7 +13,7 @@ const Page = async () => {
   const designations = await prisma.designations.findMany();
   return (
     <MotionProvider>
-      <div className="h-screen flex justify-center items-center">
+      <div className="h-screen flex justify-center items-center dark:bg-white/5">
         <RegistrationForm services={services} designations={designations} />
       </div>
     </MotionProvider>

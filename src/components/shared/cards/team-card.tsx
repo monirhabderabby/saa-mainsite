@@ -21,7 +21,7 @@ export default function ServiTeaceCard({ service }: ServiceCardProps) {
   const totalTeams = service.teams.length;
 
   return (
-    <Card className="hover:shadow-lg transition-shadow duration-200">
+    <Card className="hover:shadow-lg transition-shadow duration-200 dark:bg-white/5">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl font-semibold">
