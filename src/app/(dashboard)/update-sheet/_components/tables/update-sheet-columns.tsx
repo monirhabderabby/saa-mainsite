@@ -3,14 +3,20 @@ import { UpdateSheetData } from "@/helper/update-sheet/update-sheet";
 import { ColumnDef } from "@tanstack/react-table";
 import { Pencil } from "lucide-react";
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import Link from "next/link";
 import DoneByComponent from "./done-by-component";
 import TlCheckComponent from "./tl-check-component";
 import UpdateToComponents from "./update-to";
+import UpdatedByComponents from "./updated-by-component";
 const ViewUpdateSheetModal = dynamic(() => import("./view-modal"), {
   ssr: false,
 });
+
+const CenteredHeader = (title: string) => {
+  const Comp = () => <div className="text-center">{title}</div>;
+  Comp.displayName = `CenteredHeader(${title})`;
+  return Comp;
+};
 
 export const updateSheetColumns: ColumnDef<UpdateSheetData>[] = [
   {
@@ -28,49 +34,40 @@ export const updateSheetColumns: ColumnDef<UpdateSheetData>[] = [
   },
   {
     accessorKey: "updateBy",
-    header: "Update By",
-    cell: ({ row }) => {
-      return (
-        <div className="flex justify-start items-center gap-x-2">
-          {" "}
-          <Image
-            src="/placeholder.avif"
-            height={20}
-            width={20}
-            alt={row.original.updateBy.fullName as string}
-          />
-          {row.original.updateBy.fullName}
-        </div>
-      );
-    },
+    header: CenteredHeader("Update By"),
+    cell: ({ row }) => <UpdatedByComponents data={row.original} />,
   },
   {
     accessorKey: "message",
-    header: "Message",
+    header: CenteredHeader("Message"),
     cell: ({ row }) => (
-      <ViewUpdateSheetModal
-        trigger={
-          <Button variant="outline" size="sm">
-            View
-          </Button>
-        }
-        data={row.original}
-      />
+      <div className="flex justify-center">
+        <ViewUpdateSheetModal
+          trigger={
+            <Button variant="outline" size="sm">
+              View
+            </Button>
+          }
+          data={row.original}
+        />
+      </div>
     ),
   },
   {
     accessorKey: "attachments",
-    header: "Attachments",
+    header: CenteredHeader("Attachments"),
     cell: ({ row }) => (
-      <Button asChild variant="link" effect="shine">
-        <a
-          href={row.original.attachments as string}
-          className="hover:text-blue-500 transition-colors duration-300 "
-          target="_blank"
-        >
-          {row.original.attachments?.slice(0, 20)}...
-        </a>
-      </Button>
+      <div className="flex justify-center">
+        <Button asChild variant="link" effect="shine">
+          <a
+            href={row.original.attachments as string}
+            className="hover:text-blue-500 transition-colors duration-300 "
+            target="_blank"
+          >
+            {row.original.attachments?.slice(0, 20)}...
+          </a>
+        </Button>
+      </div>
     ),
   },
   {

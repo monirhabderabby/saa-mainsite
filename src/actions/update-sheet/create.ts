@@ -76,6 +76,8 @@ export async function createUpdateSheetEntries(
         updateById: user.id as string,
         tlId: null,
         doneById: null,
+        tlCheckAt: null,
+        updatedAt: new Date(),
       },
     });
 

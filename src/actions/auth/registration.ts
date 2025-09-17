@@ -97,8 +97,17 @@ export async function registerAction(data: RegistrationSchemaValues) {
       // create permissions in a single operation
       await tx.permissions.createMany({
         data: [
-          { name: "ISSUE_SHEET", userId: user.id },
-          { name: "UPDATE_SHEET", userId: user.id },
+          {
+            name: "ISSUE_SHEET",
+            userId: user.id,
+            isIssueCreateAllowed: role === "SALES_MEMBER" ? true : undefined,
+          },
+          {
+            name: "UPDATE_SHEET",
+            userId: user.id,
+            isMessageCreateAllowed:
+              role === "OPERATION_MEMBER" ? true : undefined,
+          },
         ],
       });
 

@@ -94,8 +94,13 @@ const routes = [
     id: 8,
     label: "Settings",
     icon: Settings,
-    href: "/dashboard/settings",
-    access: ["ADMIN", "SUPER_ADMIN"] as Role[],
+    href: "/settings",
+    access: [
+      "ADMIN",
+      "SUPER_ADMIN",
+      "OPERATION_MEMBER",
+      "SALES_MEMBER",
+    ] as Role[],
   },
 ];
 

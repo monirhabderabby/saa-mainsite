@@ -12,23 +12,23 @@ interface Props {
   data: UpdateSheetData;
 }
 
-const DoneByComponent = ({ data }: Props) => {
+const UpdatedByComponents = ({ data }: Props) => {
   return (
-    <div className="flex justify-center items-center">
-      {data.doneById && (
+    <div className="flex justify-center">
+      {data.updateById && (
         <ProfileToolTip
           trigger={
             <Button variant="link">
-              @{data.tlBy?.fullName?.split(" ")[0]}
+              @{data.updateBy?.fullName?.split(" ")[0]}
             </Button>
           }
-          fullName={data.tlBy?.fullName ?? ""}
-          joiningDate={data.sendAt}
-          designation={data.doneBy?.designation.name ?? ""}
+          fullName={data.updateBy?.fullName ?? ""}
+          joiningDate={data.createdAt}
+          designation={data.updateBy.designation.name ?? ""}
         />
       )}
     </div>
   );
 };
 
-export default DoneByComponent;
+export default UpdatedByComponents;

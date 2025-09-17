@@ -11,12 +11,14 @@ interface Props {
   trigger: ReactNode;
   fullName: string;
   joiningDate?: Date | null;
+  designation?: string;
 }
 
 export default function ProfileToolTip({
   trigger,
   fullName,
   joiningDate,
+  designation,
 }: Props) {
   return (
     <HoverCard>
@@ -29,9 +31,9 @@ export default function ProfileToolTip({
           </Avatar>
           <div className="space-y-1">
             <h4 className="text-sm font-semibold">{fullName}</h4>
-            <p className="text-sm">Full Stack Developer</p>
+            <p className="text-sm">{designation ?? "Full Stack Developer"}</p>
             <div className="text-muted-foreground text-xs">
-              Joined {moment(joiningDate).format("DD MMM, YYYY")}
+              Joined {moment(joiningDate).format("DD MMM, YYYY [at] h:mm A")}
             </div>
           </div>
         </div>

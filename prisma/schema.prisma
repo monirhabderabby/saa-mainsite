@@ -95,7 +95,7 @@ model Designations {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    @@unique([serviceId, name]) // 👈 add this
+    @@unique([serviceId, name])
 }
 
 model Profile {
@@ -244,21 +244,22 @@ model UpdateSheet {
     commentFromSales     String?
     updateTo             UpdateTo
 
-    doneById String? @db.ObjectId
-    doneBy   User?   @relation("DoneByChecks", fields: [doneById], references: [id], onDelete: Cascade)
+    doneById String?   @db.ObjectId
+    sendAt   DateTime?
+    doneBy   User?     @relation("DoneByChecks", fields: [doneById], references: [id], onDelete: Cascade)
 
-    tlId String? @db.ObjectId
-    tlBy User?   @relation("TLChecks", fields: [tlId], references: [id], onDelete: Cascade)
+    tlId      String?   @db.ObjectId
+    tlCheckAt DateTime?
+    tlBy      User?     @relation("TLChecks", fields: [tlId], references: [id], onDelete: Cascade)
 
-    updateById String @db.ObjectId
-    updateBy   User   @relation("UpdateEntries", fields: [updateById], references: [id], onDelete: Cascade)
+    updateById String    @db.ObjectId
+    updatedAt  DateTime?
+    updateBy   User      @relation("UpdateEntries", fields: [updateById], references: [id], onDelete: Cascade)
 
     profileId String  @db.ObjectId
     profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @updatedAt
-    sendAt    DateTime?
+    createdAt DateTime @default(now())
 }
 
 enum IssueStatus {

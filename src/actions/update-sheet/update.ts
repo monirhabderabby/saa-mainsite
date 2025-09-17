@@ -157,7 +157,8 @@ export async function tlCheck(id: string) {
   await prisma.updateSheet.update({
     where: { id },
     data: {
-      tlId: isAlreadyChecked ? null : user.id, // Remove if already set, else add
+      tlId: isAlreadyChecked ? null : user.id,
+      tlCheckAt: isAlreadyChecked ? null : new Date(),
     },
     select: { id: true, tlId: true }, // Return minimal data
   });
