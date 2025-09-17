@@ -1,5 +1,6 @@
 "use client";
 import { deleteService } from "@/actions/services/delete";
+import AddDesignationModal from "@/components/shared/modal/add-designation-modal";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -77,6 +78,22 @@ const ServiceCard = ({ data }: Props) => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
+                <DropdownMenuItem asChild>
+                  <AddDesignationModal
+                    serviceId={data.id}
+                    serviceName={data.name}
+                    trigger={
+                      <Button
+                        variant="ghost"
+                        className="w-full flex items-center justify-start"
+                        size="sm"
+                      >
+                        <Briefcase />
+                        Add Designation
+                      </Button>
+                    }
+                  />
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <AddServiceDialog
                     trigger={
