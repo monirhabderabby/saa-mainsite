@@ -5,7 +5,15 @@ import AddServiceDialog from "./_components/add-service-modal";
 import ServiceCard from "./_components/service-card";
 
 const Page = async () => {
-  const services = await prisma.services.findMany();
+  const services = await prisma.services.findMany({
+    include: {
+      designations: {
+        select: {
+          id: true,
+        },
+      },
+    },
+  });
   return (
     <div>
       <div className="flex justify-between">

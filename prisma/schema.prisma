@@ -36,6 +36,9 @@ model User {
     role          Role
     password      String
 
+    // designationId String       @db.ObjectId 
+    // designation   Designations @relation(fields: [designationId], references: [id], onDelete: Cascade)
+
     serviceId String?   @db.ObjectId
     service   Services? @relation(fields: [serviceId], references: [id])
 
@@ -73,6 +76,21 @@ model Services {
     users User[]
 
     issues IssueSheet[]
+
+    designations Designations[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Designations {
+    id   String @id @default(auto()) @map("_id") @db.ObjectId
+    name String
+
+    serviceId String   @db.ObjectId
+    service   Services @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+    // users User[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
