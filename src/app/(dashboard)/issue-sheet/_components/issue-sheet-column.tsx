@@ -4,12 +4,20 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Pencil } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import StatusChangeBy from "./action/status-change-by";
+import TeamSelector from "./action/team-selector";
 const IssueSheetStatusAction = dynamic(
   () => import("./action/issue-sheet-status-action"),
   {
     ssr: false,
   }
 );
+
+const CenteredHeader = (title: string) => {
+  const Comp = () => <div className="text-center">{title}</div>;
+  Comp.displayName = `CenteredHeader(${title})`;
+  return Comp;
+};
 
 export const issueSheetColumns: ColumnDef<IssueSheetData>[] = [
   {
@@ -27,6 +35,8 @@ export const issueSheetColumns: ColumnDef<IssueSheetData>[] = [
   },
   {
     accessorKey: "teamId",
+    header: "Team",
+    cell: ({ row }) => <TeamSelector data={row.original} />,
   },
   {
     accessorKey: "specialNotes",
@@ -90,6 +100,11 @@ export const issueSheetColumns: ColumnDef<IssueSheetData>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => <IssueSheetStatusAction data={row.original} />,
+  },
+  {
+    accessorKey: "statusChangedById",
+    header: CenteredHeader("Change By"),
+    cell: ({ row }) => <StatusChangeBy data={row.original} />,
   },
   {
     header: "Action",

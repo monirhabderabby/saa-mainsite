@@ -86,7 +86,7 @@ export default async function ManageTeamsPage({
             <div>
               <h1 className="text-lg font-bold text-balance">Manage Teams</h1>
               <p className="text-muted-foreground">
-                {teams[0].service?.name} Service
+                {teams[0]?.service?.name ?? ""} Service
               </p>
             </div>
           </div>

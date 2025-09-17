@@ -33,7 +33,7 @@ export default function ProfileToolTip({
             <h4 className="text-sm font-semibold">{fullName}</h4>
             <p className="text-sm">{designation ?? "Full Stack Developer"}</p>
             <div className="text-muted-foreground text-xs">
-              Joined {moment(joiningDate).format("DD MMM, YYYY [at] h:mm A")}
+              {moment(joiningDate).format("DD MMM, YYYY [at] h:mm A")}
             </div>
           </div>
         </div>

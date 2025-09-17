@@ -116,3 +116,69 @@ export async function editIssueAction(id: string, data: IssueSheetSchemaType) {
     };
   }
 }
+
+export async function assignTeamIntoIssueSheet(
+  teamId: string,
+  issueSheetId: string
+) {
+  const session = await auth();
+
+  // 🔒 Authentication
+  if (!session || !session.user || !session.user.id) {
+    return {
+      success: false,
+      message: "You must be logged in to edit an issue.",
+    };
+  }
+
+  // ✅ Check if user is part of the team
+  const teamInfo = await prisma.userTeam.findFirst({
+    where: {
+      teamId,
+      userId: session.user.id,
+    },
+  });
+
+  if (!teamInfo) {
+    return {
+      success: false,
+      message: "You are not a member of this team.",
+    };
+  }
+
+  // ✅ Only Leader or Co-Leader can assign
+  if (
+    teamInfo.responsibility !== "Leader" &&
+    teamInfo.responsibility !== "Coleader"
+  ) {
+    return {
+      success: false,
+      message:
+        "Only Leaders or Co-Leaders can assign the team to an issue sheet.",
+    };
+  }
+
+  // ✅ Assign team into issue sheet
+  try {
+    const updatedIssueSheet = await prisma.issueSheet.update({
+      where: {
+        id: issueSheetId,
+      },
+      data: {
+        teamId: teamId,
+      },
+    });
+
+    return {
+      success: true,
+      message: "Team successfully assigned to the issue sheet.",
+      data: updatedIssueSheet,
+    };
+  } catch (error) {
+    console.error("Error assigning team:", error);
+    return {
+      success: false,
+      message: "Failed to assign team to issue sheet.",
+    };
+  }
+}
