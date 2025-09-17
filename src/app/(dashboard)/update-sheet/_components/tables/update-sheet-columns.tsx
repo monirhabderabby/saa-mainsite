@@ -62,13 +62,15 @@ export const updateSheetColumns: ColumnDef<UpdateSheetData>[] = [
     accessorKey: "attachments",
     header: "Attachments",
     cell: ({ row }) => (
-      <a
-        href={row.original.attachments as string}
-        className="hover:text-blue-500 transition-colors duration-300 "
-        target="_blank"
-      >
-        {row.original.attachments}
-      </a>
+      <Button asChild variant="link" effect="shine">
+        <a
+          href={row.original.attachments as string}
+          className="hover:text-blue-500 transition-colors duration-300 "
+          target="_blank"
+        >
+          {row.original.attachments?.slice(0, 20)}...
+        </a>
+      </Button>
     ),
   },
   {
@@ -86,7 +88,7 @@ export const updateSheetColumns: ColumnDef<UpdateSheetData>[] = [
   },
   {
     accessorKey: "updateTo",
-    header: "Update To",
+    header: "Update To  ",
     cell: ({ row }) => <UpdateToComponents data={row.original} />,
   },
   {

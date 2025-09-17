@@ -16,10 +16,10 @@ export const colorMap: Record<UpdateTo, string> = {
 };
 
 export const labelMap: Record<UpdateTo, string> = {
-  [UpdateTo.ORDER_PAGE_UPDATE]: "Order Page Update",
-  [UpdateTo.INBOX_PAGE_UPDATE]: "Inbox Page Update",
+  [UpdateTo.ORDER_PAGE_UPDATE]: "Order Page",
+  [UpdateTo.INBOX_PAGE_UPDATE]: "Inbox Page ",
   [UpdateTo.DELIVERY]: "Delivery",
-  [UpdateTo.INBOX_AND_ORDER_PAGE_UPDATE]: "Inbox & Order Page Update",
+  [UpdateTo.INBOX_AND_ORDER_PAGE_UPDATE]: "Inbox & Order",
   [UpdateTo.UPWORK_INBOX]: "Upwork Inbox",
   [UpdateTo.REVIEW_RESPONSE]: "Review Response",
   [UpdateTo.FIVERR_SUPPORT_REPLY]: "Fiverr Support Reply",
@@ -31,7 +31,7 @@ const UpdateToBadge: React.FC<Props> = ({ updateTo }) => {
 
   return (
     <span
-      className={`px-3 py-1 rounded-full text-sm font-medium  ${colorClass}`}
+      className={`px-3 py-1 rounded-full text-[12px] font-medium  ${colorClass}`}
     >
       {label}
     </span>

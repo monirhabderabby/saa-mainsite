@@ -6,7 +6,11 @@ interface Props {
 }
 
 const UpdateToComponents = ({ data }: Props) => {
-  return <UpdateToBadge updateTo={data.updateTo} />;
+  return (
+    <div className="w-[110%] ">
+      <UpdateToBadge updateTo={data.updateTo} />
+    </div>
+  );
 };
 
 export default UpdateToComponents;
