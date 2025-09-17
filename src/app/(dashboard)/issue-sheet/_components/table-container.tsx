@@ -18,11 +18,31 @@ import { AlertTriangle } from "lucide-react";
 import { issueSheetColumns } from "./issue-sheet-column";
 
 const IssueTableContainer = () => {
-  const { status } = useIssueSheetFilterState();
+  let { status, page, profileId, serviceId, teamId, clientName, orderId } =
+    useIssueSheetFilterState();
+  page = page ?? 1;
+  profileId = profileId ?? "";
+  status = status ?? "All";
+  serviceId = serviceId ?? "All";
+  teamId = teamId ?? "All";
+  clientName = clientName ?? "";
+  orderId = orderId ?? "";
+
   const { data, isLoading, isError, error } = useQuery<GetIssueSheetsReturn>({
-    queryKey: ["issue-sheet", status],
+    queryKey: [
+      "issue-sheet",
+      status,
+      ,
+      profileId,
+      serviceId,
+      teamId,
+      clientName,
+      orderId,
+    ],
     queryFn: () =>
-      fetch(`/api/issue-sheets?status=${status}`).then((res) => res.json()),
+      fetch(
+        `/api/issue-sheets?status=${status}&page=${page}&limit=10&profileId=${profileId}&serviceId=${serviceId}&teamId=${teamId}&clientName=${clientName}&orderId=${orderId}`
+      ).then((res) => res.json()),
   });
 
   if (isError) {

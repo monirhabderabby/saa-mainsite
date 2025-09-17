@@ -32,7 +32,7 @@ import {
 } from "@/schemas/issue-sheet/filter";
 import { useIssueSheetFilterState } from "@/zustand/issue-sheet";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { IssueStatus, Profile, Team } from "@prisma/client";
+import { IssueStatus, Profile, Services, Team } from "@prisma/client";
 import { Repeat } from "lucide-react";
 import dynamic from "next/dynamic";
 import { ReactNode, useState } from "react";
@@ -65,11 +65,13 @@ interface Props {
   trigger: ReactNode;
   profiles: Profile[];
   teams: Team[];
+  services: Services[];
 }
 export default function AddFilterIssueSheetEntries({
   trigger,
   profiles,
   teams,
+  services,
 }: Props) {
   const [open, setOpen] = useState(false);
   const { setAllValues, clearFilters } = useIssueSheetFilterState();
@@ -211,10 +213,42 @@ export default function AddFilterIssueSheetEntries({
             <div className="w-full grid grid-cols-2 gap-5">
               <FormField
                 control={form.control}
+                name="serviceId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Service line</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select service line" />
+                        </SelectTrigger>
+
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectItem value="All">All</SelectItem>
+                            {services.map((p) => (
+                              <SelectItem value={p.id} key={p.id}>
+                                {p.name}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormDescription></FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
                 name="teamId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Profiles</FormLabel>
+                    <FormLabel>Team</FormLabel>
                     <FormControl>
                       <Select
                         onValueChange={field.onChange}

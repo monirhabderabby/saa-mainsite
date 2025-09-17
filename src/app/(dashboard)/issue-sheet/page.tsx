@@ -24,9 +24,10 @@ const Page = async () => {
   const cu = await auth();
   if (!cu || !cu?.user || !cu.user.id) redirect("/login");
 
-  const [profiles, teams] = await prisma.$transaction([
+  const [profiles, teams, services] = await prisma.$transaction([
     prisma.profile.findMany(),
     prisma.team.findMany(),
+    prisma.services.findMany(),
   ]);
 
   const permission = await prisma.permissions.findFirst({
@@ -55,6 +56,7 @@ const Page = async () => {
           <div className="flex items-center gap-5">
             <AddFilterIssueSheetEntries
               profiles={profiles}
+              services={services}
               teams={teams}
               trigger={
                 <Button variant="outline">
