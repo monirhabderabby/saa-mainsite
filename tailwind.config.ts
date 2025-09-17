@@ -16,6 +16,7 @@ const config: Config = {
           background: "#545454",
           foundation: "#333333",
         },
+
         customYellow: {
           primary: "#FFC300",
         },
@@ -30,6 +31,8 @@ const config: Config = {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          green: "#01A22A",
+          yellow: "#FFC300",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",

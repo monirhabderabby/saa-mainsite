@@ -59,8 +59,8 @@ const ServiceCard = ({ data }: Props) => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Briefcase className="h-5 w-5 text-primary" />
+              <div className="p-2 bg-primary-green/10 rounded-lg">
+                <Briefcase className="h-5 w-5 text-primary-green" />
               </div>
               <div>
                 <CardTitle className="text-lg font-bold text-card-foreground">
