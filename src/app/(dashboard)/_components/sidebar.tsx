@@ -29,7 +29,7 @@ const routes = [
     id: 1,
     label: "Overview",
     icon: LayoutDashboard,
-    href: "/dashboard",
+    href: "/",
     access: [
       "ADMIN",
       "OPERATION_MEMBER",
