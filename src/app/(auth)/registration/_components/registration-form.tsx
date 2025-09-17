@@ -32,7 +32,7 @@ import {
   RegistrationSchemaValues,
 } from "@/schemas/auth/registration";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Role } from "@prisma/client";
+import { Designations, Role } from "@prisma/client";
 import { Loader2, MoveLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -47,16 +47,17 @@ export const allowedRegistrationRoles = [
 
 interface Props {
   services: { id: string; name: string }[];
+  designations: Designations[];
 }
 
-export default function RegistrationForm({ services }: Props) {
+export default function RegistrationForm({ services, designations }: Props) {
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"form" | "success">("form");
   const [pending, startTransition] = useTransition();
   const form = useForm<RegistrationSchemaValues>({
     resolver: zodResolver(registrationSchema),
     defaultValues: {
-      serviceId: "fsdfds",
+      serviceId: "",
     },
   });
 
@@ -82,6 +83,11 @@ export default function RegistrationForm({ services }: Props) {
     });
   }
 
+  const selectedServiceId = form.watch("serviceId");
+  const filteredDesignations = designations.filter(
+    (d) => d.serviceId === selectedServiceId
+  );
+
   return (
     <Card>
       <CardHeader>
@@ -101,7 +107,7 @@ export default function RegistrationForm({ services }: Props) {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-5 max-w-[500px] mx-auto pb-10"
+                className="space-y-5 max-w-[600px] mx-auto pb-10"
               >
                 <div className="grid grid-cols-12 gap-4">
                   <div className="col-span-12">
@@ -152,7 +158,7 @@ export default function RegistrationForm({ services }: Props) {
                     name="serviceId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Service</FormLabel>
+                        <FormLabel>Service Line</FormLabel>
                         <FormControl>
                           <Select
                             onValueChange={field.onChange}
@@ -198,7 +204,7 @@ export default function RegistrationForm({ services }: Props) {
                   )}
                 />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   <FormField
                     control={form.control}
                     name="employeeId"
@@ -247,6 +253,39 @@ export default function RegistrationForm({ services }: Props) {
                           </Select>
                         </FormControl>
                         <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="designationId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Designation</FormLabel>
+                        <FormControl>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select a role" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {filteredDesignations.map((item) => (
+                                <SelectItem value={item.id} key={item.id}>
+                                  {item.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                        <FormDescription>
+                          Select a service line first to see the available
+                          designations.
+                        </FormDescription>
                       </FormItem>
                     )}
                   />

@@ -19,6 +19,9 @@ export const registrationSchema = z.object({
   role: z.enum(["OPERATION_MEMBER", "SALES_MEMBER"], {
     message: "Role must be either OPERATION_MEMBER or SALES_MEMBER",
   }),
+  designationId: z.string({
+    message: "Designation is required",
+  }),
 });
 
 export type RegistrationSchemaValues = z.infer<typeof registrationSchema>;

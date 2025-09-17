@@ -36,8 +36,8 @@ model User {
     role          Role
     password      String
 
-    // designationId String       @db.ObjectId 
-    // designation   Designations @relation(fields: [designationId], references: [id], onDelete: Cascade)
+    designationId String       @db.ObjectId
+    designation   Designations @relation(fields: [designationId], references: [id], onDelete: Cascade)
 
     serviceId String?   @db.ObjectId
     service   Services? @relation(fields: [serviceId], references: [id])
@@ -70,7 +70,7 @@ model UserVerification {
 
 model Services {
     id   String @id @default(auto()) @map("_id") @db.ObjectId
-    name String
+    name String @unique
 
     teams Team[]
     users User[]
@@ -90,10 +90,12 @@ model Designations {
     serviceId String   @db.ObjectId
     service   Services @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
-    // users User[]
+    users User[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
+    @@unique([serviceId, name]) // 👈 add this
 }
 
 model Profile {
