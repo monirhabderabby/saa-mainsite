@@ -35,7 +35,7 @@ export async function changeAccountRole({ userId, updatedRole }: UpdateProps) {
       };
     }
 
-    // ✅ Prevent self-role modification (optional but safer)
+    // ✅ Prevent self-role modification
     if (userId === currentUserId) {
       return {
         success: false,
@@ -43,9 +43,12 @@ export async function changeAccountRole({ userId, updatedRole }: UpdateProps) {
       };
     }
 
-    // ✅ Check if user exists
+    // ✅ Check if target user exists
     const existUser = await prisma.user.findUnique({
       where: { id: userId },
+      include: {
+        service: true,
+      },
     });
 
     if (!existUser) {
@@ -61,6 +64,19 @@ export async function changeAccountRole({ userId, updatedRole }: UpdateProps) {
         success: false,
         message: `The user already has the role "${updatedRole}".`,
       };
+    }
+
+    // ✅ Business rule: only Management team can be promoted to Admin
+    if (updatedRole === Role.ADMIN) {
+      const isInManagement = existUser.service?.name === "Management";
+
+      if (!isInManagement) {
+        return {
+          success: false,
+          message:
+            "Only members of the Management team can be promoted to Admin.",
+        };
+      }
     }
 
     // ✅ Update role
