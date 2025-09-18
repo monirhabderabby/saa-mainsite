@@ -34,14 +34,14 @@ interface Props {
 const EmployeeAction = ({ data }: Props) => {
   const { data: session, status } = useSession();
 
-  // Loading state: don't render actions until session is known
-  if (status === "loading") return null;
-
   // Determine if current user is super admin
   const isSuperAdmin = useMemo(
     () => session?.user?.role === "SUPER_ADMIN",
     [session]
   );
+
+  // Loading state: don't render actions until session is known
+  if (status === "loading") return null;
 
   return (
     <DropdownMenu>
