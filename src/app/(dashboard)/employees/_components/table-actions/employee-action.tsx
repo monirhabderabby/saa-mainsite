@@ -6,7 +6,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { UserWithAllIncludes } from "@/types/user";
 import { Eye, MoreHorizontal, Shield, ShieldCheck } from "lucide-react";
+import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
+import { useMemo } from "react";
 const AccountStatusModal = dynamic(
   () => import("../modals/add-account-status-modal"),
   {
@@ -30,6 +32,17 @@ interface Props {
 }
 
 const EmployeeAction = ({ data }: Props) => {
+  const { data: session, status } = useSession();
+
+  // Loading state: don't render actions until session is known
+  if (status === "loading") return null;
+
+  // Determine if current user is super admin
+  const isSuperAdmin = useMemo(
+    () => session?.user?.role === "SUPER_ADMIN",
+    [session]
+  );
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -51,20 +64,22 @@ const EmployeeAction = ({ data }: Props) => {
           user={data}
         />
 
-        <AddRoleChangeModal
-          trigger={
-            <Button
-              variant="ghost"
-              className="justify-start w-full gap-2" // <-- key
-            >
-              <Shield className="w-4 h-4" />
-              Change Role
-            </Button>
-          }
-          currentRole={data.role}
-          userId={data.id}
-          userName={data.fullName!}
-        />
+        {isSuperAdmin && (
+          <AddRoleChangeModal
+            trigger={
+              <Button
+                variant="ghost"
+                className="justify-start w-full gap-2" // <-- key
+              >
+                <Shield className="w-4 h-4" />
+                Change Role
+              </Button>
+            }
+            currentRole={data.role}
+            userId={data.id}
+            userName={data.fullName!}
+          />
+        )}
 
         <AccountStatusModal
           data={data}
