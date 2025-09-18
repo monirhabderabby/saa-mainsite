@@ -169,8 +169,8 @@ const Sidebar = ({ cu }: Props) => {
               {accessibleRoutes.map((route) => {
                 const Icon = route.icon;
                 const isActive =
-                  route.href === "/dashboard"
-                    ? pathname === "/dashboard"
+                  route.href === "/"
+                    ? pathname === "/"
                     : pathname.startsWith(route.href);
 
                 return (

@@ -12,6 +12,7 @@ async function getAllCollectionStats() {
     nameOnly: true,
   })) as { cursor: { firstBatch: { name: string }[] } };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const allStats: any[] = [];
 
   // 2. Loop through collections and get stats
@@ -53,6 +54,8 @@ export default async function Home() {
     size: formatBytes(coll.size), // readable data size
     storageSize: formatBytes(coll.storageSize), // allocated storage
   }));
+
+  console.log(formatted);
 
   if (role === "SUPER_ADMIN") {
     return <SuperAdminOverViewContainer />;

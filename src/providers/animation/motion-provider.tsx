@@ -16,7 +16,7 @@ export default function MotionProvider({ children }: MotionProviderProps) {
         filter: "blur(0px)",
         transition: { duration: 0.7, delay: 0.1 },
       }}
-      className="min-h-screen"
+      className=""
     >
       {children}
     </motion.div>
