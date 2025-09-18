@@ -1,10 +1,12 @@
 import StatsCard from "@/components/shared/cards/stats-card";
-import { Database, FileText, Truck, Upload } from "lucide-react";
+import { Database, FileText } from "lucide-react";
 import { Suspense } from "react";
+import DeliveryInQue from "./_components/delivery-in-que";
 import IssuesDoneToday from "./_components/issue-done-today";
 import IssuesOpen from "./_components/issue-open";
 import IssuesWip from "./_components/issue-wip";
 import TotalEmployees from "./_components/total-employees";
+import UpdateInQue from "./_components/update-in-que";
 
 function CardSkeleton() {
   return (
@@ -56,21 +58,13 @@ const SuperAdminOverViewContainer = async () => {
           </Suspense>
 
           {/* Queue Management */}
-          <StatsCard
-            title="Updates in Queue"
-            value="42"
-            subtitle="Pending deployment"
-            icon={<Upload className="h-4 w-4 text-primary-yellow" />}
-            trend={{ value: -8.1, isPositive: true }}
-          />
+          <Suspense fallback={<CardSkeleton />}>
+            <UpdateInQue />
+          </Suspense>
 
-          <StatsCard
-            title="Delivery in Queue"
-            value="18"
-            subtitle="Ready for delivery"
-            icon={<Truck className="h-4 w-4 text-primary-yellow" />}
-            trend={{ value: 15.7, isPositive: true }}
-          />
+          <Suspense fallback={<CardSkeleton />}>
+            <DeliveryInQue />
+          </Suspense>
 
           {/* Storage Analytics */}
           <StatsCard
