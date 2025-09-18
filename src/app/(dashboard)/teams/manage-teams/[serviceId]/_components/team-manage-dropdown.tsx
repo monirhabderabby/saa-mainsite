@@ -24,14 +24,11 @@ interface Props {
 const TeamManageDropdown = async ({ teamId, teamName, serviceId }: Props) => {
   const users = await prisma.user.findMany({
     where: {
-      userTeams: {
-        none: {
-          teamId: teamId,
-        },
-      },
-      serviceId: serviceId,
+      serviceId, // in the same service
+      userTeams: { none: {} }, // not assigned to any team (empty relation)
     },
   });
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
