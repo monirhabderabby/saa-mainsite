@@ -48,7 +48,11 @@ export default async function ManageTeamsPage({
     include: {
       userTeams: {
         include: {
-          user: true,
+          user: {
+            include: {
+              designation: true,
+            },
+          },
         },
       },
       service: {
@@ -152,7 +156,7 @@ export default async function ManageTeamsPage({
                               {member.user.fullName}
                             </div>
                             <div className="text-sm text-muted-foreground">
-                              Full Stack Developer
+                              {member.user.designation.name}
                             </div>
                           </div>
                         </div>

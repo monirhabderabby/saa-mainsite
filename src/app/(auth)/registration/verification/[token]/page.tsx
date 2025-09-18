@@ -70,7 +70,7 @@ const Page = async ({ params }: { params: { token: string } }) => {
       {/* 🎉 Confetti runs only if verified */}
       <ConfettiFireworks run={verified} />
 
-      <Card className="min-w-[300px] shadow-none">
+      <Card className="min-w-[300px] shadow-none dark:bg-white/5">
         <CardHeader className="pb-5">
           {verified && (
             <div className="w-full flex justify-center">
