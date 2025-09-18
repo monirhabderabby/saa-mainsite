@@ -2,7 +2,7 @@ import { AccountStatus } from "@prisma/client";
 import { z } from "zod";
 
 export const userStatusSchema = z.object({
-  id: z.string().cuid(), // matches Prisma @default(cuid())
+  id: z.string(), // matches Prisma @default(cuid())
   accountStatus: z.nativeEnum(AccountStatus),
 });
 

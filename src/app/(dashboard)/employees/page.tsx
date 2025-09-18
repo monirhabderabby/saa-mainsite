@@ -1,32 +1,44 @@
 import { auth } from "@/auth";
-import { Card, CardContent } from "@/components/ui/card";
-import prisma from "@/lib/prisma";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import MotionProvider from "@/providers/animation/motion-provider";
 import { redirect } from "next/navigation";
-import EmployeeTableContainer from "./_components/employee-table-container";
+import { Suspense } from "react";
+import EmployeementServerFetch from "./_components/employeement-server-fetch";
+
+function CardSkeleton() {
+  return (
+    <Card className="shadow-none">
+      <CardHeader>
+        <CardTitle>Employee Directory</CardTitle>
+        <CardDescription>
+          Browse and search for employees by their ID.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="h-[252px] w-full rounded-2xl animate-pulse bg-muted" />
+      </CardContent>
+    </Card>
+  );
+}
 
 const Page = async () => {
   const cu = await auth();
 
   if (!cu || !cu.user) redirect("/login");
-  const users = await prisma.user.findMany({
-    include: {
-      service: true,
-      permissions: true,
-      designation: true,
-      userTeams: {
-        include: {
-          team: true,
-        },
-      },
-    },
-  });
-
   return (
-    <Card className="shadow-none ">
-      <CardContent>
-        <EmployeeTableContainer data={users ?? []} cuRole={cu.user.role} />
-      </CardContent>
-    </Card>
+    <div className="bg-white h-full">
+      <Suspense fallback={<CardSkeleton />}>
+        <MotionProvider>
+          <EmployeementServerFetch curentUserRole={cu.user.role} />
+        </MotionProvider>
+      </Suspense>
+    </div>
   );
 };
 

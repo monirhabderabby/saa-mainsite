@@ -3,6 +3,7 @@
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import { Role } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 interface UpdateProps {
   userId: string;
@@ -84,6 +85,8 @@ export async function changeAccountRole({ userId, updatedRole }: UpdateProps) {
       where: { id: userId },
       data: { role: updatedRole },
     });
+
+    revalidatePath("/employees");
 
     return {
       success: true,

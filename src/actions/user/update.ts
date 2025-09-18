@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import { PermissionField } from "@/types/user";
 import { AccountStatus, Role } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 interface Props {
   accountStatus: AccountStatus;
@@ -56,6 +57,8 @@ export async function statusUpdate({ id, accountStatus }: Props) {
     where: { id },
     data: { accountStatus },
   });
+
+  revalidatePath("/employees");
 
   return {
     success: true,

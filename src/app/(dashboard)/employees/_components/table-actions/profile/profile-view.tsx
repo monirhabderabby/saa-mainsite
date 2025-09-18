@@ -20,7 +20,7 @@ interface ProfileViewProps {
   user: UserWithAllIncludes;
 }
 
-export function ProfileView({ trigger, user }: ProfileViewProps) {
+export default function ProfileView({ trigger, user }: ProfileViewProps) {
   const [open, setOpen] = useState(false);
   const getInitials = (name: string) => {
     return name
