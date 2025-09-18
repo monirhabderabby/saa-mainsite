@@ -69,6 +69,28 @@ async function main() {
     );
   }
 
+  const hashedPassword = await bcrypt.hash("123456789", 12);
+  const designation = await prisma.designations.findFirst({
+    where: {
+      serviceId: fsdService,
+    },
+  });
+
+  const account = {
+    fullName: "Monir Hossain Rabby",
+    email: "monir.bdcalling@gmail.com",
+    employeeId: 17114,
+    serviceId: fsdService.id,
+    password: hashedPassword,
+    accountStatus: "ACTIVE",
+    role: "SUPER_ADMIN", // or another default role as per your schema
+    designationId: designation.id,
+  };
+
+  await prisma.user.create({
+    data: account,
+  });
+
   console.log("✅ Services and designations seeded successfully!");
 }
 

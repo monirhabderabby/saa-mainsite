@@ -75,11 +75,7 @@ export async function getIssueSheets(options: {
       team: { select: { name: true, id: true } },
       service: { select: { name: true, id: true } },
       profile: true,
-      statusChangedBy: {
-        include: {
-          designation: true,
-        },
-      },
+      statusChangedBy: true,
     },
     skip: (page - 1) * limit,
     take: limit,
@@ -108,10 +104,6 @@ export type IssueSheetData = Prisma.IssueSheetGetPayload<{
     team: { select: { name: true; id: true } };
     service: { select: { name: true; id: true } };
     profile: true;
-    statusChangedBy: {
-      include: {
-        designation: true;
-      };
-    };
+    statusChangedBy?: true;
   };
 }>;

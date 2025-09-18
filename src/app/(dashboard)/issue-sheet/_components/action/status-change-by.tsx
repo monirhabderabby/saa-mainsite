@@ -24,7 +24,7 @@ const StatusChangeBy = ({ data }: Props) => {
           }
           fullName={data.statusChangedBy?.fullName ?? ""}
           joiningDate={data.statusChangedAt}
-          designation={data.statusChangedBy?.designation.name ?? ""}
+          designation={"Not Found"}
         />
       ) : (
         <></>
