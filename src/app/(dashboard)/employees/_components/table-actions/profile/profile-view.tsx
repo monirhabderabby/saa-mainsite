@@ -56,7 +56,9 @@ export function ProfileView({ trigger, user }: ProfileViewProps) {
                 {user.fullName}
               </h3>
               <Badge variant="secondary" className="mt-1">
-                Dev-X
+                {user.userTeams.length > 0
+                  ? user.userTeams[0].team.name
+                  : "Not Found"}
               </Badge>
             </div>
           </div>
@@ -96,7 +98,11 @@ export function ProfileView({ trigger, user }: ProfileViewProps) {
                 <Users className="h-4 w-4 text-muted-foreground" />
                 <div>
                   <p className="text-sm font-medium">Team</p>
-                  <p className="text-sm text-muted-foreground">Dev-X</p>
+                  <p className="text-sm text-muted-foreground">
+                    {user.userTeams.length > 0
+                      ? user.userTeams[0].team.name
+                      : "Not Found"}
+                  </p>
                 </div>
               </div>
             </CardContent>

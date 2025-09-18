@@ -7,6 +7,12 @@ const Page = async () => {
     include: {
       service: true,
       permissions: true,
+      designation: true,
+      userTeams: {
+        include: {
+          team: true,
+        },
+      },
     },
   });
 
