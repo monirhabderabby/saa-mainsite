@@ -18,37 +18,27 @@ export async function createIssueAction(data: IssueSheetSchemaType) {
     };
   }
 
-  // 🔒 Authorization
-  if (!allowedRoles.includes(session.user.role as Role)) {
-    return {
-      success: false,
-      message: "You don't have permission to create an issue.",
-    };
-  }
+  const userRole = session.user.role as Role;
 
-  const permission = await prisma.permissions.findFirst({
-    where: {
-      name: "ISSUE_SHEET",
-    },
-    select: {
-      isIssueCreateAllowed: true,
-    },
-  });
+  // ✅ If super admin or admin → skip permission check
+  if (!allowedRoles.includes(userRole)) {
+    const permission = await prisma.permissions.findFirst({
+      where: {
+        name: "ISSUE_SHEET",
+        userId: session.user.id, // optional: enforce per-user permissions
+      },
+      select: {
+        isIssueCreateAllowed: true,
+      },
+    });
 
-  // Check if permission exists
-  if (!permission) {
-    return {
-      success: false,
-      message: "Permission for issue sheet not found. Contact admin.",
-    };
-  }
-
-  // Optionally, also check if creation is allowed
-  if (!permission.isIssueCreateAllowed) {
-    return {
-      success: false,
-      message: "You do not have permission to create issue sheets.",
-    };
+    if (!permission || !permission.isIssueCreateAllowed) {
+      return {
+        success: false,
+        message:
+          "You are not allowed to raise issues in the sheets at this time.",
+      };
+    }
   }
 
   try {
