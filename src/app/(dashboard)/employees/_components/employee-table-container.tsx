@@ -5,6 +5,7 @@ import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataTable } from "@/components/ui/data-table";
 import { Input } from "@/components/ui/input";
 import { UserWithAllIncludes } from "@/types/user";
+import { Role } from "@prisma/client";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -17,10 +18,14 @@ import { employeeColumns } from "./employee-column";
 
 interface Props {
   data: UserWithAllIncludes[];
+  cuRole: Role;
 }
 
-const EmployeeTableContainer = ({ data }: Props) => {
+const EmployeeTableContainer = ({ data, cuRole }: Props) => {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility] = useState({
+    role: cuRole === Role.SUPER_ADMIN, // only show if super admin
+  });
 
   const table = useReactTable({
     data,
@@ -31,6 +36,7 @@ const EmployeeTableContainer = ({ data }: Props) => {
     getFilteredRowModel: getFilteredRowModel(),
     state: {
       columnFilters,
+      columnVisibility,
     },
   });
   return (

@@ -2,8 +2,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserWithAllIncludes } from "@/types/user";
 import { ColumnDef } from "@tanstack/react-table";
 import moment from "moment";
+import dynamic from "next/dynamic";
 import AccountStatusAction from "./table-actions/account-status-action";
 import EmployeeAction from "./table-actions/employee-action";
+const RoleManagement = dynamic(
+  () => import("./table-actions/role-management"),
+  {
+    ssr: false,
+  }
+);
 
 export const employeeColumns: ColumnDef<UserWithAllIncludes>[] = [
   {
@@ -40,6 +47,11 @@ export const employeeColumns: ColumnDef<UserWithAllIncludes>[] = [
     accessorKey: "accountStatus",
     header: "Status",
     cell: ({ row }) => <AccountStatusAction data={row.original} />,
+  },
+  {
+    accessorKey: "role",
+    header: "Role",
+    cell: ({ row }) => <RoleManagement data={row.original} />,
   },
   {
     accessorKey: "createdAt",
