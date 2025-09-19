@@ -34,9 +34,6 @@ export default async function ServiTeaceCard({ service }: ServiceCardProps) {
       employeeId: true,
     },
     where: {
-      managedServices: {
-        none: {},
-      },
       userTeams: {
         none: {
           team: {
@@ -75,13 +72,14 @@ export default async function ServiTeaceCard({ service }: ServiceCardProps) {
                 serviceId={service.id}
                 serviceName={service.name}
                 users={users}
+                initialManagerId={service.serviceManagerId ?? undefined}
                 trigger={
                   <Button
                     variant="ghost"
                     size="sm"
                     className="relative flex cursor-default select-none items-center gap-2 rounded-sm pr-2 px-0 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0 w-full"
                   >
-                    Add Manager
+                    {service.serviceManagerId ? "Edit" : "Assign"} Manager
                   </Button>
                 }
               />

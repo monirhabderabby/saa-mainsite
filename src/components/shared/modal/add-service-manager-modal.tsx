@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 
 import { AddManagerAction } from "@/actions/services/add-manager";
+import { editManagerAction } from "@/actions/services/edit-manager";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -45,6 +46,7 @@ interface AddMemberModalProps {
   serviceName: string;
   users: UserTypes[]; // from backend
   trigger?: React.ReactNode;
+  initialManagerId?: string;
 }
 
 export default function AddServiceManagerModal({
@@ -52,6 +54,7 @@ export default function AddServiceManagerModal({
   serviceName,
   users,
   trigger,
+  initialManagerId,
 }: AddMemberModalProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, startTransition] = useTransition();
@@ -60,29 +63,50 @@ export default function AddServiceManagerModal({
     resolver: zodResolver(addManagerSchema),
     defaultValues: {
       serviceId,
-      serviceManagerId: "",
+      serviceManagerId: initialManagerId ?? "",
     },
   });
 
   const onSubmit = async (values: AddManagerSchemaType) => {
-    startTransition(() => {
-      AddManagerAction(values).then((res) => {
-        if (!res.success) {
-          toast.error(res.message);
-          return;
-        }
+    if (initialManagerId) {
+      startTransition(() => {
+        editManagerAction(values).then((res) => {
+          if (!res.success) {
+            toast.error(res.message);
+            return;
+          }
 
-        // handle success
-        toast.success(res.message, {
-          richColors: true,
+          // handle success
+          toast.success(res.message, {
+            richColors: true,
+          });
+          form.reset({
+            serviceId: undefined,
+            serviceManagerId: undefined,
+          });
+          setOpen(false);
         });
-        form.reset({
-          serviceId: undefined,
-          serviceManagerId: undefined,
-        });
-        setOpen(false);
       });
-    });
+    } else {
+      startTransition(() => {
+        AddManagerAction(values).then((res) => {
+          if (!res.success) {
+            toast.error(res.message);
+            return;
+          }
+
+          // handle success
+          toast.success(res.message, {
+            richColors: true,
+          });
+          form.reset({
+            serviceId: undefined,
+            serviceManagerId: undefined,
+          });
+          setOpen(false);
+        });
+      });
+    }
   };
 
   return (
@@ -144,7 +168,7 @@ export default function AddServiceManagerModal({
                 Cancel
               </Button>
               <Button type="submit" disabled={isLoading}>
-                Add Manager{" "}
+                {initialManagerId ? "Change" : "Add"} Manager{" "}
                 {isLoading ? <Loader className="animate-spin" /> : <Plus />}
               </Button>
             </div>
