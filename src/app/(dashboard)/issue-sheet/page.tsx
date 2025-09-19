@@ -35,6 +35,20 @@ const Page = async () => {
     prisma.services.findMany(),
   ]);
 
+  const currentUser = await prisma.user.findUnique({
+    where: {
+      id: cu.user.id,
+    },
+    select: {
+      serviceId: true,
+      service: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+
   const permission = await prisma.permissions.findFirst({
     where: {
       userId: cu.user.id,
@@ -46,6 +60,9 @@ const Page = async () => {
   });
 
   const isWriteAccess = permission?.isIssueCreateAllowed ?? false;
+
+  const isManagement = currentUser?.service?.name === "Management";
+
   return (
     <Card className="shadow-none ">
       <CardHeader>
@@ -60,6 +77,9 @@ const Page = async () => {
           </div>
           <div className="flex items-center gap-5">
             <AddFilterIssueSheetEntries
+              currentUserServiceId={
+                isManagement ? undefined : (currentUser?.serviceId ?? "")
+              }
               profiles={profiles}
               services={services}
               teams={teams}

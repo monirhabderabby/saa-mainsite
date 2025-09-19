@@ -35,7 +35,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { IssueStatus, Profile, Services, Team } from "@prisma/client";
 import { Repeat } from "lucide-react";
 import dynamic from "next/dynamic";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 const SmartDatePicker = dynamic(
   () => import("@/components/ui/custom/smart-date-picker"),
@@ -66,12 +66,14 @@ interface Props {
   profiles: Profile[];
   teams: Team[];
   services: Services[];
+  currentUserServiceId?: string;
 }
 export default function AddFilterIssueSheetEntries({
   trigger,
   profiles,
   teams,
   services,
+  currentUserServiceId,
 }: Props) {
   const [open, setOpen] = useState(false);
   const { setAllValues, clearFilters } = useIssueSheetFilterState();
@@ -84,7 +86,7 @@ export default function AddFilterIssueSheetEntries({
       profileId: undefined,
       createdFrom: undefined,
       createdTo: undefined,
-      serviceId: undefined,
+      serviceId: currentUserServiceId ?? undefined,
       status: undefined,
       teamId: undefined,
     },
@@ -98,6 +100,12 @@ export default function AddFilterIssueSheetEntries({
     });
     setOpen(false);
   }
+
+  useEffect(() => {
+    setAllValues({
+      serviceId: currentUserServiceId,
+    });
+  }, [currentUserServiceId, setAllValues]);
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
