@@ -44,6 +44,14 @@ export async function statusUpdate({ id, accountStatus }: Props) {
     };
   }
 
+  // Role check: Prevent admins from deactivating super-admins
+  if (session.user.role === "ADMIN" && existUser.role === "SUPER_ADMIN") {
+    return {
+      success: false,
+      message: "You cannot update the status of a SUPER ADMIN.",
+    };
+  }
+
   // If account status is already the same, just ignore
   if (existUser.accountStatus === accountStatus) {
     return {
