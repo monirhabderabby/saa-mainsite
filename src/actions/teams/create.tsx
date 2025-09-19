@@ -11,7 +11,7 @@ import {
 import { Role } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
-const allowedRoles = ["SUPER_ADMIN"] as Role[];
+const allowedRoles = ["SUPER_ADMIN", "ADMIN"] as Role[];
 
 export async function createTeamAction(data: TeamSchemaType) {
   try {

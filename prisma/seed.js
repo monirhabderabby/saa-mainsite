@@ -64,7 +64,7 @@ const SEED_ADMIN = {
   role: "SUPER_ADMIN",
   accountStatus: "ACTIVE",
   teamName: "GM",
-  designationName: "General Manager",
+  designationName: "GM, ScaleUp Ads Agency",
   managementServiceName: "Management",
 };
 
