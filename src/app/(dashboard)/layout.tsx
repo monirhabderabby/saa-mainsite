@@ -1,8 +1,12 @@
 import { auth } from "@/auth";
+import prisma from "@/lib/prisma";
+import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
-import Sidebar from "./_components/sidebar";
 import Topbar from "./_components/top-bar";
+const Sidebar = dynamic(() => import("./_components/sidebar"), {
+  ssr: false,
+});
 
 interface Props {
   children: ReactNode;
@@ -10,14 +14,24 @@ interface Props {
 
 const SiteLayout = async ({ children }: Props) => {
   const cu = await auth();
-
   if (!cu) redirect("/login");
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id: cu.user.id,
+    },
+    include: {
+      designation: true,
+    },
+  });
+
+  if (!user) redirect("/login");
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Sidebar cu={cu.user} />
+      <Sidebar cu={user} />
       {/* Main Content */}
-      <div className="ml-52 flex flex-1 flex-col">
+      <div className="ml-60 flex flex-1 flex-col">
         {/* Top Bar */}
         <Topbar name={"Monir Hossain Rabby" as string} />
 

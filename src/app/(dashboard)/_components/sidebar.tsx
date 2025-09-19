@@ -1,12 +1,19 @@
 "use client";
 
 import { logoutAction } from "@/actions/auth/logout";
-import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AlertModal from "@/components/ui/custom/alert-modal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { logoSrcBlack, logoSrcWhite } from "@/constants/assets";
-import { Role } from "@prisma/client";
+import { Prisma, Role } from "@prisma/client";
 import {
   Building,
+  ChevronRight,
   CircleQuestionMark,
   FileText,
   Laptop,
@@ -14,6 +21,7 @@ import {
   LogOut,
   Settings,
   Sheet,
+  User,
   Users,
 } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -22,7 +30,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { ExtendedUser } from "../../../../next-auth-d";
 
 const routes = [
   {
@@ -105,7 +112,11 @@ const routes = [
 ];
 
 interface Props {
-  cu: ExtendedUser;
+  cu: Prisma.UserGetPayload<{
+    include: {
+      designation: true;
+    };
+  }>;
 }
 
 const Sidebar = ({ cu }: Props) => {
@@ -148,7 +159,7 @@ const Sidebar = ({ cu }: Props) => {
 
   return (
     <>
-      <div className="fixed inset-y-0 left-0 z-50 w-52 border-r  ">
+      <div className="fixed inset-y-0 left-0 z-50 w-60 border-r  ">
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="border-b p-4 flex justify-center items-center border-black/30 dark:border-white/20">
@@ -195,16 +206,42 @@ const Sidebar = ({ cu }: Props) => {
           </nav>
 
           {/* Logout Button */}
-          <div className="border-t p-3">
-            <Button
+          <div className="border-t p-3 hover:bg-gray-50 dark:hover:bg-white/5">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="flex items-center justify-between gap-3 w-full cursor-pointer ">
+                  <div className="flex items-center gap-3">
+                    <Avatar>
+                      <AvatarImage src="/placeholder.avif" />
+                      <AvatarFallback>A</AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col items-start">
+                      <h1 className="text-[14px]">{cu.fullName}</h1>
+                      <p className="text-[12px]">{cu.designation.name}</p>
+                    </div>
+                  </div>
+                  <ChevronRight />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" side="right" className="w-40">
+                <DropdownMenuItem>
+                  <User /> Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setOpen(true)}>
+                  <LogOut /> Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {/* <Button
               variant="outline"
               className="w-full justify-start gap-3 text-primary hover:text-primary/80"
               onClick={() => setOpen(true)}
             >
               <LogOut className="h-5 w-5" />
               <span>Logout</span>
-            </Button>
-          </div>
+            </Button> */}
         </div>
       </div>
       <AlertModal
