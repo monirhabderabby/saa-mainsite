@@ -12,12 +12,15 @@ import { Filter } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+
+// Dynamic imports for components
 const IssueTableContainer = dynamic(
   () => import("./_components/table-container"),
   {
     ssr: false,
   }
 );
+
 const AddFilterIssueSheetEntries = dynamic(
   () => import("./_components/filter/add-filter-issue-sheet-entries"),
   {
@@ -26,18 +29,23 @@ const AddFilterIssueSheetEntries = dynamic(
 );
 
 const Page = async () => {
-  const cu = await auth();
-  if (!cu || !cu?.user || !cu.user.id) redirect("/login");
+  // Authenticated user data
+  const currentUserSession = await auth();
+  if (!currentUserSession || !currentUserSession?.user?.id) {
+    redirect("/login");
+  }
 
+  // Fetch required data for profiles, teams, and services
   const [profiles, teams, services] = await prisma.$transaction([
     prisma.profile.findMany(),
     prisma.team.findMany(),
     prisma.services.findMany(),
   ]);
 
+  // Check if the user has permission to create issues
   const permission = await prisma.permissions.findFirst({
     where: {
-      userId: cu.user.id,
+      userId: currentUserSession.user.id,
       name: "ISSUE_SHEET",
     },
     select: {
@@ -45,11 +53,12 @@ const Page = async () => {
     },
   });
 
-  const isWriteAccess = permission?.isIssueCreateAllowed ?? false;
+  const canCreateIssues = permission?.isIssueCreateAllowed ?? false;
 
-  const currentUser = await prisma.user.findUnique({
+  // Fetch current user's details and associated teams
+  const currentUserDetails = await prisma.user.findUnique({
     where: {
-      id: cu.user.id,
+      id: currentUserSession.user.id,
     },
     select: {
       serviceId: true,
@@ -58,15 +67,36 @@ const Page = async () => {
           name: true,
         },
       },
+      userTeams: {
+        include: {
+          team: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
     },
   });
 
-  if (!currentUser) redirect("/login");
+  if (!currentUserDetails) {
+    redirect("/login");
+  }
 
-  const isManagement = currentUser.service?.name === "Management";
+  // Determine if the current user belongs to management or sales roles
+  const isManagement = currentUserDetails.service?.name === "Management";
+  const isSalesPerson = currentUserSession.user.role === "SALES_MEMBER";
+
+  // Check if default filters should be ignored
+  const shouldIgnoreDefaultFilters = isManagement || isSalesPerson;
+
+  // Get the user's associated team (if any)
+  const userTeams = currentUserDetails.userTeams;
+  const userTeam = (userTeams.length > 0 && userTeams[0]) || undefined;
 
   return (
-    <Card className="shadow-none ">
+    <Card className="shadow-none">
       <CardHeader>
         <div className="flex justify-between items-center w-full">
           <div>
@@ -78,9 +108,15 @@ const Page = async () => {
             </CardDescription>
           </div>
           <div className="flex items-center gap-5">
+            {/* Filter Component */}
             <AddFilterIssueSheetEntries
               currentUserServiceId={
-                isManagement ? undefined : (currentUser?.serviceId ?? "")
+                shouldIgnoreDefaultFilters
+                  ? undefined
+                  : (currentUserDetails?.serviceId ?? "")
+              }
+              currentUserTeamId={
+                shouldIgnoreDefaultFilters ? undefined : userTeam?.teamId
               }
               profiles={profiles}
               services={services}
@@ -91,7 +127,8 @@ const Page = async () => {
                 </Button>
               }
             />
-            {isWriteAccess && (
+            {/* Add Issue Button */}
+            {canCreateIssues && (
               <Button effect="gooeyLeft" asChild>
                 <Link href="/issue-sheet/add-entry" className="w-full">
                   Add Issue

@@ -67,6 +67,7 @@ interface Props {
   teams: Team[];
   services: Services[];
   currentUserServiceId?: string;
+  currentUserTeamId?: string;
 }
 export default function AddFilterIssueSheetEntries({
   trigger,
@@ -74,6 +75,7 @@ export default function AddFilterIssueSheetEntries({
   teams,
   services,
   currentUserServiceId,
+  currentUserTeamId,
 }: Props) {
   const [open, setOpen] = useState(false);
   const { setAllValues, clearFilters } = useIssueSheetFilterState();
@@ -88,7 +90,7 @@ export default function AddFilterIssueSheetEntries({
       createdTo: undefined,
       serviceId: currentUserServiceId ?? undefined,
       status: undefined,
-      teamId: undefined,
+      teamId: currentUserTeamId ?? undefined,
     },
   });
 
