@@ -211,8 +211,10 @@ const Sidebar = ({ cu }: Props) => {
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" side="right" className="w-40">
-                <DropdownMenuItem>
-                  <User /> Profile
+                <DropdownMenuItem asChild>
+                  <Link href="/profile">
+                    <User /> Profile
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setOpen(true)}>
                   <LogOut /> Logout

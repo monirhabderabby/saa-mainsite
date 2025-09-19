@@ -35,7 +35,9 @@ export default function StatsCard({
             {title}
           </CardTitle>
           {icon && (
-            <div className="bg-primary-green/20 p-3 rounded-lg">{icon}</div>
+            <div className="dark:bg-primary-green/20 bg-gray-50 p-3 rounded-lg">
+              {icon}
+            </div>
           )}
         </CardHeader>
         <CardContent>

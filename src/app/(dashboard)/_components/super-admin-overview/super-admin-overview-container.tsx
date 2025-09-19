@@ -1,5 +1,3 @@
-import StatsCard from "@/components/shared/cards/stats-card";
-import { Database, FileText } from "lucide-react";
 import { Suspense } from "react";
 import DeliveryInQue from "./_components/delivery-in-que";
 import IssuesDoneToday from "./_components/issue-done-today";
@@ -16,7 +14,7 @@ function CardSkeleton() {
 
 const SuperAdminOverViewContainer = async () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-full bg-background">
       <header className="border-b border-border/50 bg-card/30 backdrop-blur-sm">
         <div className=" px-6 py-4">
           <div className="flex items-center justify-between">
@@ -38,7 +36,7 @@ const SuperAdminOverViewContainer = async () => {
 
       <main className="p-5">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
           {/* Employee Stats */}
           <Suspense fallback={<CardSkeleton />}>
             <TotalEmployees />
@@ -65,23 +63,6 @@ const SuperAdminOverViewContainer = async () => {
           <Suspense fallback={<CardSkeleton />}>
             <DeliveryInQue />
           </Suspense>
-
-          {/* Storage Analytics */}
-          <StatsCard
-            title="Update Sheet Storage"
-            value="2.4 GB"
-            subtitle="Database size"
-            icon={<Database className="h-4 w-4 text-primary-yellow" />}
-            trend={{ value: 12.3, isPositive: false }}
-          />
-
-          <StatsCard
-            title="Issue Sheet Storage"
-            value="1.8 GB"
-            subtitle="Database size"
-            icon={<FileText className="h-4 w-4 text-primary-yellow" />}
-            trend={{ value: 7.9, isPositive: false }}
-          />
         </div>
       </main>
     </div>
