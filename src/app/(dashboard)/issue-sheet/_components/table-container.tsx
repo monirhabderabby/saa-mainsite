@@ -51,6 +51,7 @@ const IssueTableContainer = () => {
       orderId,
       createdFrom,
       createdTo,
+      page,
     ],
     queryFn: () =>
       fetch(

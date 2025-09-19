@@ -18,6 +18,9 @@ export async function GET(req: NextRequest) {
     const createdFrom = searchParams.get("createdFrom") || undefined;
     const createdTo = searchParams.get("createdTo") || undefined;
 
+    // Start timer
+    const start = performance.now();
+
     const result = await getIssueSheets({
       page,
       limit,
@@ -30,6 +33,12 @@ export async function GET(req: NextRequest) {
       createdFrom,
       createdTo,
     });
+
+    // End timer
+    const end = performance.now();
+    const durationMs = end - start;
+
+    console.log(`Get all issues take: ${durationMs}ms`);
 
     return Response.json({ success: true, ...result });
   } catch (error) {

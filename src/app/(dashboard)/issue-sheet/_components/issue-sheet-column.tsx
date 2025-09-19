@@ -5,6 +5,7 @@ import { Pencil } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import IssueSheetServiceLine from "./action/issue-sheet-service-line";
+import SpecialNotes from "./action/special-notes";
 import StatusChangeBy from "./action/status-change-by";
 import TeamSelector from "./action/team-selector";
 const IssueSheetStatusAction = dynamic(
@@ -46,6 +47,12 @@ export const issueSheetColumns: ColumnDef<IssueSheetData>[] = [
   },
   {
     accessorKey: "specialNotes",
+    header: "Special Notes",
+    cell: ({ row }) => (
+      <>
+        <SpecialNotes data={row.original} />
+      </>
+    ),
   },
   {
     accessorKey: "orderPageUrl",
