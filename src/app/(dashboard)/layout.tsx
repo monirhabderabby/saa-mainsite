@@ -33,7 +33,7 @@ const SiteLayout = async ({ children }: Props) => {
       {/* Main Content */}
       <div className="ml-60 flex flex-1 flex-col">
         {/* Top Bar */}
-        <Topbar name={"Monir Hossain Rabby" as string} />
+        <Topbar name={user.fullName as string} />
 
         <div className=" bg-[#F5F7FA] dark:bg-background p-6 min-h-[calc(100vh-65px)]">
           {children}

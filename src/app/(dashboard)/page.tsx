@@ -57,7 +57,7 @@ export default async function Home() {
 
   console.log(formatted);
 
-  if (role === "SUPER_ADMIN") {
+  if (role === "SUPER_ADMIN" || role === "ADMIN") {
     return <SuperAdminOverViewContainer />;
   }
   return (

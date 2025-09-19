@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/custom/theme-toggle";
 
 interface Props {
@@ -16,8 +15,6 @@ const Topbar = ({ name }: Props) => {
       </div>
 
       <div>
-        <Button variant="ghost">Tool 1</Button>
-        <Button variant="ghost">Tool 2</Button>
         <ThemeToggle />
       </div>
     </header>

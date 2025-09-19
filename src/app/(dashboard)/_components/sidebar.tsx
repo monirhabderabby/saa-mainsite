@@ -1,6 +1,7 @@
 "use client";
 
 import { logoutAction } from "@/actions/auth/logout";
+import LogoImageForLogin from "@/app/(auth)/login/_components/logo-image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AlertModal from "@/components/ui/custom/alert-modal";
 import {
@@ -9,7 +10,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { logoSrcBlack, logoSrcWhite } from "@/constants/assets";
 import { Prisma, Role } from "@prisma/client";
 import {
   Building,
@@ -24,8 +24,6 @@ import {
   User,
   Users,
 } from "lucide-react";
-import { useTheme } from "next-themes";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
@@ -123,11 +121,8 @@ const Sidebar = ({ cu }: Props) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const [mounted, setMounted] = useState(false);
 
   const pathname = usePathname();
-
-  const { theme } = useTheme();
 
   const onLogout = () => {
     setIsLoading(true);
@@ -148,10 +143,6 @@ const Sidebar = ({ cu }: Props) => {
     };
   }, []);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   // inside Sidebar component, before return
   const accessibleRoutes = routes.filter((route) =>
     route.access.includes(cu.role)
@@ -163,14 +154,8 @@ const Sidebar = ({ cu }: Props) => {
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="border-b p-4 flex justify-center items-center border-black/30 dark:border-white/20">
-            <div className="relative h-[100px] w-[150px]">
-              {mounted && (
-                <Image
-                  src={theme === "light" ? logoSrcBlack : logoSrcWhite}
-                  alt="logo"
-                  fill
-                />
-              )}
+            <div className="relative h-[100px] w-[150px] flex items-center">
+              <LogoImageForLogin />
             </div>
           </div>
 
