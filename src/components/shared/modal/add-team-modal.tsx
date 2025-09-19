@@ -34,12 +34,14 @@ import { toast } from "sonner";
 interface Props {
   trigger: ReactNode;
   initialData?: Team;
-  services: Services[];
+  services?: Services[];
+  serviceId: string;
 }
 export default function AddTeamModal({
   trigger,
   initialData,
   services,
+  serviceId,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -48,7 +50,7 @@ export default function AddTeamModal({
     resolver: zodResolver(teamSchema),
     defaultValues: {
       name: initialData?.name ?? "",
-      serviceId: initialData?.serviceId ?? "",
+      serviceId: initialData?.serviceId ?? serviceId ?? "",
     },
   });
 
@@ -84,35 +86,40 @@ export default function AddTeamModal({
       <AlertDialogContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 s">
-            <FormField
-              control={form.control}
-              name="serviceId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Select service</FormLabel>
-                  <FormControl>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a service" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {services.map((item) => (
-                          <SelectItem key={item.id} value={item.id}>
-                            {item.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormDescription>
-                    Choose the service this team will be associated with.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {!serviceId && (
+              <FormField
+                control={form.control}
+                name="serviceId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Select service</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a service" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {services?.map((item) => (
+                            <SelectItem key={item.id} value={item.id}>
+                              {item.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormDescription>
+                      Choose the service this team will be associated with.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             <FormField
               control={form.control}
               name="name"

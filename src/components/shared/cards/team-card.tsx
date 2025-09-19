@@ -13,6 +13,7 @@ import { ServiceWithTeamsAndUsers } from "@/types/services";
 import { MoreHorizontal, User, Users } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import AddTeamModal from "../modal/add-team-modal";
 const AddServiceManagerModal = dynamic(
   () => import("@/components/shared/modal/add-service-manager-modal"),
   {
@@ -77,9 +78,21 @@ export default async function ServiTeaceCard({ service }: ServiceCardProps) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="relative flex cursor-default select-none items-center gap-2 rounded-sm pr-2 px-0 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0 w-full"
+                    className="relative flex cursor-default select-none items-center gap-2 rounded-sm pr-2 px-0 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0 w-full h-[30px] font-normal text-[14px]"
                   >
                     {service.serviceManagerId ? "Edit" : "Assign"} Manager
+                  </Button>
+                }
+              />
+              <AddTeamModal
+                serviceId={service.id}
+                trigger={
+                  <Button
+                    className="relative flex cursor-default select-none items-center gap-2 rounded-sm pr-2 px-0 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0 w-full h-[30px] font-normal text-[14px]"
+                    variant="ghost"
+                    size="sm"
+                  >
+                    Add New Team
                   </Button>
                 }
               />

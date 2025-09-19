@@ -40,7 +40,6 @@ export default async function ManageTeamsPage({
 }: {
   params: { serviceId: string };
 }) {
-  const services = await prisma.services.findMany();
   const teams = await prisma.team.findMany({
     where: {
       serviceId: params.serviceId,
@@ -95,7 +94,7 @@ export default async function ManageTeamsPage({
             </div>
           </div>
           <AddTeamModal
-            services={services}
+            serviceId={params.serviceId}
             trigger={
               <Button effect="gooeyLeft">
                 <Plus className="w-4 h-4 mr-1" />
