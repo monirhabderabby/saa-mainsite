@@ -5,3 +5,12 @@ export const serviceSchema = z.object({
 });
 
 export type SerivceSchemaType = z.infer<typeof serviceSchema>;
+
+export const addManagerSchema = z.object({
+  serviceManagerId: z.string().min(1, "Manager ID is required"),
+  serviceId: z.string().min(1, {
+    message: "Service Id is Requires",
+  }),
+});
+
+export type AddManagerSchemaType = z.infer<typeof addManagerSchema>;
