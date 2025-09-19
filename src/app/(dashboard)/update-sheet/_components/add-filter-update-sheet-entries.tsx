@@ -73,6 +73,7 @@ export const allowUpdateTo = [
 interface Props {
   trigger: ReactNode;
   profiles: Profile[];
+  currentUserServiceId?: string;
 }
 export default function AddFilterUpdateSheetEntries({
   trigger,

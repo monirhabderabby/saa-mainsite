@@ -34,6 +34,7 @@ const Page = async () => {
   });
 
   const isWriteAccess = permission?.isMessageCreateAllowed ?? false;
+
   return (
     <Card className="shadow-none ">
       <CardHeader>
@@ -46,7 +47,7 @@ const Page = async () => {
             </CardDescription>
           </div>
           <div className="flex items-center gap-5">
-            <FilterContainer />
+            <FilterContainer userId={cu.user.id} />
             {isWriteAccess && (
               <Button effect="gooeyLeft" asChild>
                 <Link href="/update-sheet/add-entry" className="w-full">

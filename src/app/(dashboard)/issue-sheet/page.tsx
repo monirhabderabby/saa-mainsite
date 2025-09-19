@@ -35,6 +35,18 @@ const Page = async () => {
     prisma.services.findMany(),
   ]);
 
+  const permission = await prisma.permissions.findFirst({
+    where: {
+      userId: cu.user.id,
+      name: "ISSUE_SHEET",
+    },
+    select: {
+      isIssueCreateAllowed: true,
+    },
+  });
+
+  const isWriteAccess = permission?.isIssueCreateAllowed ?? false;
+
   const currentUser = await prisma.user.findUnique({
     where: {
       id: cu.user.id,
@@ -49,19 +61,9 @@ const Page = async () => {
     },
   });
 
-  const permission = await prisma.permissions.findFirst({
-    where: {
-      userId: cu.user.id,
-      name: "ISSUE_SHEET",
-    },
-    select: {
-      isIssueCreateAllowed: true,
-    },
-  });
+  if (!currentUser) redirect("/login");
 
-  const isWriteAccess = permission?.isIssueCreateAllowed ?? false;
-
-  const isManagement = currentUser?.service?.name === "Management";
+  const isManagement = currentUser.service?.name === "Management";
 
   return (
     <Card className="shadow-none ">
