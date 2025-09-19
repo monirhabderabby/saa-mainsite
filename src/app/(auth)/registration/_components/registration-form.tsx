@@ -41,8 +41,9 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export const allowedRegistrationRoles = [
-  { id: Role.OPERATION_MEMBER, name: "Operation Member" },
-  { id: Role.SALES_MEMBER, name: "Sales Member" },
+  { id: Role.OPERATION_MEMBER, name: "Operation" },
+  { id: Role.SALES_MEMBER, name: "Sales" },
+  { id: Role.ADMIN, name: "Admin" }, // 👈 add this
 ];
 
 interface Props {
@@ -84,9 +85,17 @@ export default function RegistrationForm({ services, designations }: Props) {
   }
 
   const selectedServiceId = form.watch("serviceId");
-  const filteredDesignations = designations.filter(
-    (d) => d.serviceId === selectedServiceId
-  );
+
+  const filteredDesignations =
+    designations.filter((d) => d.serviceId === selectedServiceId) || undefined;
+
+  // 👇 decide which roles to show
+  const filteredRoles =
+    services.find((s) => s.id === selectedServiceId)?.name === "Management"
+      ? allowedRegistrationRoles.filter((r) => r.id === Role.ADMIN)
+      : allowedRegistrationRoles.filter(
+          (r) => r.id === Role.SALES_MEMBER || r.id === Role.OPERATION_MEMBER
+        ) || undefined;
 
   return (
     <Card>
@@ -232,7 +241,7 @@ export default function RegistrationForm({ services, designations }: Props) {
                     name="role"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Role</FormLabel>
+                        <FormLabel>Access Level</FormLabel>
                         <FormControl>
                           <Select
                             onValueChange={field.onChange}
@@ -240,11 +249,11 @@ export default function RegistrationForm({ services, designations }: Props) {
                           >
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Select a role" />
+                                <SelectValue placeholder="Select a access level" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {allowedRegistrationRoles.map((item) => (
+                              {filteredRoles.map((item) => (
                                 <SelectItem value={item.id} key={item.id}>
                                   {item.name}
                                 </SelectItem>

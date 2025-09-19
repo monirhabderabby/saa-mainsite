@@ -209,14 +209,16 @@ const Sidebar = ({ cu }: Props) => {
           <div className="border-t p-3 hover:bg-gray-50 dark:hover:bg-white/5">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="flex items-center justify-between gap-3 w-full cursor-pointer ">
+                <div className="flex items-center justify-between gap-1 w-full cursor-pointer ">
                   <div className="flex items-center gap-3">
                     <Avatar>
                       <AvatarImage src="/placeholder.avif" />
                       <AvatarFallback>A</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col items-start">
-                      <h1 className="text-[14px]">{cu.fullName}</h1>
+                      <h1 className="text-[14px] truncate w-36 ">
+                        {cu.fullName}
+                      </h1>
                       <p className="text-[12px]">{cu.designation.name}</p>
                     </div>
                   </div>
@@ -233,15 +235,6 @@ const Sidebar = ({ cu }: Props) => {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-
-          {/* <Button
-              variant="outline"
-              className="w-full justify-start gap-3 text-primary hover:text-primary/80"
-              onClick={() => setOpen(true)}
-            >
-              <LogOut className="h-5 w-5" />
-              <span>Logout</span>
-            </Button> */}
         </div>
       </div>
       <AlertModal
