@@ -34,6 +34,11 @@ const Page = async () => {
           role: true,
         },
       },
+      serviceManager: {
+        select: {
+          fullName: true,
+        },
+      },
     },
   });
 

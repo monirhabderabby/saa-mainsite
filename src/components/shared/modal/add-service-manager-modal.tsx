@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 
+import { AddManagerAction } from "@/actions/services/add-manager";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -29,6 +30,7 @@ import {
 import { addManagerSchema, AddManagerSchemaType } from "@/schemas/services";
 import { Prisma } from "@prisma/client";
 import { Loader, Plus, UserPlus } from "lucide-react";
+import { toast } from "sonner";
 
 type UserTypes = Prisma.UserGetPayload<{
   select: {
@@ -64,7 +66,22 @@ export default function AddServiceManagerModal({
 
   const onSubmit = async (values: AddManagerSchemaType) => {
     startTransition(() => {
-      console.log(values);
+      AddManagerAction(values).then((res) => {
+        if (!res.success) {
+          toast.error(res.message);
+          return;
+        }
+
+        // handle success
+        toast.success(res.message, {
+          richColors: true,
+        });
+        form.reset({
+          serviceId: undefined,
+          serviceManagerId: undefined,
+        });
+        setOpen(false);
+      });
     });
   };
 
@@ -93,12 +110,6 @@ export default function AddServiceManagerModal({
               name="serviceManagerId"
               render={({ field }) => (
                 <FormItem>
-                  {/* Optional Label */}
-                  {/* 
-      <FormLabel className="flex items-center gap-2">
-        <Users className="w-4 h-4" /> Select Members
-      </FormLabel> 
-      */}
                   <FormControl>
                     <Select
                       onValueChange={field.onChange}
@@ -112,10 +123,7 @@ export default function AddServiceManagerModal({
                         {users.map((user) => (
                           <SelectItem value={user.id} key={user.id}>
                             <div className="flex justify-between w-full">
-                              <span>{user.fullName}</span>
-                              <span className="text-muted-foreground">
-                                {user.employeeId}
-                              </span>
+                              {`${user.fullName} (${user.employeeId})`}
                             </div>
                           </SelectItem>
                         ))}
@@ -136,7 +144,7 @@ export default function AddServiceManagerModal({
                 Cancel
               </Button>
               <Button type="submit" disabled={isLoading}>
-                Add Member{" "}
+                Add Manager{" "}
                 {isLoading ? <Loader className="animate-spin" /> : <Plus />}
               </Button>
             </div>

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import prisma from "@/lib/prisma";
 import { ServiceWithTeamsAndUsers } from "@/types/services";
-import { MoreHorizontal, Users } from "lucide-react";
+import { MoreHorizontal, User, Users } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 const AddServiceManagerModal = dynamic(
@@ -32,6 +32,19 @@ export default async function ServiTeaceCard({ service }: ServiceCardProps) {
       id: true,
       fullName: true,
       employeeId: true,
+    },
+    where: {
+      managedServices: {
+        none: {},
+      },
+      userTeams: {
+        none: {
+          team: {
+            name: "Management",
+          },
+        },
+      },
+      serviceId: service.id,
     },
   });
 
@@ -83,6 +96,10 @@ export default async function ServiTeaceCard({ service }: ServiceCardProps) {
           </div>
           <div className="flex items-center gap-1">
             <span>{totalTeams} teams</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <User className="w-4 h-4" />{" "}
+            <span>{service.serviceManager?.fullName}</span>
           </div>
         </div>
       </CardHeader>

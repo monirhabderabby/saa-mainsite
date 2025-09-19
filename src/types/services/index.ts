@@ -30,6 +30,11 @@ export type ServiceWithTeamsAndUsers = Prisma.ServicesGetPayload<{
         role: true;
       };
     };
+    serviceManager: {
+      select: {
+        fullName: true;
+      };
+    };
   };
 }>;
 
