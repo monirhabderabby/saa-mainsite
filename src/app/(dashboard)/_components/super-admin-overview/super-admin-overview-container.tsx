@@ -14,8 +14,8 @@ function CardSkeleton() {
 
 const SuperAdminOverViewContainer = async () => {
   return (
-    <div className="h-full bg-background">
-      <header className="border-b border-border/50 bg-card/30 backdrop-blur-sm">
+    <div className="h-full ">
+      <header className="border-b border-primary-yellow/50 dark:border-primary-yellow/10  ">
         <div className=" px-6 py-4">
           <div className="flex items-center justify-between">
             <div>

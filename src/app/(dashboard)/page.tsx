@@ -1,8 +1,22 @@
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import SuperAdminOverViewContainer from "./_components/super-admin-overview/super-admin-overview-container";
+const OperationMemberOverview = dynamic(
+  () =>
+    import("./_components/operation-member-overview/operation-member-overview"),
+  {
+    ssr: false,
+  }
+);
+const SuperAdminOverViewContainer = dynamic(
+  () =>
+    import("./_components/super-admin-overview/super-admin-overview-container"),
+  {
+    ssr: false,
+  }
+);
 
 export default async function Home() {
   const cu = await auth();
@@ -13,6 +27,8 @@ export default async function Home() {
 
   if (role === "SUPER_ADMIN" || role === "ADMIN") {
     return <SuperAdminOverViewContainer />;
+  } else if (role === "OPERATION_MEMBER") {
+    return <OperationMemberOverview />;
   }
   return (
     <div className="h-screen w-full flex justify-center items-center">

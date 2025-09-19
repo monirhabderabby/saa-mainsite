@@ -26,7 +26,7 @@ export default function StatsCard({
     <MotionProvider>
       <Card
         className={cn(
-          "border-border/50 bg-card/50 dark:bg-white/5 backdrop-blur-sm",
+          "border-border/50  dark:bg-white/5 bg-background backdrop-blur-sm",
           className
         )}
       >
