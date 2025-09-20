@@ -14,7 +14,7 @@ export default function MotionProvider({ children }: MotionProviderProps) {
       animate={{
         opacity: 1,
         filter: "blur(0px)",
-        transition: { duration: 0.7, delay: 0.1 },
+        transition: { duration: 0.7, delay: 0.3 },
       }}
       className=""
     >

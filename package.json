@@ -81,7 +81,7 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.32",
     "postcss": "^8",
-    "prisma": "^6.15.0",
+    "prisma": "^6.16.2",
     "react-email": "4.2.11",
     "tailwindcss": "^3.4.1",
     "ts-node": "^10.9.2",

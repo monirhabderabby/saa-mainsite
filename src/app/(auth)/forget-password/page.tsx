@@ -1,10 +1,6 @@
-import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ui/custom/theme-toggle";
-import { MoveLeft } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
-import LogoImageForLogin from "../login/_components/logo-image";
-import ForgetPasswordForm from "./_components/forget-password-form";
+import ForgetPasswordWrapper from "./_components/forget-pass-wrapper";
 
 export default function LoginPage() {
   return (
@@ -24,32 +20,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right side - Reset form */}
-      <div className="flex w-full flex-col items-center justify-center px-4 py-0 lg:w-1/2 relative">
-        <div className="absolute top-20 left-1/2 transform -translate-x-1/2">
-          <LogoImageForLogin />
-        </div>
-        <Card className="mx-auto w-full max-w-md space-y-10 border-0 shadow-none">
-          {/* Header */}
-          <div className="text-center">
-            <CardTitle className="text-[28px] leading-[120%] font-semibold text-gray-900 dark:text-white/90">
-              Reset <span className="text-pretty">password</span>
-            </CardTitle>
-            <CardDescription className="mt-2 text-sm text-gray-600 dark:text-white/60">
-              Enter your email address to receive magic link
-            </CardDescription>
-          </div>
-
-          {/* Form component */}
-          <ForgetPasswordForm />
-
-          <div className="w-full flex justify-center">
-            <Link href="/" className="flex items-center gap-x-2 group">
-              <MoveLeft />{" "}
-              <span className="group-hover:underline">Back to home</span>
-            </Link>
-          </div>
-        </Card>
-      </div>
+      <ForgetPasswordWrapper />
     </div>
   );
 }

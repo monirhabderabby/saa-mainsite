@@ -5,6 +5,7 @@ import { Mail } from "lucide-react";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 
+import { forgetPasswordAction } from "@/actions/auth/forget-password";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -18,8 +19,13 @@ import {
   forgetPasswordSchema,
   ForgetPasswordType,
 } from "@/schemas/auth/password-reset";
+import { toast } from "sonner";
 
-export default function ForgetPasswordForm() {
+interface Props {
+  onSuccess: (email: string) => void;
+}
+
+export default function ForgetPasswordForm({ onSuccess }: Props) {
   const [pending, startTransition] = useTransition();
 
   // Initialize the form
@@ -33,7 +39,17 @@ export default function ForgetPasswordForm() {
   // Handle form submission
   async function onSubmit(data: ForgetPasswordType) {
     startTransition(() => {
-      console.log(data);
+      forgetPasswordAction(data).then((res) => {
+        if (!res.success) {
+          toast.error(res.message);
+
+          return;
+        }
+
+        // handle success
+        toast.success(res.message);
+        onSuccess(data.email);
+      });
     });
   }
 
