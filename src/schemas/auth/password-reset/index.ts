@@ -16,3 +16,12 @@ export const customPasswordResetSchema = z
 export type CustomPasswordResetSchemaType = z.infer<
   typeof customPasswordResetSchema
 >;
+
+export const forgetPasswordSchema = z.object({
+  email: z
+    .string()
+    .min(1, { message: "Email is required" })
+    .email({ message: "Invalid email address" }),
+});
+
+export type ForgetPasswordType = z.infer<typeof forgetPasswordSchema>;

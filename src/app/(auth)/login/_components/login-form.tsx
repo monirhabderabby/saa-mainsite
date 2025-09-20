@@ -47,7 +47,7 @@ export default function LoginForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8 max-w-3xl mx-auto py-5"
+          className="space-y-5 max-w-3xl mx-auto py-5"
         >
           <FormField
             control={form.control}
@@ -59,6 +59,7 @@ export default function LoginForm() {
                   <Input
                     placeholder="Enter employee id here..."
                     type="text"
+                    className="h-[40px]"
                     {...field}
                   />
                 </FormControl>
@@ -68,20 +69,32 @@ export default function LoginForm() {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <PasswordInput placeholder="Passowrd" {...field} />
-                </FormControl>
+          <div>
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <PasswordInput
+                      placeholder="Passowrd"
+                      {...field}
+                      className="h-[40px]"
+                    />
+                  </FormControl>
 
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="flex justify-end">
+              <Button asChild variant="link" className="ml-auto">
+                <Link href="/forget-password">Forgot Password?</Link>
+              </Button>
+            </div>
+          </div>
 
           <Button type="submit" className="w-full" disabled={pending}>
             Login Now {pending && <Loader2 className="animate-spin" />}
