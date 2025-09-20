@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import PasswordResetComponent from "./_components/password-reset-component";
 import UserProfileCard from "./_components/profile-card";
 
 function CardSkeleton() {
@@ -9,10 +10,11 @@ function CardSkeleton() {
 
 const Page = async () => {
   return (
-    <div className="flex h-[calc(100vh-120px)] ">
+    <div className="flex h-full gap-x-5">
       <Suspense fallback={<CardSkeleton />}>
         <UserProfileCard />
       </Suspense>
+      <PasswordResetComponent />
     </div>
   );
 };

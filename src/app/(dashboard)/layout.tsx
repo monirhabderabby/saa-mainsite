@@ -28,14 +28,14 @@ const SiteLayout = async ({ children }: Props) => {
   if (!user) redirect("/login");
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex  flex-col">
       <Sidebar cu={user} />
       {/* Main Content */}
       <div className="ml-60 flex flex-1 flex-col">
         {/* Top Bar */}
         <Topbar name={user.fullName as string} />
 
-        <div className=" bg-[#F5F7FA] dark:bg-background p-6 min-h-[calc(100vh-65px)]">
+        <div className=" bg-[#F5F7FA] dark:bg-background p-6   h-[calc(100vh-160px)]">
           {children}
         </div>
       </div>
