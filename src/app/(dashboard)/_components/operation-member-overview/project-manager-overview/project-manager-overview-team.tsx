@@ -17,7 +17,7 @@ function CardSkeleton({ className }: { className: string }) {
 
 const ProjectManagerOverviewTeam = async ({ teamId, teamName }: Props) => {
   return (
-    <Card className="shadow-none">
+    <Card className="shadow-none dark:bg-slate-50/5">
       <CardHeader>
         <CardTitle>{teamName}</CardTitle>
       </CardHeader>

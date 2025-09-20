@@ -46,7 +46,7 @@ const AlertModal = ({
           disabled={loading}
           variant="outline"
           onClick={onClose}
-          className="text-primary hover:text-primary/80"
+          className="text-primary hover:text-primary/80 focus:ring-0 outline-0"
         >
           Cancel
         </Button>
