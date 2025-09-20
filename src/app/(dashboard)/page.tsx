@@ -1,8 +1,12 @@
 import { auth } from "@/auth";
-import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import { redirect } from "next/navigation";
+const SalesMemberOverview = dynamic(
+  () => import("./_components/sales-member-overview/sales-member-overview"),
+  {
+    ssr: false,
+  }
+);
 const OperationMemberOverview = dynamic(
   () =>
     import("./_components/operation-member-overview/operation-member-overview"),
@@ -30,11 +34,5 @@ export default async function Home() {
   } else if (role === "OPERATION_MEMBER") {
     return <OperationMemberOverview />;
   }
-  return (
-    <div className="h-screen w-full flex justify-center items-center">
-      <Button asChild>
-        <Link href="/registration">Get Started</Link>
-      </Button>
-    </div>
-  );
+  return <SalesMemberOverview />;
 }

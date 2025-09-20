@@ -212,7 +212,7 @@ const Sidebar = ({ cu }: Props) => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" side="right" className="w-40">
                 <DropdownMenuItem asChild>
-                  <Link href="/profile">
+                  <Link href="/account">
                     <User /> Profile
                   </Link>
                 </DropdownMenuItem>

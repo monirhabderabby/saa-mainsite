@@ -39,7 +39,7 @@ export default async function UserProfileCard() {
 
   const team = user.userTeams.length > 0 ? user.userTeams[0] : null;
   return (
-    <Card className="w-full max-w-sm h-full overflow-hidden bg-white shadow-lg">
+    <Card className="w-full max-w-sm h-full overflow-hidden bg-white dark:bg-white/5 shadow-lg">
       {/* Header with curved green background */}
       <div className="h-32 bg-gradient-to-br from-green-300 to-green-400 relative">
         <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
@@ -68,7 +68,7 @@ export default async function UserProfileCard() {
       {/* Content */}
       <div className="pt-20 pb-8 px-6 text-center">
         {/* Name and Role */}
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white/70 mb-1">
           {user.fullName}
         </h1>
         <p className="text-gray-500 text-sm mb-8">{roleLabels[user.role]}</p>
@@ -76,29 +76,37 @@ export default async function UserProfileCard() {
         {/* User Details */}
         <div className="space-y-4 text-left">
           <div className="flex items-center gap-3">
-            <span className="text-gray-600 font-medium min-w-[80px]">ID:</span>
-            <span className="text-gray-900">{user.employeeId}</span>
+            <span className="text-gray-600 dark:text-white/60 font-medium min-w-[80px]">
+              ID:
+            </span>
+            <span className="text-gray-900 dark:text-white/70">
+              {user.employeeId}
+            </span>
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-gray-600 font-medium min-w-[80px]">
+            <span className="text-gray-600 dark:text-white/60 font-medium min-w-[80px]">
               Name:
             </span>
-            <span className="text-gray-900">{user.fullName}</span>
+            <span className="text-gray-900 dark:text-white/70">
+              {user.fullName}
+            </span>
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-gray-600 font-medium min-w-[80px]">
+            <span className="text-gray-600 dark:text-white/60 font-medium min-w-[80px]">
               Email:
             </span>
-            <span className="text-gray-900 break-all">{user.email}</span>
+            <span className="text-gray-900 dark:text-white/70 break-all">
+              {user.email}
+            </span>
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-gray-600 font-medium min-w-[80px]">
-              Team Name:
+            <span className="text-gray-600 dark:text-white/60 font-medium min-w-[80px]">
+              Team:
             </span>
-            <span className="text-gray-900">
+            <span className="text-gray-900 dark:text-white/70">
               {team?.team?.name ?? "No team assigned"}
             </span>
           </div>
