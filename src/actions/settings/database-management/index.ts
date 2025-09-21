@@ -1,7 +1,6 @@
 "use server";
 
 import { auth } from "@/auth";
-import { getCollectionStats } from "@/helper/database-storage/get-collection-stats";
 import prisma from "@/lib/prisma";
 import {
   databaseManagementFormSchema,
@@ -50,8 +49,6 @@ export async function deleteDatabaseDataBasedonSchema(
   try {
     let result;
 
-    const statsBefore = await getCollectionStats(collection);
-
     if (collection === "updateSheet") {
       result = await prisma.updateSheet.deleteMany({
         where: {
@@ -77,18 +74,9 @@ export async function deleteDatabaseDataBasedonSchema(
       };
     }
 
-    const statsAfter = await getCollectionStats(collection);
-    const bytesFreed = statsBefore.size - statsAfter.size;
-
-    const kbFreed = bytesFreed / 1024;
-
-    const mbFreed = bytesFreed / 1024 / 1024;
-
     return {
       success: true,
-      message: `Deleted ${result.count} records from "${collection}". Approx space freed: ${kbFreed.toFixed(
-        2
-      )} KB (${mbFreed.toFixed(2)} MB).`,
+      message: `Deleted ${result.count} records from "${collection}" between ${startDate.toDateString()} and ${endDate.toDateString()}.`,
     };
   } catch (error) {
     console.error("Error deleting records:", error);
