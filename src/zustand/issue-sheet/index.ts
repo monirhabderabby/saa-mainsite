@@ -1,86 +1,65 @@
-// zustand/issue-sheet.ts
 import { create } from "zustand";
 
-export type IssueSheetFilterState = {
-  profileId?: string | null;
-  serviceId?: string | null;
-  teamId?: string | null;
+type IssueSheetFilterState = {
+  profileId?: string;
+  serviceId?: string;
+  teamId?: string;
   page: number;
-  status?: string[] | null;
-  clientName?: string | null;
-  orderId?: string | null;
-  // Persisted as ISO strings (serializable)
-  createdFrom?: string | null;
-  createdTo?: string | null;
+  status?: string;
+  clientName?: string;
+  orderId?: string;
+  createdFrom?: string;
+  createdTo?: string;
 
-  setProfileId: (id?: string | null) => void;
-  setServiceId: (id?: string | null) => void;
-  setTeamId: (id?: string | null) => void;
+  setProfileId: (id: string) => void;
+  setServiceId: (id: string) => void;
+  setTeamId: (id: string) => void;
   setPage: (page: number) => void;
   setAllValues: (data: Partial<IssueSheetFilterState>) => void;
-  clearFilters: (overrides?: Partial<IssueSheetFilterState>) => void;
+  clearFilters: () => void;
 };
 
 export const useIssueSheetFilterState = create<IssueSheetFilterState>(
   (set) => ({
-    profileId: null,
-    serviceId: null,
-    teamId: null,
+    profileId: undefined,
+    serviceId: undefined,
+    teamId: undefined,
     page: 1,
-    status: ["open", "wip"],
-    clientName: null,
-    orderId: null,
-    createdFrom: null,
-    createdTo: null,
+    status: "All",
+    clientName: undefined,
+    orderId: undefined,
+    createdFrom: undefined,
+    createdTo: undefined,
 
-    setProfileId: (id) => set({ profileId: id ?? null }),
-    setServiceId: (id) => set({ serviceId: id ?? null }),
-    setTeamId: (id) => set({ teamId: id ?? null }),
+    setProfileId: (id) => set({ profileId: id }),
+    setServiceId: (id) => set({ serviceId: id }),
+    setTeamId: (id) => set({ teamId: id }),
     setPage: (page) => set({ page }),
 
     setAllValues: (data) =>
       set((state) => ({
-        profileId:
-          data.profileId === undefined
-            ? state.profileId
-            : (data.profileId ?? null),
-        serviceId:
-          data.serviceId === undefined
-            ? state.serviceId
-            : (data.serviceId ?? null),
-        teamId:
-          data.teamId === undefined ? state.teamId : (data.teamId ?? null),
+        profileId: data.profileId ?? state.profileId,
+        serviceId: data.serviceId ?? state.serviceId,
+        teamId: data.teamId ?? state.teamId,
         page: data.page ?? state.page,
-        status:
-          data.status === undefined ? state.status : (data.status ?? null),
-        clientName:
-          data.clientName === undefined
-            ? state.clientName
-            : (data.clientName ?? null),
-        orderId:
-          data.orderId === undefined ? state.orderId : (data.orderId ?? null),
-        createdFrom:
-          data.createdFrom === undefined
-            ? state.createdFrom
-            : (data.createdFrom ?? null),
-        createdTo:
-          data.createdTo === undefined
-            ? state.createdTo
-            : (data.createdTo ?? null),
+        status: data.status ?? state.status,
+        clientName: data.clientName ?? state.clientName,
+        orderId: data.orderId ?? state.orderId,
+        createdFrom: data.createdFrom ?? state.createdFrom,
+        createdTo: data.createdTo ?? state.createdTo,
       })),
 
-    clearFilters: (overrides?: Partial<IssueSheetFilterState>) =>
+    clearFilters: () =>
       set({
-        profileId: null,
-        serviceId: null,
-        teamId: null,
+        profileId: undefined,
+        serviceId: undefined,
+        teamId: undefined,
         page: 1,
-        status: ["open", "wip"],
-        clientName: null,
-        orderId: null,
-        createdFrom: null,
-        createdTo: null,
-        ...overrides,
+        status: "All",
+        clientName: undefined,
+        orderId: undefined,
+        createdFrom: undefined,
+        createdTo: undefined,
       }),
   })
 );
