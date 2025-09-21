@@ -1,10 +1,19 @@
 // app/api/updatesheets/route.ts
+import { auth } from "@/auth";
 import { getUpdateSheets } from "@/helper/update-sheet/update-sheet";
 import { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
+  const cu = await auth();
+
+  if (!cu || !cu.user || !cu.user.id) {
+    return Response.json(
+      { success: false, message: "Unauthorized" },
+      { status: 401 }
+    );
+  }
   try {
     const searchParams = req.nextUrl.searchParams;
 

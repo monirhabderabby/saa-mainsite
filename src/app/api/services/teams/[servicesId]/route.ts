@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import prisma from "@/lib/prisma"; // adjust path to your prisma client
 import { NextResponse } from "next/server";
 
@@ -6,6 +7,14 @@ export async function GET(
   req: Request,
   { params }: { params: { servicesId: string } }
 ) {
+  const cu = await auth();
+
+  if (!cu || !cu.user || !cu.user.id) {
+    return Response.json(
+      { success: false, message: "Unauthorized" },
+      { status: 401 }
+    );
+  }
   try {
     const { servicesId } = params;
 
