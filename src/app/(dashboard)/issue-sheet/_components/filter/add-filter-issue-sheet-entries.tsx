@@ -18,6 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { MultiSelect } from "@/components/ui/multi-select";
 import {
   Select,
   SelectContent,
@@ -32,7 +33,7 @@ import {
 } from "@/schemas/issue-sheet/filter";
 import { useIssueSheetFilterState } from "@/zustand/issue-sheet";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { IssueStatus, Profile, Services, Team } from "@prisma/client";
+import { Profile, Services, Team } from "@prisma/client";
 import { Repeat } from "lucide-react";
 import dynamic from "next/dynamic";
 import { ReactNode, useEffect, useState } from "react";
@@ -45,20 +46,11 @@ const SmartDatePicker = dynamic(
 );
 
 export const allowStatus = [
-  { id: IssueStatus.open, name: "Open" },
-  { id: IssueStatus.wip, name: "Work in progress" },
-  {
-    id: IssueStatus.done,
-    name: "Done",
-  },
-  {
-    id: IssueStatus.cancelled,
-    name: "Cancelled",
-  },
-  {
-    id: IssueStatus.dispute,
-    name: "Dispute",
-  },
+  { value: "open", label: "Open" },
+  { value: "wip", label: "Wip" },
+  { value: "done", label: "Done" },
+  { value: "cancelled", label: "Cancelled" },
+  { value: "dispute", label: "Dispute" },
 ];
 
 interface Props {
@@ -108,7 +100,7 @@ export default function AddFilterIssueSheetEntries({
       serviceId: currentUserServiceId,
       teamId: currentUserTeamId,
     });
-  }, [currentUserServiceId, setAllValues]);
+  }, [currentUserServiceId, setAllValues, currentUserTeamId]);
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -197,24 +189,13 @@ export default function AddFilterIssueSheetEntries({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Status</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value ?? ""} // 👈 cast so TS is happy
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Choose a status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="All">All</SelectItem>
-                        {allowStatus.map((item) => (
-                          <SelectItem value={item.id} key={item.id}>
-                            {item.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <MultiSelect
+                        options={allowStatus}
+                        value={field.value ?? []}
+                        onValueChange={field.onChange}
+                      />
+                    </FormControl>
 
                     <FormMessage />
                   </FormItem>
@@ -328,11 +309,11 @@ export default function AddFilterIssueSheetEntries({
                     clientName: "",
                     orderId: "",
                     profileId: "",
-                    teamId: "",
-                    serviceId: "",
+                    teamId: currentUserTeamId ?? "",
+                    serviceId: currentUserServiceId ?? "",
                     createdFrom: undefined,
                     createdTo: undefined,
-                    status: "",
+                    status: ["open", "wip"],
                   });
                 }}
                 type="button"

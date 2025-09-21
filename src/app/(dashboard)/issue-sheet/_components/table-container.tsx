@@ -19,7 +19,7 @@ import { issueSheetColumns } from "./issue-sheet-column";
 
 const IssueTableContainer = () => {
   let {
-    status,
+    status: storeStatus,
     page,
     profileId,
     serviceId,
@@ -30,8 +30,10 @@ const IssueTableContainer = () => {
     createdTo,
   } = useIssueSheetFilterState();
   page = page ?? 1;
+  storeStatus = storeStatus;
   profileId = profileId ?? "";
-  status = status ?? "All";
+  const joinedStatus =
+    storeStatus && storeStatus.length > 0 && storeStatus.join(",");
   serviceId = serviceId ?? "All";
   teamId = teamId ?? "All";
   clientName = clientName ?? "";
@@ -42,8 +44,8 @@ const IssueTableContainer = () => {
   const { data, isLoading, isError, error } = useQuery<GetIssueSheetsReturn>({
     queryKey: [
       "issue-sheet",
-      status,
-      ,
+      storeStatus,
+
       profileId,
       serviceId,
       teamId,
@@ -55,7 +57,7 @@ const IssueTableContainer = () => {
     ],
     queryFn: () =>
       fetch(
-        `/api/issue-sheets?status=${status}&page=${page}&limit=10&profileId=${profileId}&serviceId=${serviceId}&teamId=${teamId}&clientName=${clientName}&orderId=${orderId}&createdFrom=${createdFrom}&createdTo=${createdTo}`
+        `/api/issue-sheets?status=${joinedStatus}&page=${page}&limit=10&profileId=${profileId}&serviceId=${serviceId}&teamId=${teamId}&clientName=${clientName}&orderId=${orderId}&createdFrom=${createdFrom}&createdTo=${createdTo}`
       ).then((res) => res.json()),
   });
 
