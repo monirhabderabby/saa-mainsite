@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { IssueSheetData } from "@/helper/issue-sheets/get-issue-sheets";
 import { ColumnDef } from "@tanstack/react-table";
 import { Pencil } from "lucide-react";
+import moment from "moment";
 import Link from "next/link";
 import IssueSheetServiceLine from "./action/issue-sheet-service-line";
 import IssueSheetStatusAction from "./action/issue-sheet-status-action";
@@ -16,6 +17,23 @@ const CenteredHeader = (title: string) => {
 };
 
 export const issueSheetColumns: ColumnDef<IssueSheetData>[] = [
+  {
+    header: "Date",
+    cell: ({ row }) => {
+      const createdAt = row.original.createdAt;
+
+      // Format date and time using moment
+      const formattedDate = moment(createdAt).format("DD MMM, YYYY"); // e.g., 22 Sep, 2025
+      const formattedTime = moment(createdAt).format("hh:mm A"); // e.g., 11:48 AM
+
+      return (
+        <div>
+          <h5>{formattedDate}</h5>
+          <p>{formattedTime}</p>
+        </div>
+      );
+    },
+  },
   {
     accessorKey: "profile",
     header: "Profile",

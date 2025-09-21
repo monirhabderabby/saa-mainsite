@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { UpdateSheetData } from "@/helper/update-sheet/update-sheet";
 import { ColumnDef } from "@tanstack/react-table";
 import { Pencil } from "lucide-react";
+import moment from "moment";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import DoneByComponent from "./done-by-component";
@@ -19,6 +20,23 @@ const CenteredHeader = (title: string) => {
 };
 
 export const updateSheetColumns: ColumnDef<UpdateSheetData>[] = [
+  {
+    header: "Date",
+    cell: ({ row }) => {
+      const createdAt = row.original.createdAt;
+
+      // Format date and time using moment
+      const formattedDate = moment(createdAt).format("DD MMM, YYYY"); // e.g., 22 Sep, 2025
+      const formattedTime = moment(createdAt).format("hh:mm A"); // e.g., 11:48 AM
+
+      return (
+        <div>
+          <h5>{formattedDate}</h5>
+          <p>{formattedTime}</p>
+        </div>
+      );
+    },
+  },
   {
     accessorKey: "profile",
     header: "Profile",
