@@ -321,3 +321,17 @@ model IssueSheet {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
+
+enum ApplicationStatus {
+    live
+    maintanance
+}
+
+model Settings {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    applicationStatus ApplicationStatus @default(live)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
