@@ -9,7 +9,7 @@ import {
 import { IssueSheetData } from "@/helper/issue-sheets/get-issue-sheets";
 import { cn } from "@/lib/utils"; // You might need to install or create this
 import { IssueStatus } from "@prisma/client";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 interface Props {
@@ -68,6 +68,10 @@ const IssueSheetStatusAction = ({ data }: Props) => {
       });
     });
   };
+
+  useEffect(() => {
+    setVal(data.status);
+  }, [data.status]);
 
   return (
     <Select value={val} onValueChange={onStatusChange} disabled={pending}>

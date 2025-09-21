@@ -2,18 +2,12 @@ import { Button } from "@/components/ui/button";
 import { IssueSheetData } from "@/helper/issue-sheets/get-issue-sheets";
 import { ColumnDef } from "@tanstack/react-table";
 import { Pencil } from "lucide-react";
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import IssueSheetServiceLine from "./action/issue-sheet-service-line";
+import IssueSheetStatusAction from "./action/issue-sheet-status-action";
 import SpecialNotes from "./action/special-notes";
 import StatusChangeBy from "./action/status-change-by";
 import TeamSelector from "./action/team-selector";
-const IssueSheetStatusAction = dynamic(
-  () => import("./action/issue-sheet-status-action"),
-  {
-    ssr: false,
-  }
-);
 
 const CenteredHeader = (title: string) => {
   const Comp = () => <div className="text-center">{title}</div>;

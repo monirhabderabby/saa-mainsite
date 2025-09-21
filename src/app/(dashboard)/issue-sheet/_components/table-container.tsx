@@ -19,8 +19,8 @@ import { issueSheetColumns } from "./issue-sheet-column";
 
 const IssueTableContainer = () => {
   let {
-    status,
-    page,
+    status: storeStatus,
+    page: storePage,
     profileId,
     serviceId,
     teamId,
@@ -29,12 +29,13 @@ const IssueTableContainer = () => {
     createdFrom,
     createdTo,
   } = useIssueSheetFilterState();
-  page = page ?? 1;
+
+  const statuses =
+    storeStatus && storeStatus.length > 0 ? storeStatus.join(",") : "All";
+  const page = storePage ?? 1;
   profileId = profileId ?? "";
   serviceId = serviceId ?? "All";
   teamId = teamId ?? "All";
-  status = status;
-  const statuses = status && status.length > 0 ? status.join(",") : "All";
   clientName = clientName ?? "";
   orderId = orderId ?? "";
   createdFrom = createdFrom ?? "";
@@ -43,7 +44,7 @@ const IssueTableContainer = () => {
   const { data, isLoading, isError, error } = useQuery<GetIssueSheetsReturn>({
     queryKey: [
       "issue-sheet",
-      status,
+      storeStatus,
       profileId,
       serviceId,
       teamId,

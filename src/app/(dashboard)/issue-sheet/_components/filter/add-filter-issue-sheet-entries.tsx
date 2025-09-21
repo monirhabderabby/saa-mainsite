@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -28,6 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
 import {
   IssueSheetFilter,
   issueSheetFilterSchema,
@@ -46,21 +46,13 @@ const SmartDatePicker = dynamic(
   }
 );
 
+// allowed statuses for UI (must match enum)
 export const allowStatus = [
-  { value: IssueStatus.open, label: "Open" },
-  { value: IssueStatus.wip, label: "Wip" },
-  {
-    value: IssueStatus.done,
-    label: "Done",
-  },
-  {
-    value: IssueStatus.cancelled,
-    label: "Cancelled",
-  },
-  {
-    value: IssueStatus.dispute,
-    label: "Dispute",
-  },
+  { value: "open", label: "Open" },
+  { value: "wip", label: "Wip" },
+  { value: "done", label: "Done" },
+  { value: "cancelled", label: "Cancelled" },
+  { value: "dispute", label: "Dispute" },
 ];
 
 interface Props {
@@ -68,64 +60,102 @@ interface Props {
   profiles: Profile[];
   teams: Team[];
   services: Services[];
-  currentUserServiceId?: string;
-  currentUserTeamId?: string;
+  currentUserServiceId?: string | null;
+  currentUserTeamId?: string | null;
 }
 export default function AddFilterIssueSheetEntries({
   trigger,
   profiles,
   teams,
   services,
-  currentUserServiceId,
-  currentUserTeamId,
+  currentUserServiceId = null,
+  currentUserTeamId = null,
 }: Props) {
   const [open, setOpen] = useState(false);
-  const { setAllValues, clearFilters, status } = useIssueSheetFilterState();
+
+  // zustand state
+  const {
+    setAllValues,
+    clearFilters,
+    status: storeStatus,
+    teamId,
+    serviceId,
+  } = useIssueSheetFilterState();
+
+  const allowedStatus: IssueStatus[] = [
+    "open",
+    "wip",
+    "done",
+    "cancelled",
+    "dispute",
+  ];
 
   const form = useForm<IssueSheetFilter>({
     resolver: zodResolver(issueSheetFilterSchema),
     defaultValues: {
-      clientName: undefined,
-      orderId: undefined,
+      clientName: "",
+      orderId: "",
       profileId: undefined,
       createdFrom: undefined,
       createdTo: undefined,
-      serviceId: currentUserServiceId ?? undefined,
-      status: status ?? [],
-      teamId: currentUserTeamId ?? undefined,
+      serviceId: serviceId ?? undefined,
+      status: storeStatus?.filter((s): s is IssueStatus =>
+        allowedStatus.includes(s as IssueStatus)
+      ) ?? ["open", "wip"],
+      teamId: teamId ?? undefined,
     },
   });
 
-  function onSubmit(values: IssueSheetFilter) {
+  // prevent double submits
+  const { handleSubmit, reset, formState } = form;
+
+  const onSubmit = (values: IssueSheetFilter) => {
+    console.log(values);
     setAllValues({
       ...values,
-      createdFrom: values.createdFrom?.toISOString(),
-      createdTo: values.createdTo?.toISOString(),
+      createdFrom:
+        values.createdFrom instanceof Date
+          ? values.createdFrom.toISOString()
+          : values.createdFrom,
+      createdTo:
+        values.createdTo instanceof Date
+          ? values.createdTo.toISOString()
+          : values.createdTo,
     });
     setOpen(false);
+  };
+
+  // Reset / Clear: clear store and form consistently
+  function handleReset() {
+    clearFilters({
+      status: ["open", "wip"],
+      serviceId: currentUserServiceId ?? null,
+      teamId: currentUserTeamId ?? null,
+    });
+    reset({
+      clientName: undefined,
+      orderId: undefined,
+      profileId: undefined,
+      teamId: currentUserTeamId ?? undefined,
+      serviceId: currentUserServiceId ?? undefined,
+      createdFrom: undefined,
+      createdTo: undefined,
+      status: ["open", "wip"],
+    });
   }
 
   useEffect(() => {
     setAllValues({
-      serviceId: currentUserServiceId,
-      teamId: currentUserTeamId,
+      clientName: "",
+      orderId: "",
+      profileId: undefined,
+      serviceId: currentUserServiceId ?? null,
+      status: ["open", "wip"],
+      teamId: currentUserTeamId ?? null,
+      createdFrom: undefined,
+      createdTo: undefined,
     });
-  }, [currentUserServiceId, setAllValues, currentUserTeamId]);
-
-  useEffect(() => {
-    if (open) {
-      form.reset({
-        clientName: "",
-        orderId: "",
-        profileId: "",
-        teamId: currentUserTeamId ?? undefined,
-        serviceId: currentUserServiceId ?? undefined,
-        createdFrom: undefined,
-        createdTo: undefined,
-        status: status ?? [], // 👈 pull latest from Zustand
-      });
-    }
-  }, [open, status, currentUserTeamId, currentUserServiceId, form]);
+  }, [currentUserServiceId, currentUserTeamId, setAllValues]);
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -139,8 +169,9 @@ export default function AddFilterIssueSheetEntries({
             and dates. Click &quot;Reset&quot; to clear all filters.
           </AlertDialogDescription>
         </AlertDialogHeader>
+
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 ">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 ">
             <div className="grid grid-cols-2 gap-5">
               <FormField
                 control={form.control}
@@ -151,10 +182,15 @@ export default function AddFilterIssueSheetEntries({
                     <FormControl>
                       <Input
                         {...field}
+                        // keep UI friendly: show empty string if undefined
                         value={field.value ?? ""}
                         placeholder="You can write client name ex: Ashanti, rafarraveria"
+                        onChange={(e) =>
+                          field.onChange(e.target.value || undefined)
+                        }
                       />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -167,14 +203,19 @@ export default function AddFilterIssueSheetEntries({
                     <FormControl>
                       <Input
                         {...field}
-                        value={field.value ?? ""} // 👈 ensures always a string
+                        value={field.value ?? ""}
                         placeholder="ex: FO321834E7607"
+                        onChange={(e) =>
+                          field.onChange(e.target.value || undefined)
+                        }
                       />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
+
             <div className="w-full grid grid-cols-2 gap-5">
               <FormField
                 control={form.control}
@@ -184,8 +225,10 @@ export default function AddFilterIssueSheetEntries({
                     <FormLabel>Profiles</FormLabel>
                     <FormControl>
                       <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
+                        onValueChange={(val) =>
+                          field.onChange(val === "All" ? undefined : val)
+                        }
+                        value={field.value ?? undefined}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select profile" />
@@ -203,7 +246,6 @@ export default function AddFilterIssueSheetEntries({
                         </SelectContent>
                       </Select>
                     </FormControl>
-                    <FormDescription></FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -227,6 +269,7 @@ export default function AddFilterIssueSheetEntries({
                 )}
               />
             </div>
+
             <div className="w-full grid grid-cols-2 gap-5">
               <FormField
                 control={form.control}
@@ -236,8 +279,10 @@ export default function AddFilterIssueSheetEntries({
                     <FormLabel>Service line</FormLabel>
                     <FormControl>
                       <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
+                        onValueChange={(val) =>
+                          field.onChange(val === "All" ? undefined : val)
+                        }
+                        value={field.value ?? undefined}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select service line" />
@@ -255,7 +300,6 @@ export default function AddFilterIssueSheetEntries({
                         </SelectContent>
                       </Select>
                     </FormControl>
-                    <FormDescription></FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -268,11 +312,13 @@ export default function AddFilterIssueSheetEntries({
                     <FormLabel>Team</FormLabel>
                     <FormControl>
                       <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
+                        onValueChange={(val) =>
+                          field.onChange(val === "All" ? undefined : val)
+                        }
+                        value={field.value ?? undefined}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Select profile" />
+                          <SelectValue placeholder="Select team" />
                         </SelectTrigger>
 
                         <SelectContent>
@@ -287,12 +333,12 @@ export default function AddFilterIssueSheetEntries({
                         </SelectContent>
                       </Select>
                     </FormControl>
-                    <FormDescription></FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
+
             <div className="grid grid-cols-2 gap-5">
               <FormField
                 control={form.control}
@@ -301,9 +347,16 @@ export default function AddFilterIssueSheetEntries({
                   <FormItem>
                     <FormLabel>Created From</FormLabel>
                     <SmartDatePicker
-                      value={field.value} // 👈 force controlled, placeholder shows
+                      value={
+                        field.value instanceof Date
+                          ? field.value
+                          : field.value
+                            ? new Date(field.value)
+                            : undefined
+                      }
                       onChange={field.onChange}
                     />
+
                     <FormMessage />
                   </FormItem>
                 )}
@@ -316,51 +369,40 @@ export default function AddFilterIssueSheetEntries({
                   <FormItem>
                     <FormLabel>Created To</FormLabel>
                     <SmartDatePicker
-                      value={field.value} // 👈 same fix
+                      value={
+                        field.value instanceof Date
+                          ? field.value
+                          : field.value
+                            ? new Date(field.value)
+                            : undefined
+                      }
                       onChange={field.onChange}
                     />
+
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
-            <div className="flex justify-end gap-x-4">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  clearFilters({
-                    teamId: currentUserTeamId ?? undefined,
-                    serviceId: currentUserServiceId ?? undefined,
-                    status: ["open", "wip"],
-                  });
 
-                  form.reset({
-                    clientName: "",
-                    orderId: "",
-                    profileId: "",
-                    teamId: currentUserTeamId ?? undefined,
-                    serviceId: currentUserServiceId ?? undefined,
-                    createdFrom: undefined,
-                    createdTo: undefined,
-                    status: ["open", "wip"],
-                  });
-                }}
-                type="button"
-              >
+            <div className="flex justify-end gap-x-4">
+              <Button variant="outline" onClick={handleReset} type="button">
                 <Repeat /> Reset
               </Button>
               <Button
                 variant="outline"
                 className="text-primary hover:text-primary/80"
                 onClick={() => {
-                  form.reset();
+                  reset();
                   setOpen(false);
                 }}
                 type="button"
               >
                 Cancel
               </Button>
-              <Button type="submit">Apply Filters</Button>
+              <Button type="submit" disabled={formState.isSubmitting}>
+                {formState.isSubmitting ? "Applying..." : "Apply Filters"}
+              </Button>
             </div>
           </form>
         </Form>
