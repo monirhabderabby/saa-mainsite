@@ -3,7 +3,6 @@
 import { deleteDatabaseDataBasedonSchema } from "@/actions/settings/database-management";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import AlertModal from "@/components/ui/custom/alert-modal";
 import {
   Form,
   FormControl,
@@ -33,9 +32,13 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { AlertTriangle, CalendarIcon, FileText, Trash2 } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+const AlertModal = dynamic(() => import("@/components/ui/custom/alert-modal"), {
+  ssr: false,
+});
 
 const collections = [
   {
@@ -159,6 +162,7 @@ const DatabaseManagementForm = () => {
                         selected={field.value}
                         onSelect={field.onChange}
                         initialFocus
+                        disabled={(date) => date > new Date()}
                       />
                     </PopoverContent>
                   </Popover>
@@ -199,6 +203,7 @@ const DatabaseManagementForm = () => {
                         selected={field.value}
                         onSelect={field.onChange}
                         initialFocus
+                        disabled={(date) => date > new Date()}
                       />
                     </PopoverContent>
                   </Popover>
