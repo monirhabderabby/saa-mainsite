@@ -28,7 +28,7 @@ const EmployeementServerFetch = async ({ curentUserRole }: Props) => {
   });
 
   return (
-    <Card className="shadow-none ">
+    <Card className="shadow-none w-full">
       <CardContent>
         <EmployeeTableContainer data={users ?? []} cuRole={curentUserRole} />
       </CardContent>

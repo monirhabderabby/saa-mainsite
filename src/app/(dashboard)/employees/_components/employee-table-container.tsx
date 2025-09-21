@@ -40,9 +40,9 @@ const EmployeeTableContainer = ({ data, cuRole }: Props) => {
     },
   });
   return (
-    <>
-      <CardHeader className="px-0">
-        <div className="flex items-center justify-between">
+    <div className="w-full">
+      <CardHeader className="px-0 w-full">
+        <div className="flex items-center justify-between w-full">
           <div>
             <CardTitle>Employee Directory</CardTitle>
             <CardDescription>
@@ -81,7 +81,7 @@ const EmployeeTableContainer = ({ data, cuRole }: Props) => {
           </Button>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
