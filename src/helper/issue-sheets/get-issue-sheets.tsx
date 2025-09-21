@@ -35,7 +35,10 @@ export async function getIssueSheets(options: {
   if (clientName)
     filters.clientName = { contains: clientName, mode: "insensitive" };
   if (orderId) filters.orderId = { contains: orderId, mode: "insensitive" };
-  if (status && status !== "All") filters.status = status;
+  if (status && status !== "All") {
+    const statuses = status ? status.split(",") : [];
+    filters.status = { in: statuses };
+  }
 
   // CreatedAt filter
   if (

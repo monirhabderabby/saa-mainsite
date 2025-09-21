@@ -31,9 +31,10 @@ const IssueTableContainer = () => {
   } = useIssueSheetFilterState();
   page = page ?? 1;
   profileId = profileId ?? "";
-  status = status ?? "All";
   serviceId = serviceId ?? "All";
   teamId = teamId ?? "All";
+  status = status;
+  const statuses = status && status.length > 0 ? status.join(",") : "All";
   clientName = clientName ?? "";
   orderId = orderId ?? "";
   createdFrom = createdFrom ?? "";
@@ -43,7 +44,6 @@ const IssueTableContainer = () => {
     queryKey: [
       "issue-sheet",
       status,
-      ,
       profileId,
       serviceId,
       teamId,
@@ -55,7 +55,7 @@ const IssueTableContainer = () => {
     ],
     queryFn: () =>
       fetch(
-        `/api/issue-sheets?status=${status}&page=${page}&limit=10&profileId=${profileId}&serviceId=${serviceId}&teamId=${teamId}&clientName=${clientName}&orderId=${orderId}&createdFrom=${createdFrom}&createdTo=${createdTo}`
+        `/api/issue-sheets?status=${statuses}&page=${page}&limit=10&profileId=${profileId}&serviceId=${serviceId}&teamId=${teamId}&clientName=${clientName}&orderId=${orderId}&createdFrom=${createdFrom}&createdTo=${createdTo}`
       ).then((res) => res.json()),
   });
 

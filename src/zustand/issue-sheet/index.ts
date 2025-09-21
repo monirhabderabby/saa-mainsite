@@ -5,7 +5,7 @@ type IssueSheetFilterState = {
   serviceId?: string;
   teamId?: string;
   page: number;
-  status?: string;
+  status?: string[];
   clientName?: string;
   orderId?: string;
   createdFrom?: string;
@@ -25,7 +25,7 @@ export const useIssueSheetFilterState = create<IssueSheetFilterState>(
     serviceId: undefined,
     teamId: undefined,
     page: 1,
-    status: "All",
+    status: ["open", "wip"],
     clientName: undefined,
     orderId: undefined,
     createdFrom: undefined,
@@ -55,7 +55,7 @@ export const useIssueSheetFilterState = create<IssueSheetFilterState>(
         serviceId: undefined,
         teamId: undefined,
         page: 1,
-        status: "All",
+        status: [],
         clientName: undefined,
         orderId: undefined,
         createdFrom: undefined,

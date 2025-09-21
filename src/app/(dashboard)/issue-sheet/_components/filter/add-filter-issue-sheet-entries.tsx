@@ -18,6 +18,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { MultiSelect } from "@/components/ui/multi-select";
+
 import {
   Select,
   SelectContent,
@@ -45,19 +47,19 @@ const SmartDatePicker = dynamic(
 );
 
 export const allowStatus = [
-  { id: IssueStatus.open, name: "Open" },
-  { id: IssueStatus.wip, name: "Work in progress" },
+  { value: IssueStatus.open, label: "Open" },
+  { value: IssueStatus.wip, label: "Wip" },
   {
-    id: IssueStatus.done,
-    name: "Done",
+    value: IssueStatus.done,
+    label: "Done",
   },
   {
-    id: IssueStatus.cancelled,
-    name: "Cancelled",
+    value: IssueStatus.cancelled,
+    label: "Cancelled",
   },
   {
-    id: IssueStatus.dispute,
-    name: "Dispute",
+    value: IssueStatus.dispute,
+    label: "Dispute",
   },
 ];
 
@@ -78,7 +80,7 @@ export default function AddFilterIssueSheetEntries({
   currentUserTeamId,
 }: Props) {
   const [open, setOpen] = useState(false);
-  const { setAllValues, clearFilters } = useIssueSheetFilterState();
+  const { setAllValues, clearFilters, status } = useIssueSheetFilterState();
 
   const form = useForm<IssueSheetFilter>({
     resolver: zodResolver(issueSheetFilterSchema),
@@ -89,7 +91,7 @@ export default function AddFilterIssueSheetEntries({
       createdFrom: undefined,
       createdTo: undefined,
       serviceId: currentUserServiceId ?? undefined,
-      status: undefined,
+      status: status ?? [],
       teamId: currentUserTeamId ?? undefined,
     },
   });
@@ -109,6 +111,21 @@ export default function AddFilterIssueSheetEntries({
       teamId: currentUserTeamId,
     });
   }, [currentUserServiceId, setAllValues, currentUserTeamId]);
+
+  useEffect(() => {
+    if (open) {
+      form.reset({
+        clientName: "",
+        orderId: "",
+        profileId: "",
+        teamId: currentUserTeamId ?? undefined,
+        serviceId: currentUserServiceId ?? undefined,
+        createdFrom: undefined,
+        createdTo: undefined,
+        status: status ?? [], // 👈 pull latest from Zustand
+      });
+    }
+  }, [open, status, currentUserTeamId, currentUserServiceId, form]);
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -197,24 +214,13 @@ export default function AddFilterIssueSheetEntries({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Status</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value ?? ""} // 👈 cast so TS is happy
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Choose a status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="All">All</SelectItem>
-                        {allowStatus.map((item) => (
-                          <SelectItem value={item.id} key={item.id}>
-                            {item.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <MultiSelect
+                        options={allowStatus}
+                        value={field.value ?? []}
+                        onValueChange={field.onChange}
+                      />
+                    </FormControl>
 
                     <FormMessage />
                   </FormItem>
@@ -325,6 +331,7 @@ export default function AddFilterIssueSheetEntries({
                   clearFilters({
                     teamId: currentUserTeamId ?? undefined,
                     serviceId: currentUserServiceId ?? undefined,
+                    status: ["open", "wip"],
                   });
 
                   form.reset({
@@ -335,7 +342,7 @@ export default function AddFilterIssueSheetEntries({
                     serviceId: currentUserServiceId ?? undefined,
                     createdFrom: undefined,
                     createdTo: undefined,
-                    status: "",
+                    status: ["open", "wip"],
                   });
                 }}
                 type="button"
