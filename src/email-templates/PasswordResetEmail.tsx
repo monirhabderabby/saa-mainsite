@@ -12,8 +12,8 @@ import {
 } from "@react-email/components";
 
 interface PasswordResetEmailProps {
-  userName?: string;
-  resetUrl?: string;
+  userName: string;
+  resetUrl: string;
   companyName?: string;
   companyLogo?: string;
 }

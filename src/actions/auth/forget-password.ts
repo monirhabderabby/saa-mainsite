@@ -1,6 +1,8 @@
 "use server";
 
+import PasswordResetEmail from "@/email-templates/PasswordResetEmail";
 import prisma from "@/lib/prisma";
+import { resend } from "@/lib/resend";
 import {
   forgetPasswordSchema,
   ForgetPasswordType,
@@ -24,6 +26,8 @@ export async function forgetPasswordAction(data: ForgetPasswordType) {
     },
     select: {
       id: true,
+      fullName: true,
+      email: true,
     },
   });
 
@@ -81,10 +85,17 @@ export async function forgetPasswordAction(data: ForgetPasswordType) {
 
   // Build magic link with raw token
   const magicLink = `${process.env.AUTH_URL}/reset-password/${rawToken}`;
-  console.log(magicLink);
 
   // TODO: Send email with magic link
-  // await sendPasswordResetEmail(parsedValue.data.email, magicLink);
+  await resend.emails.send({
+    from: "ScaleUp Ads Agency <support@monirhrabby.info>",
+    to: [user.email as string],
+    subject: `Reset your password – ScaleUp Ads Agency`,
+    react: PasswordResetEmail({
+      userName: user.fullName as string,
+      resetUrl: magicLink,
+    }),
+  });
 
   return {
     success: true,

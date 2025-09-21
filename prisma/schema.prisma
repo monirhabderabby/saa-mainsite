@@ -27,7 +27,7 @@ enum PermissionTool {
 
 model User {
     id            String        @id @default(auto()) @map("_id") @db.ObjectId
-    fullName      String?
+    fullName      String
     email         String        @unique
     emailVerified DateTime?
     image         String?
