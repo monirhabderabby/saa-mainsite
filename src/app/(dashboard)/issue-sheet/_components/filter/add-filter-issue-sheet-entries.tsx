@@ -331,7 +331,7 @@ export default function AddFilterIssueSheetEntries({
                     clientName: "",
                     orderId: "",
                     profileId: "",
-                    teamId: currentUserServiceId ?? undefined,
+                    teamId: currentUserTeamId ?? undefined,
                     serviceId: currentUserServiceId ?? undefined,
                     createdFrom: undefined,
                     createdTo: undefined,
