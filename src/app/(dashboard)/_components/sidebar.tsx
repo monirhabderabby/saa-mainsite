@@ -3,7 +3,6 @@
 import { logoutAction } from "@/actions/auth/logout";
 import LogoImageForLogin from "@/app/(auth)/login/_components/logo-image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import AlertModal from "@/components/ui/custom/alert-modal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,10 +23,14 @@ import {
   User,
   Users,
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
+const AlertModal = dynamic(() => import("@/components/ui/custom/alert-modal"), {
+  ssr: false,
+});
 
 const routes = [
   {
@@ -100,12 +103,7 @@ const routes = [
     label: "Settings",
     icon: Settings,
     href: "/settings",
-    access: [
-      "ADMIN",
-      "SUPER_ADMIN",
-      "OPERATION_MEMBER",
-      "SALES_MEMBER",
-    ] as Role[],
+    access: ["SUPER_ADMIN"] as Role[],
   },
 ];
 
