@@ -1,5 +1,4 @@
 import { getIssueSheets } from "@/helper/issue-sheets/get-issue-sheets";
-import { redis } from "@/lib/redis/redis";
 import { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -20,36 +19,36 @@ export async function GET(req: NextRequest) {
     const createdTo = searchParams.get("createdTo") || undefined;
 
     // Build a unique cache key based on params
-    const cacheKey = `issueSheets:${JSON.stringify({
-      page,
-      limit,
-      profileId,
-      serviceId,
-      teamId,
-      clientName,
-      orderId,
-      status,
-      createdFrom,
-      createdTo,
-    })}`;
+    // const cacheKey = `issueSheets:${JSON.stringify({
+    //   page,
+    //   limit,
+    //   profileId,
+    //   serviceId,
+    //   teamId,
+    //   clientName,
+    //   orderId,
+    //   status,
+    //   createdFrom,
+    //   createdTo,
+    // })}`;
 
-    const cacheStart = performance.now();
+    // const cacheStart = performance.now();
 
-    // Try to get from cache
-    const cached = await redis.get(cacheKey);
-    if (cached) {
-      console.log("Cache hit ✅", cacheKey);
-      const end = performance.now();
-      const durationMs = end - cacheStart;
+    // // Try to get from cache
+    // const cached = await redis.get(cacheKey);
+    // if (cached) {
+    //   console.log("Cache hit ✅", cacheKey);
+    //   const end = performance.now();
+    //   const durationMs = end - cacheStart;
 
-      console.log(`Cache HIT: ${durationMs.toFixed(2)}ms`);
-      return Response.json({ success: true, ...cached });
-    }
+    //   console.log(`Cache HIT: ${durationMs.toFixed(2)}ms`);
+    //   return Response.json({ success: true, ...cached });
+    // }
 
-    console.log("Cache miss ❌", cacheKey);
+    // console.log("Cache miss ❌", cacheKey);
 
-    // Start timer
-    const start = performance.now();
+    // // Start timer
+    // const start = performance.now();
 
     const result = await getIssueSheets({
       page,
@@ -65,13 +64,13 @@ export async function GET(req: NextRequest) {
     });
 
     // End timer
-    const end = performance.now();
-    const durationMs = end - start;
+    // const end = performance.now();
+    // const durationMs = end - start;
 
-    console.log(`Get all issues take: ${durationMs.toFixed(2)}ms`);
+    // console.log(`Get all issues take: ${durationMs.toFixed(2)}ms`);
 
     // Save result to Redis with TTL (e.g., 60 seconds)
-    await redis.set(cacheKey, result, { ex: 300 });
+    // await redis.set(cacheKey, result, { ex: 300 });
 
     return Response.json({ success: true, ...result });
   } catch (error) {

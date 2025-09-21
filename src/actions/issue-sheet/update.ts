@@ -124,14 +124,14 @@ export async function assignTeamIntoIssueSheet(
   const session = await auth();
 
   // 🔒 Authentication
-  if (!session || !session.user || !session.user.id) {
+  if (!session?.user?.id) {
     return {
       success: false,
       message: "You must be logged in to edit an issue.",
     };
   }
 
-  // ✅ Check if user is part of the team
+  // ✅ Check team membership
   const teamInfo = await prisma.userTeam.findFirst({
     where: {
       teamId,
@@ -139,34 +139,53 @@ export async function assignTeamIntoIssueSheet(
     },
   });
 
-  if (!teamInfo) {
+  // ✅ Get issue sheet with service + manager info
+  const issue = await prisma.issueSheet.findFirst({
+    where: { id: issueSheetId },
+    include: {
+      service: {
+        include: {
+          serviceManager: {
+            select: {
+              id: true,
+              fullName: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!issue) {
     return {
       success: false,
-      message: "You are not a member of this team.",
+      message: "Issue sheet not found.",
     };
   }
 
-  // ✅ Only Leader or Co-Leader can assign
-  if (
-    teamInfo.responsibility !== "Leader" &&
-    teamInfo.responsibility !== "Coleader"
-  ) {
+  // 🟢 Check authorization:
+  // - Team Leader / Co-Leader
+  // - OR Project Manager of the issue's service
+  const isLeaderOrCoLeader =
+    teamInfo?.responsibility === "Leader" ||
+    teamInfo?.responsibility === "Coleader";
+
+  const isProjectManager =
+    issue.service?.serviceManager?.id === session.user.id;
+
+  if (!isLeaderOrCoLeader && !isProjectManager) {
     return {
       success: false,
       message:
-        "Only Leaders or Co-Leaders can assign the team to an issue sheet.",
+        "Only Leaders, Co-Leaders, or the Project Manager can assign the team to an issue sheet.",
     };
   }
 
   // ✅ Assign team into issue sheet
   try {
     const updatedIssueSheet = await prisma.issueSheet.update({
-      where: {
-        id: issueSheetId,
-      },
-      data: {
-        teamId: teamId,
-      },
+      where: { id: issueSheetId },
+      data: { teamId },
     });
 
     return {

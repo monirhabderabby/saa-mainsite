@@ -16,7 +16,7 @@ type IssueSheetFilterState = {
   setTeamId: (id: string) => void;
   setPage: (page: number) => void;
   setAllValues: (data: Partial<IssueSheetFilterState>) => void;
-  clearFilters: () => void;
+  clearFilters: (data: Partial<IssueSheetFilterState>) => void;
 };
 
 export const useIssueSheetFilterState = create<IssueSheetFilterState>(
@@ -49,7 +49,7 @@ export const useIssueSheetFilterState = create<IssueSheetFilterState>(
         createdTo: data.createdTo ?? state.createdTo,
       })),
 
-    clearFilters: () =>
+    clearFilters: (overrides?: Partial<IssueSheetFilterState>) =>
       set({
         profileId: undefined,
         serviceId: undefined,
@@ -60,6 +60,7 @@ export const useIssueSheetFilterState = create<IssueSheetFilterState>(
         orderId: undefined,
         createdFrom: undefined,
         createdTo: undefined,
+        ...overrides, // apply custom overrides if provided
       }),
   })
 );

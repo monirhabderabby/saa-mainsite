@@ -106,8 +106,9 @@ export default function AddFilterIssueSheetEntries({
   useEffect(() => {
     setAllValues({
       serviceId: currentUserServiceId,
+      teamId: currentUserTeamId,
     });
-  }, [currentUserServiceId, setAllValues]);
+  }, [currentUserServiceId, setAllValues, currentUserTeamId]);
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -321,14 +322,17 @@ export default function AddFilterIssueSheetEntries({
               <Button
                 variant="outline"
                 onClick={() => {
-                  clearFilters();
+                  clearFilters({
+                    teamId: currentUserTeamId ?? undefined,
+                    serviceId: currentUserServiceId ?? undefined,
+                  });
 
                   form.reset({
                     clientName: "",
                     orderId: "",
                     profileId: "",
-                    teamId: "",
-                    serviceId: "",
+                    teamId: currentUserServiceId ?? undefined,
+                    serviceId: currentUserServiceId ?? undefined,
                     createdFrom: undefined,
                     createdTo: undefined,
                     status: "",
