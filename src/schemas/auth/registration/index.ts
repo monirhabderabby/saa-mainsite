@@ -1,4 +1,3 @@
-import prisma from "@/lib/prisma";
 import { z } from "zod";
 
 export const registrationSchema = z.object({
@@ -26,11 +25,3 @@ export const registrationSchema = z.object({
 });
 
 export type RegistrationSchemaValues = z.infer<typeof registrationSchema>;
-
-async function getServiceById(id: string) {
-  const service = await prisma.services.findUnique({
-    where: { id },
-  });
-
-  return service;
-}
