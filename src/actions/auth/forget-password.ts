@@ -88,7 +88,7 @@ export async function forgetPasswordAction(data: ForgetPasswordType) {
 
   // TODO: Send email with magic link
   await resend.emails.send({
-    from: "ScaleUp Ads Agency <support@monirhrabby.info>",
+    from: "ScaleUp Ads Agency <support@scaleupdevagency.com>",
     to: [user.email as string],
     subject: `Reset your password – ScaleUp Ads Agency`,
     react: PasswordResetEmail({

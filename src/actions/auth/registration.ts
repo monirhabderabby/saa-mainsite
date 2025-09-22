@@ -88,7 +88,7 @@ export async function registerAction(data: RegistrationSchemaValues) {
 
       // Enviar OTP por correo electrónico
       await resend.emails.send({
-        from: "ScaleUp Ads Agency <support@monirhrabby.info>",
+        from: "ScaleUp Ads Agency <support@scaleupdevagency.com>",
         to: [user.email as string],
         subject: `Welcome to ScaleUp Ads Agency – Please verify your email`,
         html: emailHtml,
