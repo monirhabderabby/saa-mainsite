@@ -6,7 +6,6 @@ export type GetUsersParams = {
   page?: number;
   limit?: number;
   name?: string;
-  designationId?: string;
   serviceId?: string;
   teamId?: string;
 };
@@ -20,10 +19,6 @@ export async function getUsers(params: GetUsersParams = {}) {
 
   if (params.name) {
     where.fullName = { contains: params.name, mode: "insensitive" };
-  }
-
-  if (params.designationId) {
-    where.designationId = params.designationId;
   }
 
   if (params.serviceId) {
