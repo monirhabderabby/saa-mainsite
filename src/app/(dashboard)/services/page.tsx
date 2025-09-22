@@ -1,9 +1,15 @@
 import { Button } from "@/components/ui/button";
 
 import prisma from "@/lib/prisma";
-import AddServiceDialog from "./_components/add-service-modal";
+import dynamic from "next/dynamic";
 import { DesignationCard } from "./_components/designation-card";
 import ServiceCard from "./_components/service-card";
+const AddServiceDialog = dynamic(
+  () => import("./_components/add-service-modal"),
+  {
+    ssr: false,
+  }
+);
 
 const Page = async () => {
   const services = await prisma.services.findMany({
@@ -31,7 +37,7 @@ const Page = async () => {
     },
   });
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pb-10">
       <div className="flex justify-between space-y-8">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold text-foreground">
