@@ -1,3 +1,4 @@
+import prisma from "@/lib/prisma";
 import { z } from "zod";
 
 export const registrationSchema = z.object({
@@ -16,7 +17,7 @@ export const registrationSchema = z.object({
 
   employeeId: z.string().min(1, { message: "Employee ID is required" }),
 
-  role: z.enum(["OPERATION_MEMBER", "SALES_MEMBER"], {
+  role: z.enum(["OPERATION_MEMBER", "SALES_MEMBER", "ADMIN"], {
     message: "Role must be either OPERATION_MEMBER or SALES_MEMBER",
   }),
   designationId: z.string({
@@ -25,3 +26,11 @@ export const registrationSchema = z.object({
 });
 
 export type RegistrationSchemaValues = z.infer<typeof registrationSchema>;
+
+async function getServiceById(id: string) {
+  const service = await prisma.services.findUnique({
+    where: { id },
+  });
+
+  return service;
+}
