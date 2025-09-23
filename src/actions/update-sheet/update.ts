@@ -136,6 +136,20 @@ export async function tlCheck(id: string) {
     };
   }
 
+  // 🔎 Check if user is service manager
+  const userDetails = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: {
+      service: {
+        select: {
+          serviceManagerId: true,
+        },
+      },
+    },
+  });
+
+  const isServiceManager = userDetails?.service?.serviceManagerId === user.id;
+
   // Step 3: Check user permission
   const userPermission = await prisma.permissions.findFirst({
     where: {
@@ -145,7 +159,7 @@ export async function tlCheck(id: string) {
     select: { isMessageTLCheckAllowed: true }, // Select only the needed field
   });
 
-  if (!userPermission?.isMessageTLCheckAllowed) {
+  if (!isServiceManager && !userPermission?.isMessageTLCheckAllowed) {
     return {
       success: false,
       message: "You are not allowed to perform TL Check on the update sheet.",

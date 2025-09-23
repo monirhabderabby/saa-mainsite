@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "@/auth";
+import { ensureUpdateSheetPermission } from "@/helper/update-sheet/ensure-update-sheet-permission";
 import prisma from "@/lib/prisma";
 import { addManagerSchema, AddManagerSchemaType } from "@/schemas/services";
 import { Role } from "@prisma/client";
@@ -85,6 +86,9 @@ export async function AddManagerAction(data: AddManagerSchemaType) {
         serviceManagerId: serviceManagerId,
       },
     });
+
+    // 5. Ensure TL check permission
+    await ensureUpdateSheetPermission(serviceManagerId);
 
     // ✅ Revalidate path
     revalidatePath(`/teams`);
