@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { UserWithAllIncludes } from "@/types/user";
+import { UsersData } from "@/helper/users";
 import { ColumnDef } from "@tanstack/react-table";
 import moment from "moment";
 import dynamic from "next/dynamic";
@@ -12,7 +12,7 @@ const RoleManagement = dynamic(
   }
 );
 
-export const employeeColumns: ColumnDef<UserWithAllIncludes>[] = [
+export const employeeColumns: ColumnDef<UsersData>[] = [
   {
     accessorKey: "employeeId",
     header: "Employee ID",

@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 export type GetUsersParams = {
   page?: number;
   limit?: number;
-  name?: string;
+  searchQuery?: string;
   serviceId?: string;
   teamId?: string;
 };
@@ -17,15 +17,19 @@ export async function getUsers(params: GetUsersParams = {}) {
 
   const where: Prisma.UserWhereInput = {};
 
-  if (params.name) {
-    where.fullName = { contains: params.name, mode: "insensitive" };
+  if (params.searchQuery) {
+    where.OR = [
+      { employeeId: { contains: params.searchQuery, mode: "insensitive" } },
+      { fullName: { contains: params.searchQuery, mode: "insensitive" } },
+      { email: { contains: params.searchQuery, mode: "insensitive" } },
+    ];
   }
 
-  if (params.serviceId) {
+  if (params.serviceId && params.serviceId !== "All") {
     where.serviceId = params.serviceId;
   }
 
-  if (params.teamId) {
+  if (params.teamId && params.teamId !== "All") {
     where.userTeams = { some: { teamId: params.teamId } };
   }
 
@@ -54,6 +58,7 @@ export async function getUsers(params: GetUsersParams = {}) {
       hasNextPage: page < totalPages,
       hasPrevPage: page > 1,
     },
+    success: true,
   };
 }
 

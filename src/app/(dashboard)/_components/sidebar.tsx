@@ -49,7 +49,7 @@ const routes = [
     id: 2,
     label: "Employees",
     icon: Users,
-    href: "/employees",
+    href: "/users",
     access: ["ADMIN", "SUPER_ADMIN"] as Role[],
   },
   {

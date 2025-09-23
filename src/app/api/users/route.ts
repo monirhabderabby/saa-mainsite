@@ -19,25 +19,21 @@ export async function GET(req: NextRequest) {
 
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
-    const serviceId = searchParams.get("serviceid") ?? undefined;
+    const serviceId = searchParams.get("serviceId") ?? undefined;
     const teamId = searchParams.get("teamId") ?? undefined;
 
     // Optional filters (you can extend this as needed)
-    const name = searchParams.get("name") || undefined;
+    const searchQuery = searchParams.get("searchQuery") || undefined;
 
-    const { data, pagination } = await getUsers({
+    const res = await getUsers({
       limit,
       page,
-      name,
+      searchQuery,
       serviceId,
       teamId,
     });
 
-    return Response.json({
-      success: true,
-      data,
-      pagination,
-    });
+    return Response.json(res);
   } catch (error) {
     console.error(error);
     return Response.json(
