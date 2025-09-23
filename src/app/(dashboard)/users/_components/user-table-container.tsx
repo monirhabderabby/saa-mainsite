@@ -16,15 +16,15 @@ import { AlertTriangle } from "lucide-react";
 import { employeeColumns } from "./employee-column";
 
 const UserTableContainer = () => {
-  const { page, searchQuery, serviceId } = useUserFilterStore();
+  const { page, searchQuery, serviceId, accountStatus } = useUserFilterStore();
 
   const debouncedValue = useDebounce(searchQuery);
 
   const { data, isError, error, isLoading } = useQuery({
-    queryKey: ["users", page, debouncedValue, serviceId],
+    queryKey: ["users", page, debouncedValue, serviceId, accountStatus],
     queryFn: () =>
       fetch(
-        `/api/users?page=${page}&limit=10&searchQuery=${debouncedValue}&serviceId=${serviceId}`
+        `/api/users?page=${page}&limit=10&searchQuery=${debouncedValue}&serviceId=${serviceId}&accountStatus=${accountStatus}`
       ).then((res) => res.json()),
   });
 

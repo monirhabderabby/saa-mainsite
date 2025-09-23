@@ -153,7 +153,9 @@ const Sidebar = ({ cu }: Props) => {
           {/* Logo */}
           <div className="border-b p-4 flex justify-center items-center border-black/30 dark:border-white/20">
             <div className="relative h-[100px] w-[150px] flex items-center">
-              <LogoImageForLogin />
+              <Link href="/">
+                <LogoImageForLogin />
+              </Link>
             </div>
           </div>
 

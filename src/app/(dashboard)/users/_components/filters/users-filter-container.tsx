@@ -8,13 +8,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useUserFilterStore } from "@/zustand/users";
+import { AccountStatus } from "@prisma/client";
 interface Props {
   services: { id: string; name: string }[];
 }
 
 const UserFilterContainer = ({ services }: Props) => {
-  const { searchQuery, setSearchQuery, setServiceId, serviceId } =
-    useUserFilterStore();
+  const {
+    searchQuery,
+    setSearchQuery,
+    setServiceId,
+    serviceId,
+    accountStatus,
+    setAccountStatus,
+  } = useUserFilterStore();
 
   return (
     <div className="flex items-center gap-5">
@@ -27,6 +34,22 @@ const UserFilterContainer = ({ services }: Props) => {
           {services.map((item) => (
             <SelectItem key={item.id} value={item.id}>
               {item.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <Select
+        value={accountStatus}
+        onValueChange={(val) => setAccountStatus(val as AccountStatus)}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Select Account Status" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="All">All</SelectItem>
+          {Object.keys(AccountStatus).map((item) => (
+            <SelectItem value={item} key={item}>
+              {item}
             </SelectItem>
           ))}
         </SelectContent>

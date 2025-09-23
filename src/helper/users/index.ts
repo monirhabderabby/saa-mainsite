@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { AccountStatus, Prisma, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -8,6 +8,7 @@ export type GetUsersParams = {
   searchQuery?: string;
   serviceId?: string;
   teamId?: string;
+  accountStatus?: AccountStatus;
 };
 
 export async function getUsers(params: GetUsersParams = {}) {
@@ -33,6 +34,11 @@ export async function getUsers(params: GetUsersParams = {}) {
     where.userTeams = { some: { teamId: params.teamId } };
   }
 
+  // Add accountStatus filter
+  if (params.accountStatus) {
+    where.accountStatus = params.accountStatus;
+  }
+
   const totalItems = await prisma.user.count({ where });
   const totalPages = Math.ceil(totalItems / limit);
 
@@ -45,6 +51,9 @@ export async function getUsers(params: GetUsersParams = {}) {
       permissions: true,
       designation: true,
       userTeams: { include: { team: true } },
+    },
+    orderBy: {
+      createdAt: "desc",
     },
   });
 

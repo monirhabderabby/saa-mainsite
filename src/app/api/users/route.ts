@@ -1,5 +1,6 @@
 // app/api/users/route.ts
 import { getUsers } from "@/helper/users";
+import { AccountStatus } from "@prisma/client";
 import { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -24,6 +25,7 @@ export async function GET(req: NextRequest) {
 
     // Optional filters (you can extend this as needed)
     const searchQuery = searchParams.get("searchQuery") || undefined;
+    const accountStatus = searchParams.get("accountStatus") || undefined;
 
     const res = await getUsers({
       limit,
@@ -31,6 +33,10 @@ export async function GET(req: NextRequest) {
       searchQuery,
       serviceId,
       teamId,
+      accountStatus:
+        accountStatus && accountStatus !== "All"
+          ? (accountStatus as AccountStatus)
+          : undefined,
     });
 
     return Response.json(res);
