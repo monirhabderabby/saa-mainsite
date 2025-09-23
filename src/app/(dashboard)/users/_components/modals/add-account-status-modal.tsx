@@ -47,10 +47,9 @@ const AccountStatusModal = ({ data, trigger }: Props) => {
   });
 
   const onSubmit = (values: UserStatusSchemaType) => {
-    console.log(values);
     startTransition(() => {
       statusUpdate(values).then((res) => {
-        if (!res.success) {
+        if (!res.success || !res.user) {
           toast.error(res.message);
           return;
         }
