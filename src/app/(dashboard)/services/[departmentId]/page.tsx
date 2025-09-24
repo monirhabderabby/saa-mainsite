@@ -17,6 +17,7 @@ const Page = async ({ params }: { params: { departmentId: string } }) => {
       designations: {
         select: {
           id: true,
+          name: true,
         },
       },
       department: true,
@@ -55,7 +56,7 @@ const Page = async ({ params }: { params: { departmentId: string } }) => {
         <AddServiceDialog trigger={<Button>Create Service</Button>} />
       </div>
 
-      <div className="mt-10 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4  gap-5">
+      <div className="mt-10 grid grid-cols-1 md:grid-cols-3   gap-5">
         {services.map((s) => (
           <ServiceCard key={s.id} data={s} />
         ))}

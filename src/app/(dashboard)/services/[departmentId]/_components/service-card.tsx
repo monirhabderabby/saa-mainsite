@@ -18,15 +18,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Prisma } from "@prisma/client";
 import { Briefcase, EllipsisVertical, Pencil, Trash } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import AddServiceDialog from "./add-service-modal";
+const AddServiceDialog = dynamic(() => import("./add-service-modal"), {
+  ssr: false,
+});
 
 type ServiceType = Prisma.ServicesGetPayload<{
   include: {
     designations: {
       select: {
         id: true;
+        name: true;
       };
     };
     department: true;
@@ -139,6 +143,11 @@ const ServiceCard = ({ data }: Props) => {
             <p className="text-sm text-muted-foreground">
               Total number of designations available in this service
             </p>
+          </div>
+          <div className="mt-5">
+            <div className="border border-input w-full rounded-lg p-2 flex items-center justify-between">
+              <h1>Sales Executive</h1>
+            </div>
           </div>
         </CardContent>
       </Card>
