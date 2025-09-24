@@ -57,9 +57,9 @@ const FSD_DESIGNATIONS = [
 
 /** Seed account */
 const SEED_ADMIN = {
-  fullName: "Rony Vai (GM)",
-  email: "monir.bdcalling@gmail.com",
-  employeeId: "17114",
+  fullName: "Anisur Rahman Roni",
+  email: "arrony.dm@gmail.com",
+  employeeId: "17001",
   rawPassword: "123456789",
   role: "SUPER_ADMIN",
   accountStatus: "ACTIVE",
