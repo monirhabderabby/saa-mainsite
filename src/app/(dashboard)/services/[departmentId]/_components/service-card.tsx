@@ -21,6 +21,7 @@ import { Briefcase, EllipsisVertical, Pencil, Trash } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
+import DesignationBadge from "./designation-badge";
 const AddServiceDialog = dynamic(() => import("./add-service-modal"), {
   ssr: false,
 });
@@ -144,10 +145,15 @@ const ServiceCard = ({ data }: Props) => {
               Total number of designations available in this service
             </p>
           </div>
-          <div className="mt-5">
-            <div className="border border-input w-full rounded-lg p-2 flex items-center justify-between">
-              <h1>Sales Executive</h1>
-            </div>
+          <div className="mt-5 flex flex-wrap gap-3">
+            {data.designations.map((item) => (
+              <DesignationBadge
+                data={item}
+                key={item.id}
+                serviceId={data.id}
+                serviceName={data.name}
+              />
+            ))}
           </div>
         </CardContent>
       </Card>
