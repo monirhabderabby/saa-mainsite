@@ -1,67 +1,41 @@
-import ServiceCard from "@/components/shared/cards/team-card";
+import { Button } from "@/components/ui/button";
+import { Card, CardFooter, CardHeader } from "@/components/ui/card";
 import prisma from "@/lib/prisma";
-import { ServiceStats, ServiceWithTeamsAndUsers } from "@/types/services";
-import TeamStatsOverview from "./_components/team-stats-overview";
+import Image from "next/image";
+import Link from "next/link";
 
 const Page = async () => {
-  const services: ServiceWithTeamsAndUsers[] = await prisma.services.findMany({
-    include: {
-      teams: {
-        include: {
-          userTeams: {
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  fullName: true,
-                  employeeId: true,
-                  image: true,
-                  email: true,
-                  role: true,
-                },
-              },
-            },
-          },
-        },
-      },
-      users: {
-        select: {
-          id: true,
-          fullName: true,
-          employeeId: true,
-          image: true,
-          email: true,
-          role: true,
-        },
-      },
-      serviceManager: {
-        select: {
-          fullName: true,
-        },
-      },
-    },
-  });
-
-  const stats: ServiceStats = {
-    totalServices: services.length,
-    totalTeams: services.reduce(
-      (acc, service) => acc + service.teams.length,
-      0
-    ),
-    totalMembers: services.reduce(
-      (acc, service) => acc + service.users.length,
-      0
-    ),
-  };
+  const department = await prisma.department.findMany();
 
   return (
-    <div className="space-y-10 pb-10">
-      <TeamStatsOverview stats={stats} />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-        {services.map((n) => (
-          <ServiceCard key={n.id} service={n} />
-        ))}
-      </div>
+    <div className="grid grid-cols-12 gap-10">
+      {department.map((item) => (
+        <Card className="max-w-md col-span-4" key={item.id}>
+          <CardHeader>
+            <div className="h-[300px] w-full  relative rounded-lg">
+              <Image
+                src="/unnamed.webp"
+                fill
+                alt={item.name}
+                className="rounded-lg"
+              />
+              <div className="bg-black/50 absolute inset-0" />
+              <div className="absolute inset-0 z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white flex flex-col items-center">
+                <h1 className="text-[40px] font-bold text-primary-yellow">
+                  {item.name}
+                </h1>
+
+                <p className="text-[20px]">Department</p>
+              </div>
+            </div>
+          </CardHeader>
+          <CardFooter>
+            <Button className="w-full" asChild variant="outline">
+              <Link href={`/teams/${item.id}`}>Enter</Link>
+            </Button>
+          </CardFooter>
+        </Card>
+      ))}
     </div>
   );
 };
