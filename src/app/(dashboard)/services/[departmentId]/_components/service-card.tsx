@@ -29,6 +29,7 @@ type ServiceType = Prisma.ServicesGetPayload<{
         id: true;
       };
     };
+    department: true;
   };
 }>;
 
