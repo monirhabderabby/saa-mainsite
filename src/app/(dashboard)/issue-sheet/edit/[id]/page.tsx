@@ -1,5 +1,4 @@
 import { auth } from "@/auth";
-import AddIssueForm from "@/components/forms/issue-sheet/add-issue-form";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,12 +7,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { AccessDeniedCard } from "@/components/ui/custom/access-denied-card";
 import prisma from "@/lib/prisma";
 import { Role } from "@prisma/client";
 import { MoveLeft } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+const AddIssueForm = dynamic(
+  () => import("@/components/forms/issue-sheet/add-issue-form"),
+  {
+    ssr: false,
+  }
+);
+const AccessDeniedCard = dynamic(
+  () => import("@/components/ui/custom/access-denied-card"),
+  {
+    ssr: false,
+  }
+);
 
 const allowedRoles = ["SUPER_ADMIN", "ADMIN"] as Role[];
 
@@ -80,6 +91,7 @@ const Page = async ({ params }: { params: { id: string } }) => {
           profiles={profiles}
           initianData={entry}
           services={services}
+          currentUserRole={cu.user.role}
         />
       </CardContent>
     </Card>

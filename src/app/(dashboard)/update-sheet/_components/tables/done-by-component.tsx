@@ -17,12 +17,8 @@ const DoneByComponent = ({ data }: Props) => {
     <div className="flex justify-center items-center">
       {data.doneById && (
         <ProfileToolTip
-          trigger={
-            <Button variant="link">
-              @{data.tlBy?.fullName?.split(" ")[0]}
-            </Button>
-          }
-          fullName={data.tlBy?.fullName ?? ""}
+          trigger={<Button variant="link">@{data.doneBy?.nickName}</Button>}
+          fullName={data.doneBy?.fullName ?? ""}
           joiningDate={data.sendAt}
           designation={data.doneBy?.designation.name ?? ""}
         />

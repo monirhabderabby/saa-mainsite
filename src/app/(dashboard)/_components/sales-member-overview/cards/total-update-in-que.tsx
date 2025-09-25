@@ -7,6 +7,9 @@ const TotalUpdateInQue = async () => {
         not: null,
       },
       doneById: null,
+      updateTo: {
+        not: "DELIVERY",
+      },
     },
   });
   return (

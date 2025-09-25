@@ -260,7 +260,7 @@ enum TeamResponsibility {
 
 model UserTeam {
     id     String @id @default(auto()) @map("_id") @db.ObjectId
-    userId String @db.ObjectId
+    userId String @unique @db.ObjectId
     teamId String @db.ObjectId
 
     responsibility TeamResponsibility @default(Member)

@@ -17,11 +17,7 @@ const UpdatedByComponents = ({ data }: Props) => {
     <div className="flex justify-center">
       {data.updateById && (
         <ProfileToolTip
-          trigger={
-            <Button variant="link">
-              @{data.updateBy?.fullName?.split(" ")[0]}
-            </Button>
-          }
+          trigger={<Button variant="link">@{data.updateBy?.nickName}</Button>}
           fullName={data.updateBy?.fullName ?? ""}
           joiningDate={data.createdAt}
           designation={data.updateBy.designation.name ?? ""}

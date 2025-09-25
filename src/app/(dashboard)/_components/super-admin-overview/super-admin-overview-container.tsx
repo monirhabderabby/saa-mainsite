@@ -36,7 +36,7 @@ const SuperAdminOverViewContainer = async () => {
 
       <main className="p-5">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Employee Stats */}
           <Suspense fallback={<CardSkeleton />}>
             <TotalEmployees />
