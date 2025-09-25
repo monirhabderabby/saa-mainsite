@@ -122,6 +122,7 @@ export default function AddProfileDialog({
                 variant="outline"
                 className="text-primary hover:text-primary/80"
                 onClick={() => {
+                  onClose?.();
                   form.reset();
                   setOpen(false);
                 }}
