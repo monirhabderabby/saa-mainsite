@@ -1,3 +1,4 @@
+"use client";
 const AddDesignationModal = dynamic(
   () => import("@/components/shared/modal/add-designation-modal"),
   {
