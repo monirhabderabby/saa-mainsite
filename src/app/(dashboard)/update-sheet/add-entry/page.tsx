@@ -1,4 +1,9 @@
-import AddUpdateForm from "@/components/forms/update-sheet/add-update-form";
+const AddUpdateForm = dynamic(
+  () => import("@/components/forms/update-sheet/add-update-form"),
+  {
+    ssr: false,
+  }
+);
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import prisma from "@/lib/prisma";
 import { MoveLeft } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 
 const Page = async () => {

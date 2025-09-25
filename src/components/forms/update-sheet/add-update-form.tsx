@@ -9,6 +9,14 @@ import { createUpdateSheetEntries } from "@/actions/update-sheet/create";
 import { deleteUpdateSheetEntry } from "@/actions/update-sheet/delete";
 import { updateUpdateSheetEntry } from "@/actions/update-sheet/update";
 import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import AlertModal from "@/components/ui/custom/alert-modal";
 import {
   Form,
@@ -20,6 +28,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -27,7 +40,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { colorMap } from "@/components/ui/update-to-badge";
-import { getTextFromHtml } from "@/lib/utils";
+import { cn, getTextFromHtml } from "@/lib/utils";
 import {
   restrictedWords,
   UpdateSheetCreateSchema,
@@ -35,7 +48,7 @@ import {
 } from "@/schemas/update-sheet/create";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Profile, UpdateSheet, UpdateTo } from "@prisma/client";
-import { Loader2, Trash } from "lucide-react";
+import { Check, ChevronsUpDown, Loader2, Trash } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
@@ -169,32 +182,61 @@ export default function AddUpdateForm({ profiles, initialData }: Props) {
           className="space-y-5  pb-10"
         >
           <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-4">
+            <div className="col-span-4 pt-2">
               <FormField
                 control={form.control}
                 name="profileId"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col">
                     <FormLabel>Profile</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      value={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a profile" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {profiles.map((p) => (
-                          <SelectItem value={p.id} key={p.id}>
-                            {p.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className={cn(
+                              "w-full justify-between",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value
+                              ? profiles.find((p) => p.id === field.value)?.name
+                              : "Select a profile"}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full min-w-[400px] p-0">
+                        <Command>
+                          <CommandInput placeholder="Search profiles..." />
+                          <CommandList>
+                            <CommandEmpty>No profile found.</CommandEmpty>
+                            <CommandGroup>
+                              {profiles.map((p) => (
+                                <CommandItem
+                                  key={p.id}
+                                  value={p.name} // 👈 use name for search
+                                  onSelect={() => {
+                                    field.onChange(p.id); // 👈 still store id
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      field.value === p.id
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {p.name}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )}
