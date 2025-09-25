@@ -1,4 +1,4 @@
-import { tlCheck } from "@/actions/update-sheet/update";
+import { tlCheck } from "@/actions/update-sheet/tl-check";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { UpdateSheetData } from "@/helper/update-sheet/update-sheet";

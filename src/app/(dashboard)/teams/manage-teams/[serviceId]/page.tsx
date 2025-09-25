@@ -76,7 +76,7 @@ export default async function ManageTeamsPage({
   });
 
   return (
-    <div className="min-h-screen ">
+    <div className="">
       <div className="">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">

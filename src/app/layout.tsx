@@ -49,7 +49,7 @@ export default async function RootLayout({
           >
             <TanstackProvider>{children}</TanstackProvider>
           </ThemeProvider>{" "}
-          <Toaster />
+          <Toaster richColors />
           <NextTopLoader showSpinner={false} color="#FFC300" />
         </SessionProvider>
       </body>

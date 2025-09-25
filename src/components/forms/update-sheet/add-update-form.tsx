@@ -47,7 +47,7 @@ import {
   updateSheetCreateSchema,
 } from "@/schemas/update-sheet/create";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Profile, UpdateSheet, UpdateTo } from "@prisma/client";
+import { Prisma, Profile, UpdateTo } from "@prisma/client";
 import { Check, ChevronsUpDown, Loader2, Trash } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
@@ -55,9 +55,38 @@ import { useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
+type initialDataType = Prisma.UpdateSheetGetPayload<{
+  select: {
+    id: true;
+    updateById: true;
+    profileId: true;
+    clientName: true;
+    orderId: true;
+    attachments: true;
+    commentFromOperation: true;
+    commentFromSales: true;
+    updateTo: true;
+    message: true;
+    updateBy: {
+      select: {
+        service: {
+          select: {
+            id: true;
+            serviceManagerId: true;
+          };
+        };
+        userTeams: {
+          select: {
+            teamId: true;
+          };
+        };
+      };
+    };
+  };
+}>;
 interface Props {
   profiles: Profile[];
-  initialData?: UpdateSheet;
+  initialData?: initialDataType;
 }
 
 export const allowUpdateTo = [

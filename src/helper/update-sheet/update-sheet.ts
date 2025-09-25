@@ -102,6 +102,7 @@ export async function getUpdateSheets(options: {
           fullName: true,
           image: true,
           designation: true,
+          nickName: true,
         },
       },
       profile: true,
@@ -137,6 +138,7 @@ export type UpdateSheetData = Prisma.UpdateSheetGetPayload<{
         fullName: true;
         image: true;
         designation: true;
+        nickName: true;
       };
     };
     profile: true;
