@@ -48,11 +48,7 @@ const TlCheckComponent = ({ data }: Props) => {
     <div className="flex justify-center items-center">
       {data.doneById && data.tlCheckAt && data.tlId ? (
         <ProfileToolTip
-          trigger={
-            <Button variant="link">
-              @{data.tlBy?.fullName?.split(" ")[0]}
-            </Button>
-          }
+          trigger={<Button variant="link">@{data.tlBy?.nickName}</Button>}
           fullName={data.tlBy?.fullName ?? ""}
           joiningDate={data.tlCheckAt}
           designation={data.tlBy?.designation.name ?? ""}

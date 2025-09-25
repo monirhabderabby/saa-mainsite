@@ -98,7 +98,7 @@ export const updateSheetColumns: ColumnDef<UpdateSheetData>[] = [
   },
   {
     accessorKey: "tlId",
-    header: "TL Check",
+    header: () => <p className="text-center">Tl Check</p>,
     cell: ({ row }) => <TlCheckComponent data={row.original} />,
   },
   {
