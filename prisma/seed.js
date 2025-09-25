@@ -64,6 +64,7 @@ const FSD_DESIGNATIONS = [
 /** Seed account */
 const SEED_ADMIN = {
   fullName: "Anisur Rahman Roni",
+  nickName: "Rony",
   email: "arrony.dm@gmail.com",
   employeeId: "17001",
   rawPassword: "123456789",

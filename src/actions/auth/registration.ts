@@ -29,6 +29,7 @@ export async function registerAction(data: RegistrationSchemaValues) {
     serviceId,
     designationId,
     departmentId,
+    nickName,
   } = parsed.data;
 
   try {
@@ -88,6 +89,7 @@ export async function registerAction(data: RegistrationSchemaValues) {
           designationId,
           departmentId,
           emailVerified: new Date(),
+          nickName,
         },
         select: {
           id: true,
