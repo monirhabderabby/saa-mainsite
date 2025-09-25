@@ -2,8 +2,9 @@ import { Button } from "@/components/ui/button";
 
 import prisma from "@/lib/prisma";
 import dynamic from "next/dynamic";
-import { DesignationCard } from "./_components/designation-card";
-import ServiceCard from "./_components/service-card";
+const ServiceCard = dynamic(() => import("./_components/service-card"), {
+  ssr: false,
+});
 const AddServiceDialog = dynamic(
   () => import("./_components/add-service-modal"),
   {
@@ -27,20 +28,20 @@ const Page = async ({ params }: { params: { departmentId: string } }) => {
     },
   });
 
-  const designations = await prisma.designations.findMany({
-    include: {
-      users: {
-        select: {
-          id: true,
-        },
-      },
-      service: {
-        select: {
-          name: true,
-        },
-      },
-    },
-  });
+  // const designations = await prisma.designations.findMany({
+  //   include: {
+  //     users: {
+  //       select: {
+  //         id: true,
+  //       },
+  //     },
+  //     service: {
+  //       select: {
+  //         name: true,
+  //       },
+  //     },
+  //   },
+  // });
   return (
     <div className="space-y-8 pb-10">
       <div className="flex justify-between space-y-8">
@@ -65,7 +66,7 @@ const Page = async ({ params }: { params: { departmentId: string } }) => {
         ))}
       </div>
 
-      <div className="space-y-4">
+      {/* <div className="space-y-4">
         <h2 className="text-2xl font-semibold text-foreground">Designations</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {designations.map((designation) => (
@@ -78,7 +79,7 @@ const Page = async ({ params }: { params: { departmentId: string } }) => {
             />
           ))}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

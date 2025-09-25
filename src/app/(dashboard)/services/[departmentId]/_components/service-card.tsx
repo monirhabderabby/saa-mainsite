@@ -1,6 +1,5 @@
 "use client";
 import { deleteService } from "@/actions/services/delete";
-import AddDesignationModal from "@/components/shared/modal/add-designation-modal";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,6 +21,12 @@ import dynamic from "next/dynamic";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import DesignationBadge from "./designation-badge";
+const AddDesignationModal = dynamic(
+  () => import("@/components/shared/modal/add-designation-modal"),
+  {
+    ssr: false,
+  }
+);
 const AddServiceDialog = dynamic(() => import("./add-service-modal"), {
   ssr: false,
 });
@@ -43,6 +48,7 @@ interface Props {
 }
 const ServiceCard = ({ data }: Props) => {
   const [open, setOpen] = useState(false);
+  const [dropdownMenuOpen, setDropdownMenuOpen] = useState(false);
   const [pending, startTransition] = useTransition();
 
   const onDelete = () => {
@@ -77,7 +83,10 @@ const ServiceCard = ({ data }: Props) => {
                 </CardDescription>
               </div>
             </div>
-            <DropdownMenu>
+            <DropdownMenu
+              open={dropdownMenuOpen}
+              onOpenChange={setDropdownMenuOpen}
+            >
               <DropdownMenuTrigger asChild>
                 <Button variant="outline">
                   <EllipsisVertical />
@@ -86,6 +95,7 @@ const ServiceCard = ({ data }: Props) => {
               <DropdownMenuContent>
                 <DropdownMenuItem asChild>
                   <AddDesignationModal
+                    onClose={() => setDropdownMenuOpen(false)}
                     serviceId={data.id}
                     serviceName={data.name}
                     trigger={

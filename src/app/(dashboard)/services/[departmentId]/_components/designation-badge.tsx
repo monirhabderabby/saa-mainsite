@@ -89,8 +89,8 @@ const DesignationBadge = ({ data, serviceId, serviceName }: Props) => {
         onClose={() => setOpen(false)}
         onConfirm={onDelete}
         loading={pending}
-        title="Delete Service Permanently?"
-        message={`Deleting "${data.name}" will permanently remove this service from your system. Any appointments, records, or analytics associated with this service will be affected. This action cannot be undone.`}
+        title="Delete Designation Permanently?"
+        message={`Deleting the designation "${data.name}" will permanently remove it from this service. Any employees, roles, or records associated with this designation may be affected. This action cannot be undone.`}
       />
     </>
   );
