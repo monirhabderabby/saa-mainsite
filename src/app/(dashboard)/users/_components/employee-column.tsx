@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UsersData } from "@/helper/users";
+import { Role } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import moment from "moment";
 import dynamic from "next/dynamic";
@@ -12,7 +13,13 @@ const RoleManagement = dynamic(
   }
 );
 
-export const employeeColumns: ColumnDef<UsersData>[] = [
+interface Props {
+  currentUserRole: Role;
+}
+
+export const getEmployeeColumns = ({
+  currentUserRole,
+}: Props): ColumnDef<UsersData>[] => [
   {
     accessorKey: "employeeId",
     header: "Employee ID",
@@ -44,6 +51,16 @@ export const employeeColumns: ColumnDef<UsersData>[] = [
     header: "Email",
   },
   {
+    accessorKey: "departmentId",
+    header: "Department",
+    cell: ({ row }) => <p>{row.original.department?.name}</p>,
+  },
+  {
+    accessorKey: "serviceId",
+    header: "Service",
+    cell: ({ row }) => <p>{row.original.service?.name}</p>,
+  },
+  {
     accessorKey: "accountStatus",
     header: "Status",
     cell: ({ row }) => <AccountStatusAction data={row.original} />,
@@ -64,6 +81,8 @@ export const employeeColumns: ColumnDef<UsersData>[] = [
   },
   {
     header: "Action",
-    cell: ({ row }) => <EmployeeAction data={row.original} />,
+    cell: ({ row }) => (
+      <EmployeeAction data={row.original} currentUserRole={currentUserRole} />
+    ),
   },
 ];

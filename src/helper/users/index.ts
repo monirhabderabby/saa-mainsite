@@ -64,6 +64,7 @@ export async function getUsers(params: GetUsersParams = {}) {
       permissions: true,
       designation: true,
       userTeams: { include: { team: true } },
+      department: true,
     },
     orderBy: {
       createdAt: "desc",
@@ -98,5 +99,6 @@ export type UsersData = Prisma.UserGetPayload<{
         team: true;
       };
     };
+    department: true;
   };
 }>;

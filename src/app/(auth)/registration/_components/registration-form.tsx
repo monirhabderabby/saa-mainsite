@@ -1,4 +1,5 @@
 "use client";
+import { checkNickNameAction } from "@/actions/auth/check-nicknames";
 import { registerAction } from "@/actions/auth/registration";
 import { Button } from "@/components/ui/button";
 import {
@@ -121,7 +122,7 @@ export default function RegistrationForm({
                 className="space-y-5 max-w-[600px] mx-auto pb-10"
               >
                 <div className="grid grid-cols-12 gap-4">
-                  <div className="col-span-12">
+                  <div className="col-span-7">
                     <FormField
                       control={form.control}
                       name="fullName"
@@ -130,13 +131,51 @@ export default function RegistrationForm({
                           <FormLabel>Full Name</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder=""
+                              placeholder="As per your NID"
                               type="text"
                               {...field}
                               disabled={pending}
                             />
                           </FormControl>
 
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="col-span-5">
+                    <FormField
+                      control={form.control}
+                      name="nickName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>User Name</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="ex: Monir[Dev-X]"
+                              type="text"
+                              {...field}
+                              disabled={pending}
+                              onChange={(e) => {
+                                form.clearErrors("nickName");
+                                field.onChange(e);
+                              }}
+                              onBlur={async (e) => {
+                                field.onBlur(); // keep react-hook-form happy
+                                const value = e.target.value;
+                                if (value) {
+                                  const res = await checkNickNameAction(value);
+                                  if (!res.success) {
+                                    form.setError("nickName", {
+                                      message: res.message,
+                                    });
+                                  } else {
+                                    form.clearErrors("nickName");
+                                  }
+                                }
+                              }}
+                            />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}

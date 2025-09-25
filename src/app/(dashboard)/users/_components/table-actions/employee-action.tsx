@@ -5,6 +5,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { UserWithAllIncludes } from "@/types/user";
+import { Role } from "@prisma/client";
 import { Eye, MoreHorizontal, Shield, ShieldCheck } from "lucide-react";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
@@ -29,6 +30,7 @@ const ProfileView = dynamic(() => import("./profile/profile-view"), {
 
 interface Props {
   data: UserWithAllIncludes;
+  currentUserRole: Role;
 }
 
 const EmployeeAction = ({ data }: Props) => {
