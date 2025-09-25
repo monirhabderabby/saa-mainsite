@@ -10,12 +10,8 @@ const RegistrationForm = dynamic(
 );
 
 const Page = async () => {
-  const services = await prisma.services.findMany({
-    select: {
-      name: true,
-      id: true,
-    },
-  });
+  const services = await prisma.services.findMany({});
+  const departments = await prisma.department.findMany();
 
   const designations = await prisma.designations.findMany();
   return (
@@ -24,7 +20,11 @@ const Page = async () => {
         <div className="absolute top-10 right-10">
           <ThemeToggle />
         </div>
-        <RegistrationForm services={services} designations={designations} />
+        <RegistrationForm
+          services={services}
+          designations={designations}
+          departments={departments}
+        />
       </div>
     </MotionProvider>
   );

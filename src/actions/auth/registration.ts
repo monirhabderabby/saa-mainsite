@@ -7,7 +7,7 @@ import {
   registrationSchema,
   RegistrationSchemaValues,
 } from "@/schemas/auth/registration";
-import { Prisma } from "@prisma/client";
+import { Prisma, Role } from "@prisma/client";
 import { render } from "@react-email/render";
 import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
@@ -28,11 +28,32 @@ export async function registerAction(data: RegistrationSchemaValues) {
     fullName,
     password,
     serviceId,
-    role,
     designationId,
+    departmentId,
   } = parsed.data;
 
   try {
+    const department = await prisma.department.findUnique({
+      where: {
+        id: departmentId,
+      },
+      select: {
+        name: true,
+      },
+    });
+
+    if (!department) {
+      return {
+        success: false,
+        message: "department not found",
+      };
+    }
+
+    const { name: departmentName } = department;
+    const role =
+      departmentName === "Sales"
+        ? "SALES_MEMBER"
+        : ("OPERATION_MEMBER" as Role);
     // ✅ Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
@@ -46,7 +67,8 @@ export async function registerAction(data: RegistrationSchemaValues) {
           serviceId,
           password: hashedPassword,
           accountStatus: "PENDING",
-          role: role, // or another default role as per your schema
+          role:
+            departmentName === "Sales" ? "SALES_MEMBER" : "OPERATION_MEMBER", // or another default role as per your schema
           designationId,
         },
         select: {

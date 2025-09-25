@@ -16,9 +16,7 @@ export const registrationSchema = z.object({
 
   employeeId: z.string().min(1, { message: "Employee ID is required" }),
 
-  role: z.enum(["OPERATION_MEMBER", "SALES_MEMBER", "ADMIN"], {
-    message: "Role must be either OPERATION_MEMBER or SALES_MEMBER",
-  }),
+  departmentId: z.string().min(1, { message: "Employee ID is required" }),
   designationId: z.string({
     message: "Designation is required",
   }),

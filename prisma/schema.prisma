@@ -122,9 +122,14 @@ model Designations {
     @@unique([serviceId, name])
 }
 
+enum DepartmentName {
+    Sales
+    Operation
+}
+
 model Department {
-    id    String  @id @default(auto()) @map("_id") @db.ObjectId
-    name  String  @unique
+    id    String         @id @default(auto()) @map("_id") @db.ObjectId
+    name  DepartmentName @unique
     image String?
 
     // relations
