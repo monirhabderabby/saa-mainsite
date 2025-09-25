@@ -32,6 +32,23 @@ export async function registerAction(data: RegistrationSchemaValues) {
   } = parsed.data;
 
   try {
+    // ✅ Pre-check if email or employeeId already exists
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [{ email }, { employeeId }],
+      },
+      select: { email: true, employeeId: true },
+    });
+
+    if (existingUser) {
+      if (existingUser.email === email) {
+        return { success: false, message: "Email already in use." };
+      }
+      if (existingUser.employeeId === employeeId) {
+        return { success: false, message: "Employee ID already in use." };
+      }
+    }
+
     const department = await prisma.department.findUnique({
       where: {
         id: departmentId,
