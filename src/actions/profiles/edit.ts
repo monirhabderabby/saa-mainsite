@@ -3,13 +3,12 @@
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import { profileSchema } from "@/schemas/profile";
-import { SerivceSchemaType } from "@/schemas/services";
 import { Role } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 const allowedRoles = ["SUPER_ADMIN"] as Role[];
 
-export async function editProfile(id: string, data: SerivceSchemaType) {
+export async function editProfile(id: string, data: { name: string }) {
   try {
     const session = await auth();
 

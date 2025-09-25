@@ -102,6 +102,7 @@ const ServiceCard = ({ data }: Props) => {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <AddServiceDialog
+                    departmentId={data.departmentId!}
                     trigger={
                       <Button
                         variant="ghost"

@@ -28,8 +28,13 @@ import { toast } from "sonner";
 interface Props {
   trigger: ReactNode;
   initialData?: Services;
+  departmentId: string;
 }
-export default function AddServiceDialog({ trigger, initialData }: Props) {
+export default function AddServiceDialog({
+  trigger,
+  initialData,
+  departmentId,
+}: Props) {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
 
@@ -37,10 +42,12 @@ export default function AddServiceDialog({ trigger, initialData }: Props) {
     resolver: zodResolver(serviceSchema),
     defaultValues: {
       name: initialData?.name ?? "",
+      departmentId: departmentId,
     },
   });
 
   function onSubmit(values: SerivceSchemaType) {
+    console.log(values);
     startTransition(() => {
       if (initialData) {
         editService(initialData.id, values).then((res) => {

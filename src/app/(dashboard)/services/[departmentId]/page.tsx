@@ -53,7 +53,10 @@ const Page = async ({ params }: { params: { departmentId: string } }) => {
           </p>
         </div>
 
-        <AddServiceDialog trigger={<Button>Create Service</Button>} />
+        <AddServiceDialog
+          departmentId={params.departmentId}
+          trigger={<Button>Create Service</Button>}
+        />
       </div>
 
       <div className="mt-10 grid grid-cols-1 md:grid-cols-3   gap-5">
