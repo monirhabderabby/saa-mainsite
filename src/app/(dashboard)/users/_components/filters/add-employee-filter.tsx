@@ -25,72 +25,66 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { employeeFilterSchema, EmployeeFilterType } from "@/schemas/employees";
 import { useUserFilterStore } from "@/zustand/users";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AccountStatus } from "@prisma/client";
+import { AccountStatus, Role, Services, Team } from "@prisma/client";
 import { Repeat } from "lucide-react";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useState } from "react";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 
-const employeeFilterSchema = z.object({
-  serviceId: z.string().optional(),
-  departmentId: z.string().optional(),
-  accountStatus: z.string().optional(),
-  searchQuery: z.string().optional(),
-});
-
-export type EmployeeFilter = z.infer<typeof employeeFilterSchema>;
+const roleLabels: Record<Role, string> = {
+  [Role.OPERATION_MEMBER]: "Operation",
+  [Role.SALES_MEMBER]: "Sales",
+  [Role.SUPER_ADMIN]: "Super Admin",
+  [Role.ADMIN]: "Admin",
+};
 
 interface Props {
   trigger: ReactNode;
-  services: { id: string; name: string }[];
+  services: Services[];
   departments: { id: string; name: string }[];
+  teams: Team[];
 }
 
 export default function AddUserFilterModal({
   trigger,
   services,
   departments,
+  teams,
 }: Props) {
   const [open, setOpen] = useState(false);
-  const {
-    serviceId,
-    setServiceId,
-    departmentId,
-    setDepartmentId,
-    accountStatus,
-    setAccountStatus,
-    searchQuery,
-    setSearchQuery,
-  } = useUserFilterStore();
 
-  const form = useForm<EmployeeFilter>({
+  const { setAllValues, resetFilters } = useUserFilterStore();
+
+  const form = useForm<EmployeeFilterType>({
     resolver: zodResolver(employeeFilterSchema),
     defaultValues: {
-      serviceId: serviceId ?? "All",
-      departmentId: departmentId ?? "All",
-      accountStatus: accountStatus ?? "All",
-      searchQuery: searchQuery ?? "",
+      departmentId: undefined,
     },
   });
 
-  function onSubmit(values: EmployeeFilter) {
-    setServiceId(values.serviceId ?? "All");
-    setDepartmentId(values.departmentId ?? "All");
-    setAccountStatus((values.accountStatus as AccountStatus) ?? "All");
-    setSearchQuery(values.searchQuery ?? "");
+  const selectedDepartmentId = form.watch("departmentId");
+  const selectedService = form.watch("serviceId");
+
+  const filteredServices =
+    selectedDepartmentId === "All"
+      ? services
+      : services.filter((item) => item.departmentId === selectedDepartmentId);
+
+  const filteredTeams =
+    selectedService === "All"
+      ? teams
+      : teams.filter((item) => item.serviceId === selectedService);
+
+  function onSubmit(values: EmployeeFilterType) {
+    setAllValues({
+      ...values,
+      accountStatus: (values.accountStatus ?? "") as AccountStatus | "",
+    });
+
     setOpen(false);
   }
-
-  useEffect(() => {
-    form.reset({
-      serviceId,
-      departmentId,
-      accountStatus,
-      searchQuery,
-    });
-  }, [serviceId, departmentId, accountStatus, searchQuery, form]);
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -108,36 +102,29 @@ export default function AddUserFilterModal({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             <div className="grid grid-cols-2 gap-5">
-              {/* Service */}
-              <FormField
-                control={form.control}
-                name="serviceId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Service</FormLabel>
-                    <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value ?? "All"}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Service" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="All">All</SelectItem>
-                          {services.map((s) => (
-                            <SelectItem key={s.id} value={s.id}>
-                              {s.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Search */}
+              <div className="col-span-2">
+                <FormField
+                  control={form.control}
+                  name="searchQuery"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Search</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          value={field.value ?? ""}
+                          placeholder="Enter Employee ID, Name, or Email..."
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
 
+            <div className="grid grid-cols-3 gap-5">
               {/* Department */}
               <FormField
                 control={form.control}
@@ -148,7 +135,7 @@ export default function AddUserFilterModal({
                     <FormControl>
                       <Select
                         onValueChange={field.onChange}
-                        value={field.value ?? "All"}
+                        value={field.value ?? ""}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select Department" />
@@ -167,56 +154,129 @@ export default function AddUserFilterModal({
                   </FormItem>
                 )}
               />
+
+              {/* Service */}
+              <FormField
+                control={form.control}
+                name="serviceId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Service</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value ?? ""}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Service" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="All">All</SelectItem>
+                          {filteredServices.map((s) => (
+                            <SelectItem key={s.id} value={s.id}>
+                              {s.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Teams */}
+              <FormField
+                control={form.control}
+                name="teamId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Team</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value ?? ""}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select team" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="All">All</SelectItem>
+                          {filteredTeams.map((s) => (
+                            <SelectItem key={s.id} value={s.id}>
+                              {s.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
-            {/* Account Status */}
-            <FormField
-              control={form.control}
-              name="accountStatus"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Account Status</FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value ?? "All"}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select Account Status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="All">All</SelectItem>
-                        {Object.keys(AccountStatus).map((status) => (
-                          <SelectItem key={status} value={status}>
-                            {status}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-2 gap-5">
+              {/* Account Status */}
+              <FormField
+                control={form.control}
+                name="accountStatus"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Account Status</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value ?? "All"}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Account Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="All">All</SelectItem>
+                          {Object.keys(AccountStatus).map((status) => (
+                            <SelectItem key={status} value={status}>
+                              {status}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* Search */}
-            <FormField
-              control={form.control}
-              name="searchQuery"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Search</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      value={field.value ?? ""}
-                      placeholder="Enter Employee ID, Name, or Email..."
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              {/* Role */}
+              <FormField
+                control={form.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Role</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value ?? ""}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select team" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="All">All</SelectItem>
+                          {Object.keys(Role).map((item) => (
+                            <SelectItem key={item} value={item}>
+                              {roleLabels[item as Role]}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             {/* Buttons */}
             <div className="flex justify-end gap-x-4">
@@ -225,11 +285,13 @@ export default function AddUserFilterModal({
                 variant="outline"
                 onClick={() => {
                   form.reset({
-                    serviceId: "All",
-                    departmentId: "All",
-                    accountStatus: "All",
+                    serviceId: "",
+                    departmentId: "",
+                    accountStatus: "",
                     searchQuery: "",
+                    role: "",
                   });
+                  resetFilters();
                 }}
               >
                 <Repeat /> Reset
