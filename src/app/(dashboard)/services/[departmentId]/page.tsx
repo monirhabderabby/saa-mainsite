@@ -28,26 +28,12 @@ const Page = async ({ params }: { params: { departmentId: string } }) => {
     },
   });
 
-  // const designations = await prisma.designations.findMany({
-  //   include: {
-  //     users: {
-  //       select: {
-  //         id: true,
-  //       },
-  //     },
-  //     service: {
-  //       select: {
-  //         name: true,
-  //       },
-  //     },
-  //   },
-  // });
   return (
     <div className="space-y-8 pb-10">
-      <div className="flex justify-between space-y-8">
+      <div className="flex justify-between items-center space-y-8">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-foreground">
-            Dashboard Overview
+          <h1 className="text-2xl font-bold text-foreground">
+            Service Overview
           </h1>
           <p className="text-muted-foreground">
             Monitor your services and designations at a glance

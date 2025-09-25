@@ -28,8 +28,13 @@ import { toast } from "sonner";
 interface Props {
   trigger: ReactNode;
   initialData?: Profile;
+  onClose?: () => void;
 }
-export default function AddProfileDialog({ trigger, initialData }: Props) {
+export default function AddProfileDialog({
+  trigger,
+  initialData,
+  onClose,
+}: Props) {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
 
@@ -55,6 +60,7 @@ export default function AddProfileDialog({ trigger, initialData }: Props) {
             name: "",
           });
           setOpen(false);
+          onClose?.();
         });
       } else {
         createProfile(values).then((res) => {
@@ -69,6 +75,7 @@ export default function AddProfileDialog({ trigger, initialData }: Props) {
             name: "",
           });
           setOpen(false);
+          onClose?.();
         });
       }
     });
