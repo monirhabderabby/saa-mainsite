@@ -113,20 +113,29 @@ export const updateSheetColumns: ColumnDef<UpdateSheetData>[] = [
   },
   {
     header: "Action",
-    cell: ({ row }) => (
-      <>
-        {row.original.sendAt ? (
-          <Button disabled variant="ghost" size="sm">
-            Sent ✅
-          </Button>
-        ) : (
-          <Button size="icon" variant="ghost" asChild>
-            <Link href={`/update-sheet/edit/${row.original.id}`}>
+    cell: ({ row }) => {
+      const tlChecked = row.original.tlId ?? undefined;
+      const isTlChecked = !!tlChecked;
+
+      return (
+        <>
+          {row.original.sendAt ? (
+            <Button disabled variant="ghost" size="sm">
+              Sent ✅
+            </Button>
+          ) : isTlChecked ? (
+            <Button disabled size="icon" variant="ghost">
               <Pencil />
-            </Link>
-          </Button>
-        )}
-      </>
-    ),
+            </Button>
+          ) : (
+            <Button size="icon" variant="ghost" asChild>
+              <Link href={`/update-sheet/edit/${row.original.id}`}>
+                <Pencil />
+              </Link>
+            </Button>
+          )}
+        </>
+      );
+    },
   },
 ];
