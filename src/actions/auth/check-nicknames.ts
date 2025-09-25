@@ -6,7 +6,6 @@ export async function checkNickNameAction(nickName: string) {
   if (!nickName) {
     return { success: false, message: "Nickname is required" };
   }
-  return { success: false, message: "This nickname is already taken" };
 
   const exists = await prisma.user.findUnique({
     where: { nickName },

@@ -66,7 +66,6 @@ export default function RegistrationForm({
     defaultValues: {
       serviceId: "",
     },
-    mode: "onBlur",
   });
 
   function onSubmit(values: RegistrationSchemaValues) {
