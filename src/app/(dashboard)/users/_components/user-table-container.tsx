@@ -4,6 +4,7 @@ import { PaginationControls } from "@/components/ui/pagination-controls";
 import SkeletonWrapper from "@/components/ui/skeleton-wrapper";
 import { UsersData } from "@/helper/users";
 import { useUserFilterStore } from "@/zustand/users";
+import { Role } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import {
   ColumnDef,
@@ -12,9 +13,13 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { AlertTriangle } from "lucide-react";
-import { employeeColumns } from "./employee-column";
+import { getEmployeeColumns } from "./employee-column";
 
-const UserTableContainer = () => {
+interface Props {
+  currentUserRole: Role;
+}
+
+const UserTableContainer = ({ currentUserRole }: Props) => {
   let {
     page,
     searchQuery,
@@ -64,7 +69,7 @@ const UserTableContainer = () => {
   return (
     <SkeletonWrapper isLoading={isLoading}>
       <Table
-        columns={employeeColumns}
+        columns={getEmployeeColumns({ currentUserRole })}
         data={data?.data ?? []}
         totalPages={data?.pagination?.totalPages ?? 1}
       />

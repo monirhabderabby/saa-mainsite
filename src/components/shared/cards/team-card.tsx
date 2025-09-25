@@ -13,7 +13,9 @@ import { ServiceWithTeamsAndUsers } from "@/types/services";
 import { MoreHorizontal, User, Users } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import AddTeamModal from "../modal/add-team-modal";
+const AddTeamModal = dynamic(() => import("../modal/add-team-modal"), {
+  ssr: false,
+});
 const AddServiceManagerModal = dynamic(
   () => import("@/components/shared/modal/add-service-manager-modal"),
   {
