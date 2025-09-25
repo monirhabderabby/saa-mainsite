@@ -80,6 +80,7 @@ const Page = async ({ params }: { params: { id: string } }) => {
           profiles={profiles}
           initianData={entry}
           services={services}
+          currentUserRole={cu.user.role}
         />
       </CardContent>
     </Card>
