@@ -42,6 +42,7 @@ export async function createService(data: SerivceSchemaType) {
     const existingService = await prisma.services.findFirst({
       where: {
         name: parsedData.data.name,
+        departmentId: parsedData.data.departmentId,
       },
     });
 
@@ -56,6 +57,7 @@ export async function createService(data: SerivceSchemaType) {
     const service = await prisma.services.create({
       data: {
         name: parsedData.data.name,
+        departmentId: parsedData.data.departmentId,
         // Add other fields from your service schema as needed
         // description: parsedData.data.description,
         // price: parsedData.data.price,
@@ -64,7 +66,7 @@ export async function createService(data: SerivceSchemaType) {
     });
 
     // Revalidate relevant paths
-    revalidatePath("/services");
+    revalidatePath(`/services/${parsedData.data.departmentId}`);
 
     return {
       success: true,

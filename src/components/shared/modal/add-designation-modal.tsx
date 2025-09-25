@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 
 import { createDesignationAction } from "@/actions/designation/create";
+import { editDesignationAction } from "@/actions/designation/edit";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -32,12 +33,16 @@ interface AddMemberModalProps {
   serviceId: string;
   serviceName: string;
   trigger?: React.ReactNode;
+  initialData?: { name: string; id: string };
+  onClose?: () => void;
 }
 
 export default function AddDesignationModal({
   serviceId,
   trigger,
   serviceName,
+  initialData,
+  onClose,
 }: AddMemberModalProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, startTransition] = useTransition();
@@ -46,23 +51,43 @@ export default function AddDesignationModal({
     resolver: zodResolver(designationSchema),
     defaultValues: {
       serviceId,
-      name: "",
+      name: initialData?.name ?? "",
     },
   });
 
   const onSubmit = async (values: DesignationSchemaType) => {
-    startTransition(() => {
-      createDesignationAction(values).then((res) => {
-        if (!res.success) {
-          toast.error(res.message);
-          return;
-        }
+    if (initialData) {
+      startTransition(() => {
+        editDesignationAction({
+          ...values,
+          id: initialData.id,
+        }).then((res) => {
+          if (!res.success) {
+            toast.error(res.message);
+            return;
+          }
 
-        toast.success(res.message);
-        setOpen(false);
-        form.reset({});
+          toast.success(res.message);
+          setOpen(false);
+          form.reset({});
+          onClose?.();
+        });
       });
-    });
+    } else {
+      startTransition(() => {
+        createDesignationAction(values).then((res) => {
+          if (!res.success) {
+            toast.error(res.message);
+            return;
+          }
+
+          toast.success(res.message);
+          setOpen(false);
+          form.reset({});
+          onClose?.();
+        });
+      });
+    }
   };
 
   return (
@@ -78,7 +103,8 @@ export default function AddDesignationModal({
       <DialogContent className="">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <UserPlus className="w-5 h-5" /> Add Designation under {serviceName}
+            <UserPlus className="w-5 h-5" /> {initialData ? "Edit" : "Add"}{" "}
+            Designation under {serviceName}
           </DialogTitle>
         </DialogHeader>
 
@@ -105,12 +131,15 @@ export default function AddDesignationModal({
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setOpen(false)}
+                onClick={() => {
+                  setOpen(false);
+                  onClose?.();
+                }}
               >
                 Cancel
               </Button>
               <Button type="submit" disabled={isLoading}>
-                Add Designation{" "}
+                {initialData ? "Save" : "Add"} Designation{" "}
                 {isLoading ? <Loader className="animate-spin" /> : <Plus />}
               </Button>
             </div>

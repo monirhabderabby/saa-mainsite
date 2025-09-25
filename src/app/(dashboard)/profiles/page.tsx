@@ -1,8 +1,14 @@
 import { Button } from "@/components/ui/button";
 
 import prisma from "@/lib/prisma";
-import AddProfileDialog from "./_components/add-profile-dialog";
+import dynamic from "next/dynamic";
 import ProfileCard from "./_components/profile-card";
+const AddProfileDialog = dynamic(
+  () => import("./_components/add-profile-dialog"),
+  {
+    ssr: false,
+  }
+);
 
 const Page = async () => {
   const services = await prisma.profile.findMany();
@@ -10,7 +16,6 @@ const Page = async () => {
     <div>
       <div className="flex justify-between items-center">
         <h1 className="font-semibold leading-none tracking-tight text-[20px]">
-          {" "}
           Profiles
         </h1>
 

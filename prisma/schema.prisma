@@ -42,6 +42,9 @@ model User {
     serviceId String?   @db.ObjectId
     service   Services? @relation(fields: [serviceId], references: [id])
 
+    departmentId String?     @db.ObjectId
+    department   Department? @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+
     accounts            Account[]
     sessions            Session[]
     permissions         Permissions[]
@@ -97,6 +100,9 @@ model Services {
     serviceManagerId String? @db.ObjectId
     serviceManager   User?   @relation("ServiceManager", fields: [serviceManagerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+    departmentId String?     @db.ObjectId
+    department   Department? @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
@@ -114,6 +120,25 @@ model Designations {
     updatedAt DateTime @updatedAt
 
     @@unique([serviceId, name])
+}
+
+enum DepartmentName {
+    Sales
+    Operation
+}
+
+model Department {
+    id    String         @id @default(auto()) @map("_id") @db.ObjectId
+    name  DepartmentName @unique
+    image String?
+
+    // relations
+    services Services[]
+    teams    Team[]
+    users    User[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model Profile {
@@ -139,6 +164,9 @@ model Team {
     userTeams UserTeam[]
     issues    IssueSheet[]
     service   Services?    @relation(fields: [serviceId], references: [id])
+
+    departmentId String?     @db.ObjectId
+    department   Department? @relation(fields: [departmentId], references: [id], onDelete: Cascade)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

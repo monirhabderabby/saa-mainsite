@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -7,19 +8,20 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import prisma from "@/lib/prisma";
-import dynamic from "next/dynamic";
+import { Filter } from "lucide-react";
 import { redirect } from "next/navigation";
+import AddUserFilterModal from "./_components/filters/add-employee-filter";
 import UserTableContainer from "./_components/user-table-container";
-const UserFilterContainer = dynamic(
-  () => import("./_components/filters/users-filter-container"),
-  {
-    ssr: false,
-  }
-);
 
 const Page = async () => {
   const cu = await auth();
   const services = await prisma.services.findMany({
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+  const department = await prisma.department.findMany({
     select: {
       id: true,
       name: true,
@@ -37,7 +39,15 @@ const Page = async () => {
               Browse and search for employees by their ID.
             </CardDescription>
           </div>
-          <UserFilterContainer services={services ?? []} />
+          <AddUserFilterModal
+            services={services ?? []}
+            departments={department}
+            trigger={
+              <Button variant="outline">
+                <Filter /> Filter
+              </Button>
+            }
+          />
         </div>
       </CardHeader>
 

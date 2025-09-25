@@ -4,6 +4,8 @@ import { editService } from "@/actions/services/edit";
 import {
   AlertDialog,
   AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
@@ -28,8 +30,15 @@ import { toast } from "sonner";
 interface Props {
   trigger: ReactNode;
   initialData?: Services;
+  departmentId: string;
+  onClose?: () => void;
 }
-export default function AddServiceDialog({ trigger, initialData }: Props) {
+export default function AddServiceDialog({
+  trigger,
+  initialData,
+  departmentId,
+  onClose,
+}: Props) {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
 
@@ -37,10 +46,12 @@ export default function AddServiceDialog({ trigger, initialData }: Props) {
     resolver: zodResolver(serviceSchema),
     defaultValues: {
       name: initialData?.name ?? "",
+      departmentId: departmentId ?? "",
     },
   });
 
   function onSubmit(values: SerivceSchemaType) {
+    console.log(values);
     startTransition(() => {
       if (initialData) {
         editService(initialData.id, values).then((res) => {
@@ -52,9 +63,11 @@ export default function AddServiceDialog({ trigger, initialData }: Props) {
           // handle success
           toast.success(res.message);
           form.reset({
-            name: "",
+            name: initialData.name ?? "",
+            departmentId: departmentId ?? "",
           });
           setOpen(false);
+          onClose?.();
         });
       } else {
         createService(values).then((res) => {
@@ -67,8 +80,10 @@ export default function AddServiceDialog({ trigger, initialData }: Props) {
           toast.success(res.message);
           form.reset({
             name: "",
+            departmentId: departmentId ?? "",
           });
           setOpen(false);
+          onClose?.();
         });
       }
     });
@@ -76,12 +91,24 @@ export default function AddServiceDialog({ trigger, initialData }: Props) {
 
   useEffect(() => {
     if (open && initialData) {
-      form.reset({ name: initialData.name });
+      form.reset({ name: initialData.name, departmentId: departmentId ?? "" });
     }
-  }, [open, initialData, form]);
+
+    return () => {
+      if (initialData) {
+        form.reset({
+          name: initialData?.name,
+          departmentId: departmentId,
+        });
+      }
+    };
+  }, [open, initialData, form, departmentId]);
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogHeader>
+        <AlertDialogTitle></AlertDialogTitle>
+      </AlertDialogHeader>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent>
         <Form {...form}>

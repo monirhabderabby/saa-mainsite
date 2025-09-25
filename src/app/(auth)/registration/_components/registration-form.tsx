@@ -32,7 +32,7 @@ import {
   RegistrationSchemaValues,
 } from "@/schemas/auth/registration";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Designations, Role } from "@prisma/client";
+import { Department, Designations, Role, Services } from "@prisma/client";
 import { Loader2, MoveLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -47,11 +47,16 @@ export const allowedRegistrationRoles = [
 ];
 
 interface Props {
-  services: { id: string; name: string }[];
+  services: Services[];
   designations: Designations[];
+  departments: Department[];
 }
 
-export default function RegistrationForm({ services, designations }: Props) {
+export default function RegistrationForm({
+  services,
+  designations,
+  departments,
+}: Props) {
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"form" | "success">("form");
   const [pending, startTransition] = useTransition();
@@ -85,17 +90,14 @@ export default function RegistrationForm({ services, designations }: Props) {
   }
 
   const selectedServiceId = form.watch("serviceId");
+  const selectedDepartment = form.watch("departmentId");
 
   const filteredDesignations =
     designations.filter((d) => d.serviceId === selectedServiceId) || undefined;
 
   // 👇 decide which roles to show
-  const filteredRoles =
-    services.find((s) => s.id === selectedServiceId)?.name === "Management"
-      ? allowedRegistrationRoles.filter((r) => r.id === Role.ADMIN)
-      : allowedRegistrationRoles.filter(
-          (r) => r.id === Role.SALES_MEMBER || r.id === Role.OPERATION_MEMBER
-        ) || undefined;
+  const filteredService =
+    services.filter((d) => d.departmentId === selectedDepartment) || undefined;
 
   return (
     <Card>
@@ -164,10 +166,10 @@ export default function RegistrationForm({ services, designations }: Props) {
                   />
                   <FormField
                     control={form.control}
-                    name="serviceId"
+                    name="departmentId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Service Line</FormLabel>
+                        <FormLabel>Department</FormLabel>
                         <FormControl>
                           <Select
                             onValueChange={field.onChange}
@@ -175,11 +177,11 @@ export default function RegistrationForm({ services, designations }: Props) {
                           >
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Select a service" />
+                                <SelectValue placeholder="Select your department" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {services.map((item) => (
+                              {departments.map((item) => (
                                 <SelectItem value={item.id} key={item.id}>
                                   {item.name}
                                 </SelectItem>
@@ -238,10 +240,10 @@ export default function RegistrationForm({ services, designations }: Props) {
 
                   <FormField
                     control={form.control}
-                    name="role"
+                    name="serviceId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Access Level</FormLabel>
+                        <FormLabel>Service Line</FormLabel>
                         <FormControl>
                           <Select
                             onValueChange={field.onChange}
@@ -249,11 +251,11 @@ export default function RegistrationForm({ services, designations }: Props) {
                           >
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Select a access level" />
+                                <SelectValue placeholder="Select a service" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {filteredRoles.map((item) => (
+                              {filteredService.map((item) => (
                                 <SelectItem value={item.id} key={item.id}>
                                   {item.name}
                                 </SelectItem>
@@ -261,6 +263,7 @@ export default function RegistrationForm({ services, designations }: Props) {
                             </SelectContent>
                           </Select>
                         </FormControl>
+
                         <FormMessage />
                       </FormItem>
                     )}
