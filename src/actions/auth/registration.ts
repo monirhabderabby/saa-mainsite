@@ -70,6 +70,7 @@ export async function registerAction(data: RegistrationSchemaValues) {
             departmentName === "Sales" ? "SALES_MEMBER" : "OPERATION_MEMBER", // or another default role as per your schema
           designationId,
           departmentId,
+          emailVerified: new Date(),
         },
         select: {
           id: true,

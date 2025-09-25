@@ -147,6 +147,7 @@ async function createSuperAdmin(managementServiceId, designationName) {
       accountStatus: SEED_ADMIN.accountStatus,
       role: SEED_ADMIN.role,
       designationId: designation.id,
+      emailVerified: new Date(),
     },
   });
 
