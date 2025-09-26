@@ -61,6 +61,17 @@ export const getEmployeeColumns = ({
     cell: ({ row }) => <p>{row.original.service?.name}</p>,
   },
   {
+    accessorKey: "userTeams",
+    header: "Team",
+    cell: ({ row }) => {
+      const userTeams = row.original.userTeams;
+      const team = userTeams.length > 0 ? userTeams[0] : undefined;
+      const teamName = team?.team.name;
+
+      return <p>{team ? teamName : "N/A"}</p>;
+    },
+  },
+  {
     accessorKey: "accountStatus",
     header: "Status",
     cell: ({ row }) => <AccountStatusAction data={row.original} />,

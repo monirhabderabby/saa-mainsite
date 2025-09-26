@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AccountStatus, User } from "@prisma/client";
+import { useQueryClient } from "@tanstack/react-query"; // 👈 import
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 
@@ -26,17 +27,32 @@ import {
   userStatusSchema,
   UserStatusSchemaType,
 } from "@/schemas/employees/table";
+import { useUserFilterStore } from "@/zustand/users";
 import { Loader, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 interface Props {
   data: User;
   trigger?: React.ReactNode;
+  onClose?: () => void;
 }
 
-const AccountStatusModal = ({ data, trigger }: Props) => {
+const AccountStatusModal = ({ data, trigger, onClose }: Props) => {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
+
+  // Get current filters from Zustand
+  const {
+    page,
+    searchQuery,
+    serviceId,
+    accountStatus,
+    role,
+    departmentId,
+    teamId,
+  } = useUserFilterStore();
+
+  const queryClient = useQueryClient(); // 👈 create queryClient instance
 
   const form = useForm<UserStatusSchemaType>({
     resolver: zodResolver(userStatusSchema),
@@ -57,6 +73,23 @@ const AccountStatusModal = ({ data, trigger }: Props) => {
         toast.success(res.message);
         form.reset(values);
         setOpen(false);
+        onClose?.();
+
+        // 👇 revalidate table query
+        // ✅ Revalidate ONLY the current query with filters
+        queryClient.invalidateQueries({
+          queryKey: [
+            "users",
+            page ?? "1",
+            searchQuery ?? "",
+            serviceId ?? "",
+            accountStatus ?? "",
+            role ?? "",
+            departmentId ?? "",
+            teamId ?? "",
+          ],
+          exact: true,
+        });
       });
     });
   };
@@ -111,7 +144,10 @@ const AccountStatusModal = ({ data, trigger }: Props) => {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setOpen(false)}
+                onClick={() => {
+                  setOpen(false);
+                  onClose?.();
+                }}
               >
                 Cancel
               </Button>

@@ -11,7 +11,12 @@ import prisma from "@/lib/prisma";
 import { Filter } from "lucide-react";
 import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
-import UserTableContainer from "./_components/user-table-container";
+const UserTableContainer = dynamic(
+  () => import("./_components/user-table-container"),
+  {
+    ssr: false,
+  }
+);
 const AddUserFilterModal = dynamic(
   () => import("./_components/filters/add-employee-filter"),
   {
@@ -38,7 +43,7 @@ const Page = async () => {
         <div className="flex items-center justify-between w-full">
           <div>
             <CardTitle>Employee Directory</CardTitle>
-            <CardDescription>
+            <CardDescription className="mt-2">
               Browse and search for employees by their ID.
             </CardDescription>
           </div>
