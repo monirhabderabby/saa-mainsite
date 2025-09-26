@@ -36,6 +36,7 @@ export const updateSheetColumns: ColumnDef<UpdateSheetData>[] = [
         </div>
       );
     },
+    size: 180,
   },
   {
     accessorKey: "profile",

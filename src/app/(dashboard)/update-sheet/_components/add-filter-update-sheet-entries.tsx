@@ -90,7 +90,7 @@ export default function AddFilterUpdateSheetEntries({
       profileId: undefined,
       updateTo: undefined,
       tl: undefined,
-      done: undefined,
+      done: "notDone",
       createdFrom: undefined,
       sendFrom: undefined,
     },

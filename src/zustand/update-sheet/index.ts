@@ -27,9 +27,9 @@ type ProfileState = {
 export const useUpdateSheetFilterState = create<ProfileState>((set) => ({
   profileId: undefined,
   page: 1,
-  updateTo: "All",
-  tl: "All",
-  done: "All",
+  updateTo: undefined,
+  tl: undefined,
+  done: "notDone",
   updateById: undefined,
   tlId: undefined,
   doneById: undefined,
