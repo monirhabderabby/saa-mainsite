@@ -3,8 +3,8 @@ import { DataTable } from "@/components/ui/data-table";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import SkeletonWrapper from "@/components/ui/skeleton-wrapper";
 import { UsersData } from "@/helper/users";
-import { useDebounce } from "@/hook/use-debounce";
 import { useUserFilterStore } from "@/zustand/users";
+import { Role } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import {
   ColumnDef,
@@ -13,18 +13,45 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { AlertTriangle } from "lucide-react";
-import { employeeColumns } from "./employee-column";
+import { getEmployeeColumns } from "./employee-column";
 
-const UserTableContainer = () => {
-  const { page, searchQuery, serviceId, accountStatus } = useUserFilterStore();
+interface Props {
+  currentUserRole: Role;
+}
 
-  const debouncedValue = useDebounce(searchQuery);
+const UserTableContainer = ({ currentUserRole }: Props) => {
+  let {
+    page,
+    searchQuery,
+    serviceId,
+    accountStatus,
+    role,
+    departmentId,
+    teamId,
+  } = useUserFilterStore();
+
+  departmentId = departmentId ?? "";
+  serviceId = serviceId ?? "";
+  teamId = teamId ?? "";
+  role = role ?? "";
+  accountStatus = accountStatus ?? "ACTIVE";
+  page = page ?? "";
+  searchQuery = searchQuery ?? "";
 
   const { data, isError, error, isLoading } = useQuery({
-    queryKey: ["users", page, debouncedValue, serviceId, accountStatus],
+    queryKey: [
+      "users",
+      page,
+      searchQuery,
+      serviceId,
+      accountStatus,
+      role,
+      departmentId,
+      teamId,
+    ],
     queryFn: () =>
       fetch(
-        `/api/users?page=${page}&limit=10&searchQuery=${debouncedValue}&serviceId=${serviceId}&accountStatus=${accountStatus}`
+        `/api/users?page=${page}&limit=10&searchQuery=${searchQuery}&serviceId=${serviceId}&accountStatus=${accountStatus}&role=${role}&departmentId=${departmentId}&teamId=${teamId}`
       ).then((res) => res.json()),
   });
 
@@ -42,7 +69,7 @@ const UserTableContainer = () => {
   return (
     <SkeletonWrapper isLoading={isLoading}>
       <Table
-        columns={employeeColumns}
+        columns={getEmployeeColumns({ currentUserRole })}
         data={data?.data ?? []}
         totalPages={data?.pagination?.totalPages ?? 1}
       />

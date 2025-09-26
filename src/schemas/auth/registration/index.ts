@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const registrationSchema = z.object({
   fullName: z.string().min(1, { message: "Full name is required" }),
+  nickName: z.string().min(1, { message: "Nick name is required" }),
 
   serviceId: z.string().min(1, { message: "Service ID is required" }),
 
@@ -16,7 +17,7 @@ export const registrationSchema = z.object({
 
   employeeId: z.string().min(1, { message: "Employee ID is required" }),
 
-  departmentId: z.string().min(1, { message: "Employee ID is required" }),
+  departmentId: z.string().min(1, { message: "Department ID is required" }),
   designationId: z.string({
     message: "Designation is required",
   }),

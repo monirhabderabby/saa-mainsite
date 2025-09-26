@@ -28,6 +28,7 @@ enum PermissionTool {
 model User {
     id            String        @id @default(auto()) @map("_id") @db.ObjectId
     fullName      String
+    nickName      String        @unique
     email         String        @unique
     emailVerified DateTime?
     image         String?
@@ -259,7 +260,7 @@ enum TeamResponsibility {
 
 model UserTeam {
     id     String @id @default(auto()) @map("_id") @db.ObjectId
-    userId String @db.ObjectId
+    userId String @unique @db.ObjectId
     teamId String @db.ObjectId
 
     responsibility TeamResponsibility @default(Member)

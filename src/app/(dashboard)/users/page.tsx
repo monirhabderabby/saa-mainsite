@@ -9,24 +9,27 @@ import {
 } from "@/components/ui/card";
 import prisma from "@/lib/prisma";
 import { Filter } from "lucide-react";
+import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
-import AddUserFilterModal from "./_components/filters/add-employee-filter";
 import UserTableContainer from "./_components/user-table-container";
+const AddUserFilterModal = dynamic(
+  () => import("./_components/filters/add-employee-filter"),
+  {
+    ssr: false,
+  }
+);
 
 const Page = async () => {
   const cu = await auth();
-  const services = await prisma.services.findMany({
-    select: {
-      id: true,
-      name: true,
-    },
-  });
+  const services = await prisma.services.findMany();
   const department = await prisma.department.findMany({
     select: {
       id: true,
       name: true,
     },
   });
+
+  const teams = await prisma.team.findMany();
 
   if (!cu || !cu.user) redirect("/login");
   return (
@@ -41,7 +44,8 @@ const Page = async () => {
           </div>
           <AddUserFilterModal
             services={services ?? []}
-            departments={department}
+            teams={teams ?? []}
+            departments={department ?? []}
             trigger={
               <Button variant="outline">
                 <Filter /> Filter
@@ -52,7 +56,7 @@ const Page = async () => {
       </CardHeader>
 
       <CardContent>
-        <UserTableContainer />
+        <UserTableContainer currentUserRole={cu.user.role} />
       </CardContent>
     </Card>
   );

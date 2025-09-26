@@ -1,43 +1,32 @@
 import { z } from "zod";
 
-export const issueSheetSchema = z.object({
-  clientName: z.string().min(1, {
-    message: "Client name is required",
-  }),
-  orderId: z.string().min(1, {
-    message: "Order ID is required",
-  }),
-  profileId: z.string({
-    message: "Profile ID is required",
-  }),
-  serviceId: z.string({
-    message: "Service ID is required",
-  }),
-  orderPageUrl: z
-    .string()
+export const issueSheetSchema = z
+  .object({
+    clientName: z
+      .string()
+      .min(1, { message: "Please enter the client's name" }),
+    orderId: z.string().min(1, { message: "Please provide the order ID" }),
+    profileId: z.string().min(1, { message: "Please select a profile" }),
+    serviceId: z.string().min(1, { message: "Please select a service" }),
+    orderPageUrl: z.string().optional(),
+    inboxPageUrl: z.string().optional(),
+    fileOrMeetingLink: z.string().optional(),
+    specialNotes: z.string().optional(),
+    noteForSales: z.string().optional(),
+  })
+  .refine(
+    (data) =>
+      (data.orderPageUrl?.trim() || "") !== "" ||
+      (data.inboxPageUrl?.trim() || "") !== "" ||
+      (data.fileOrMeetingLink?.trim() || "") !== "",
+    {
+      message:
+        "Please provide at least one: Order Page URL, Inbox Page URL, or File/Meeting Link",
+      path: ["urlGroup"], // virtual field
+    }
+  );
 
-    .optional()
-    .or(z.literal("")),
-  inboxPageUrl: z
-    .string()
-
-    .optional()
-    .or(z.literal("")),
-  specialNotes: z
-    .string()
-
-    .optional()
-    .or(z.literal("")),
-  noteForSales: z
-    .string()
-
-    .optional()
-    .or(z.literal("")),
-  fileOrMeetingLink: z
-    .string()
-
-    .optional()
-    .or(z.literal("")),
-});
-
-export type IssueSheetSchemaType = z.infer<typeof issueSheetSchema>;
+// Extend type to include virtual field
+export type IssueSheetSchemaType = z.infer<typeof issueSheetSchema> & {
+  urlGroup?: string;
+};

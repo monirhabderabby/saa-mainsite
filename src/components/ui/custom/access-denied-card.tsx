@@ -20,7 +20,7 @@ interface AccessDeniedCardProps {
   className?: string;
 }
 
-export function AccessDeniedCard({
+export default function AccessDeniedCard({
   title = "Access Denied",
   message = "You do not have the necessary permissions to edit this content. Please contact your administrator or request access to continue.",
   showRequestButton = false,

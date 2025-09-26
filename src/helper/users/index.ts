@@ -1,6 +1,5 @@
-import { AccountStatus, Prisma, PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
+import { AccountStatus, Prisma, Role } from "@prisma/client";
 
 export type GetUsersParams = {
   page?: number;
@@ -9,6 +8,8 @@ export type GetUsersParams = {
   serviceId?: string;
   teamId?: string;
   accountStatus?: AccountStatus;
+  role?: Role | "All";
+  departmentId?: string;
 };
 
 export async function getUsers(params: GetUsersParams = {}) {
@@ -26,10 +27,17 @@ export async function getUsers(params: GetUsersParams = {}) {
     ];
   }
 
+  // Filter by department
+  if (params.departmentId && params.departmentId !== "All") {
+    where.departmentId = params.departmentId;
+  }
+
+  // Filter by serviceId
   if (params.serviceId && params.serviceId !== "All") {
     where.serviceId = params.serviceId;
   }
 
+  // Add team filter
   if (params.teamId && params.teamId !== "All") {
     where.userTeams = { some: { teamId: params.teamId } };
   }
@@ -37,6 +45,11 @@ export async function getUsers(params: GetUsersParams = {}) {
   // Add accountStatus filter
   if (params.accountStatus) {
     where.accountStatus = params.accountStatus;
+  }
+
+  // Filter by role
+  if (params.role && params.role !== "All") {
+    where.role = params.role;
   }
 
   const totalItems = await prisma.user.count({ where });
@@ -51,6 +64,7 @@ export async function getUsers(params: GetUsersParams = {}) {
       permissions: true,
       designation: true,
       userTeams: { include: { team: true } },
+      department: true,
     },
     orderBy: {
       createdAt: "desc",
@@ -85,5 +99,6 @@ export type UsersData = Prisma.UserGetPayload<{
         team: true;
       };
     };
+    department: true;
   };
 }>;

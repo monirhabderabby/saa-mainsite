@@ -95,13 +95,28 @@ export async function getUpdateSheets(options: {
   const data = await prisma.updateSheet.findMany({
     where: filters,
     include: {
-      doneBy: { select: { fullName: true, image: true, designation: true } },
-      tlBy: { select: { fullName: true, image: true, designation: true } },
+      doneBy: {
+        select: {
+          fullName: true,
+          image: true,
+          designation: true,
+          nickName: true,
+        },
+      },
+      tlBy: {
+        select: {
+          fullName: true,
+          image: true,
+          designation: true,
+          nickName: true,
+        },
+      },
       updateBy: {
         select: {
           fullName: true,
           image: true,
           designation: true,
+          nickName: true,
         },
       },
       profile: true,
@@ -130,13 +145,28 @@ export type GetUpdateSheetsReturn = Awaited<ReturnType<typeof getUpdateSheets>>;
 // Type for a single UpdateSheet including the relations
 export type UpdateSheetData = Prisma.UpdateSheetGetPayload<{
   include: {
-    tlBy: { select: { fullName: true; image: true; designation: true } };
-    doneBy: { select: { fullName: true; image: true; designation: true } };
+    tlBy: {
+      select: {
+        fullName: true;
+        image: true;
+        designation: true;
+        nickName: true;
+      };
+    };
+    doneBy: {
+      select: {
+        fullName: true;
+        image: true;
+        designation: true;
+        nickName: true;
+      };
+    };
     updateBy: {
       select: {
         fullName: true;
         image: true;
         designation: true;
+        nickName: true;
       };
     };
     profile: true;

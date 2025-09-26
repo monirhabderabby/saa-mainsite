@@ -64,6 +64,7 @@ const FSD_DESIGNATIONS = [
 /** Seed account */
 const SEED_ADMIN = {
   fullName: "Anisur Rahman Roni",
+  nickName: "Rony",
   email: "arrony.dm@gmail.com",
   employeeId: "17001",
   rawPassword: "123456789",
@@ -147,6 +148,8 @@ async function createSuperAdmin(managementServiceId, designationName) {
       accountStatus: SEED_ADMIN.accountStatus,
       role: SEED_ADMIN.role,
       designationId: designation.id,
+      emailVerified: new Date(),
+      nickName: SEED_ADMIN.nickName,
     },
   });
 

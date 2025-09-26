@@ -27,7 +27,7 @@ export async function loginAction(data: LoginSchemaValues) {
     if (!user) {
       return {
         success: false,
-        message: "No account found with this email.",
+        message: "No account found with this EmployeeID.",
       };
     }
 

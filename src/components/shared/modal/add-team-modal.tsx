@@ -56,29 +56,32 @@ export default function AddTeamModal({
 
   function onSubmit(values: TeamSchemaType) {
     startTransition(async () => {
-      createTeamAction(values).then((res) => {
-        if (!res.success) {
-          toast.error(res.message);
-          return;
-        }
-        toast.success(res.message);
-        form.reset({
-          name: "",
-          serviceId: "",
-        });
-        setOpen(false);
-      });
+      const res = await createTeamAction(values);
+      if (!res.success) {
+        toast.error(res.message);
+        return;
+      }
+      toast.success(res.message);
+      form.reset({ name: "", serviceId });
+      setOpen(false);
     });
   }
 
   useEffect(() => {
-    if (open && initialData) {
-      form.reset({
-        name: initialData.name,
-        serviceId: initialData.id,
-      });
+    if (open) {
+      if (initialData) {
+        form.reset({
+          name: initialData.name,
+          serviceId: serviceId, // ✅ use correct field
+        });
+      } else {
+        form.reset({
+          name: "",
+          serviceId: serviceId, // ✅ restore passed serviceId
+        });
+      }
     }
-  }, [open, initialData, form]);
+  }, [open, initialData, serviceId, form]);
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>

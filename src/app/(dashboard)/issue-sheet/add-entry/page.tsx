@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,6 +11,7 @@ import prisma from "@/lib/prisma";
 import { MoveLeft } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
 const AddIssueForm = dynamic(
   () => import("@/components/forms/issue-sheet/add-issue-form"),
   {
@@ -18,9 +20,24 @@ const AddIssueForm = dynamic(
 );
 
 const Page = async () => {
+  const cu = await auth();
+
+  if (!cu || !cu.user) redirect("/login");
+  const department = await prisma.department.findUnique({
+    where: {
+      name: "Operation",
+    },
+  });
+
+  if (!department) notFound();
+
   const [profiles, services] = await prisma.$transaction([
     prisma.profile.findMany(),
-    prisma.services.findMany(), // Note: fixed from 'services' to 'service'
+    prisma.services.findMany({
+      where: {
+        departmentId: department?.id,
+      },
+    }), // Note: fixed from 'services' to 'service'
   ]);
   return (
     <Card>
@@ -42,7 +59,11 @@ const Page = async () => {
         </div>
       </CardHeader>
       <CardContent>
-        <AddIssueForm profiles={profiles} services={services} />
+        <AddIssueForm
+          profiles={profiles}
+          services={services}
+          currentUserRole={cu.user.role}
+        />
       </CardContent>
     </Card>
   );

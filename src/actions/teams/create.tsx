@@ -17,67 +17,52 @@ export async function createTeamAction(data: TeamSchemaType) {
   try {
     const session = await auth();
 
-    // Authentication check
-    if (!session || !session.user) {
-      return {
-        success: false,
-        message: "You must be logged in to perform this action.",
-      };
+    if (!session?.user) {
+      return { success: false, message: "You must be logged in to continue." };
     }
 
-    // Authorization check
     if (!allowedRoles.includes(session.user.role as Role)) {
       return {
         success: false,
-        message: "You don't have permission to create a team.",
+        message: "You don’t have permission to create teams.",
       };
     }
 
-    // Data validation
-    const parsedData = teamSchema.safeParse(data);
-    if (!parsedData.success) {
-      return {
-        success: false,
-        message: parsedData.error.message || "Invalid input.",
-      };
+    const parsed = teamSchema.safeParse(data);
+    if (!parsed.success) {
+      const firstError = parsed.error.message || "Invalid input.";
+      return { success: false, message: firstError };
     }
 
-    // Check if team already exists under same service
+    const { name, serviceId } = parsed.data;
+
     const exist = await prisma.team.findFirst({
-      where: {
-        name: parsedData.data.name,
-        serviceId: parsedData.data.serviceId,
-      },
+      where: { name, serviceId },
     });
 
     if (exist) {
       return {
         success: false,
-        message:
-          "A team with this name already exists for the selected service.",
+        message: "A team with this name already exists for this service.",
       };
     }
 
-    // Create team
     const newTeam = await prisma.team.create({
-      data: {
-        name: parsedData.data.name,
-        serviceId: parsedData.data.serviceId,
-      },
+      data: { name, serviceId },
     });
 
-    revalidatePath(`/teams/manage-teams/${newTeam.serviceId}`);
+    revalidatePath(`/teams/manage-teams/${serviceId}`);
 
     return {
       success: true,
-      message: "Team created successfully.",
+      message: `Team “${name}” was created successfully.`,
       data: newTeam,
     };
   } catch (error) {
     console.error("createTeamAction error:", error);
     return {
       success: false,
-      message: "Something went wrong while creating the team.",
+      message: "We couldn’t create the team. Please try again later.",
     };
   }
 }
