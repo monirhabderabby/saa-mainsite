@@ -17,8 +17,9 @@ const DeliveryInQue = async () => {
       title="Delivery in Queue"
       value={deliveryInQue}
       subtitle="Messages awaiting for delivery"
-      icon={<Clock className="h-4 w-4 text-primary-yellow" />}
+      icon={<Clock className="h-4 w-4 text-chart-1" />}
       trend={{ value: 5.3, isPositive: false }}
+      valueClassName="text-chart-1"
     />
   );
 };

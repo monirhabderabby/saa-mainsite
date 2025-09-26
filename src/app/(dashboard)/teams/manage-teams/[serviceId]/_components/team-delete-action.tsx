@@ -11,9 +11,10 @@ const AlertModal = dynamic(() => import("@/components/ui/custom/alert-modal"), {
 
 interface Props {
   teamId: string;
+  onClose?: () => void;
 }
 
-const TeamDeleteAction = ({ teamId }: Props) => {
+const TeamDeleteAction = ({ teamId, onClose }: Props) => {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
 
@@ -27,13 +28,14 @@ const TeamDeleteAction = ({ teamId }: Props) => {
 
         toast.success(res.message);
         setOpen(false);
+        onClose?.();
       });
     });
   };
   return (
     <div>
       <Button
-        variant="outline"
+        variant="ghost"
         size="sm"
         className="text-red-500 hover:text-red-600 hover:bg-red-50/50"
         onClick={() => setOpen(true)}

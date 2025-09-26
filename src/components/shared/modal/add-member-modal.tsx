@@ -31,6 +31,7 @@ interface AddMemberModalProps {
   teamName: string;
   users: User[]; // from backend
   trigger?: React.ReactNode;
+  onClose?: () => void;
 }
 
 export default function AddMemberModal({
@@ -38,6 +39,7 @@ export default function AddMemberModal({
   teamName,
   users,
   trigger,
+  onClose,
 }: AddMemberModalProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, startTransition] = useTransition();
@@ -64,6 +66,7 @@ export default function AddMemberModal({
           members: [],
         });
         setOpen(false);
+        onClose?.();
       });
     });
   };
@@ -72,7 +75,7 @@ export default function AddMemberModal({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger || (
-          <Button variant="outline" size="sm">
+          <Button variant="ghost" size="sm">
             <UserPlus className="w-4 h-4 mr-2" />
             Add Member
           </Button>
