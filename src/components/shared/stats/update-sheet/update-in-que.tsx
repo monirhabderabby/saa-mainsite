@@ -9,6 +9,9 @@ const UpdateInQue = async () => {
         not: null,
       },
       doneById: null,
+      updateTo: {
+        not: "DELIVERY",
+      },
     },
   });
 
