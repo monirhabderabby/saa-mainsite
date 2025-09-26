@@ -11,6 +11,8 @@ export async function checkNickNameAction(nickName: string) {
     where: { nickName },
   });
 
+  console.log("calling...");
+
   if (exists) {
     return { success: false, message: "This nickname is already taken" };
   }

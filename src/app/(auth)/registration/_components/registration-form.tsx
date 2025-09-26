@@ -34,10 +34,10 @@ import {
 } from "@/schemas/auth/registration";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Department, Designations, Role, Services } from "@prisma/client";
-import { Loader2, MoveLeft } from "lucide-react";
+import { Check, Loader2, MoveLeft, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -61,12 +61,17 @@ export default function RegistrationForm({
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"form" | "success">("form");
   const [pending, startTransition] = useTransition();
+  const [nickNameStatus, setNickNameStatus] = useState<
+    "idle" | "validating" | "success" | "error"
+  >("idle");
   const form = useForm<RegistrationSchemaValues>({
     resolver: zodResolver(registrationSchema),
     defaultValues: {
       serviceId: "",
     },
   });
+
+  const nickNameValue = form.watch("nickName");
 
   function onSubmit(values: RegistrationSchemaValues) {
     startTransition(() => {
@@ -99,6 +104,30 @@ export default function RegistrationForm({
   // 👇 decide which roles to show
   const filteredService =
     services.filter((d) => d.departmentId === selectedDepartment) || undefined;
+
+  useEffect(() => {
+    if (!nickNameValue) {
+      setNickNameStatus("idle");
+      form.clearErrors("nickName");
+      return;
+    }
+
+    setNickNameStatus("validating");
+
+    const handler = setTimeout(async () => {
+      const res = await checkNickNameAction(nickNameValue);
+
+      if (!res.success) {
+        setNickNameStatus("error");
+        form.setError("nickName", { message: res.message });
+      } else {
+        setNickNameStatus("success");
+        form.clearErrors("nickName");
+      }
+    }, 800); // 500ms debounce
+
+    return () => clearTimeout(handler);
+  }, [nickNameValue, form]);
 
   return (
     <Card>
@@ -151,30 +180,42 @@ export default function RegistrationForm({
                         <FormItem>
                           <FormLabel>User Name</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder="ex: Monir[Dev-X]"
-                              type="text"
-                              {...field}
-                              disabled={pending}
-                              onChange={(e) => {
-                                form.clearErrors("nickName");
-                                field.onChange(e);
-                              }}
-                              onBlur={async (e) => {
-                                field.onBlur(); // keep react-hook-form happy
-                                const value = e.target.value;
-                                if (value) {
-                                  const res = await checkNickNameAction(value);
-                                  if (!res.success) {
-                                    form.setError("nickName", {
-                                      message: res.message,
-                                    });
-                                  } else {
-                                    form.clearErrors("nickName");
-                                  }
-                                }
-                              }}
-                            />
+                            <div className="relative">
+                              <Input
+                                placeholder="ex: Monir[Dev-X]"
+                                type="text"
+                                {...field}
+                                value={field.value}
+                                onChange={(e) => {
+                                  field.onChange(e);
+                                  setNickNameStatus("idle"); // reset icon while typing
+                                  form.clearErrors("nickName");
+                                }}
+                              />
+
+                              {/* status icons */}
+                              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                {nickNameStatus === "validating" && (
+                                  <Loader2
+                                    className="text-primary animate-spin"
+                                    size={18}
+                                  />
+                                )}
+                                {nickNameStatus === "success" && (
+                                  <div className="bg-green-100 border-[1px] border-green-600/30 rounded-full p-1">
+                                    <Check
+                                      className="text-green-600"
+                                      size={16}
+                                    />
+                                  </div>
+                                )}
+                                {nickNameStatus === "error" && (
+                                  <div className="bg-red-100 rounded-full p-1">
+                                    <X className="text-red-600" size={16} />
+                                  </div>
+                                )}
+                              </div>
+                            </div>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
