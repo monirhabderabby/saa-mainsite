@@ -57,7 +57,6 @@ const EmployeeAction = ({ data, currentUserRole }: Props) => {
             </Button>
           }
           user={data}
-          onClose={() => setOpen(false)}
         />
 
         {isSuperAdmin && (
