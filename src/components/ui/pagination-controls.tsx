@@ -70,9 +70,10 @@ export function PaginationControls({
             href="#"
             onClick={(e) => {
               e.preventDefault();
-              handleChange(currentPage - 1);
+              if (currentPage > 1) handleChange(currentPage - 1);
             }}
             aria-disabled={currentPage === 1}
+            className={currentPage === 1 ? "cursor-not-allowed opacity-50" : ""}
           />
         </PaginationItem>
 
@@ -86,7 +87,7 @@ export function PaginationControls({
                 isActive={page === currentPage}
                 onClick={(e) => {
                   e.preventDefault();
-                  handleChange(page);
+                  handleChange(page as number);
                 }}
                 className="text-primary hover:text-primary/80"
               >
@@ -101,9 +102,14 @@ export function PaginationControls({
             href="#"
             onClick={(e) => {
               e.preventDefault();
-              handleChange(currentPage + 1);
+              if (currentPage < totalPages) handleChange(currentPage + 1);
             }}
             aria-disabled={currentPage === totalPages}
+            className={
+              currentPage === totalPages
+                ? "cursor-not-allowed opacity-50 hover:bg-white"
+                : ""
+            }
           />
         </PaginationItem>
       </PaginationContent>
