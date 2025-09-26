@@ -1,10 +1,10 @@
+import IssuesOpen from "@/components/shared/stats/issue-sheet/issue-open";
+import IssuesWip from "@/components/shared/stats/issue-sheet/issue-wip";
+import DeliveryInQue from "@/components/shared/stats/update-sheet/delivery-in-que";
+import UpdateInQue from "@/components/shared/stats/update-sheet/update-in-que";
 import { Suspense } from "react";
-import DeliveryInQue from "./_components/delivery-in-que";
 import IssuesDoneToday from "./_components/issue-done-today";
-import IssuesOpen from "./_components/issue-open";
-import IssuesWip from "./_components/issue-wip";
 import TotalEmployees from "./_components/total-employees";
-import UpdateInQue from "./_components/update-in-que";
 
 function CardSkeleton() {
   return (

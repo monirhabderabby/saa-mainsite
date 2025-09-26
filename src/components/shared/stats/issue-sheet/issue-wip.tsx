@@ -13,6 +13,7 @@ const IssuesWip = async () => {
       subtitle="Work in progress"
       icon={<Clock className="h-4 w-4 text-primary-yellow" />}
       trend={{ value: 5.3, isPositive: false }}
+      valueClassName="text-primary-yellow"
     />
   );
 };

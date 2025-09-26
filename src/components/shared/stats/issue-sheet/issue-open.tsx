@@ -11,8 +11,9 @@ const IssuesOpen = async () => {
       title="Issues Open"
       value={totalIssueOpen}
       subtitle="Pending resolution"
-      icon={<AlertCircle className="h-4 w-4 text-primary-yellow" />}
+      icon={<AlertCircle className="h-4 w-4 text-[#F4A162]" />}
       trend={{ value: -12.5, isPositive: true }}
+      valueClassName="text-[#F4A162]"
     />
   );
 };

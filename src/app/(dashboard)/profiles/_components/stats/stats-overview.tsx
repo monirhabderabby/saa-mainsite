@@ -1,8 +1,9 @@
-import DeliveryInQue from "@/app/(dashboard)/_components/super-admin-overview/_components/delivery-in-que";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle, Wrench } from "lucide-react";
+import IssuesOpen from "@/components/shared/stats/issue-sheet/issue-open";
+import IssuesWip from "@/components/shared/stats/issue-sheet/issue-wip";
+import TotalProfile from "@/components/shared/stats/profiles/total-profile";
+import DeliveryInQue from "@/components/shared/stats/update-sheet/delivery-in-que";
+import UpdateInQue from "@/components/shared/stats/update-sheet/update-in-que";
 import { Suspense } from "react";
-import TotalProfile from "./total-profile";
 
 function CardSkeleton() {
   return (
@@ -17,46 +18,20 @@ const ProfileStatsoverview = () => {
         <TotalProfile />
       </Suspense>
 
-      <DeliveryInQue />
+      <Suspense fallback={<CardSkeleton />}>
+        <DeliveryInQue />
+      </Suspense>
+      <Suspense fallback={<CardSkeleton />}>
+        <UpdateInQue />
+      </Suspense>
 
-      <Card className="bg-card border-border">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-card-foreground">
-            Update Queue
-          </CardTitle>
-          <Wrench className="h-4 w-4 text-chart-2" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold text-chart-2">{62}</div>
-          <p className="text-xs text-muted-foreground">Pending updates</p>
-        </CardContent>
-      </Card>
+      <Suspense fallback={<CardSkeleton />}>
+        <IssuesOpen />
+      </Suspense>
 
-      <Card className="bg-card border-border">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-card-foreground">
-            Issues Open
-          </CardTitle>
-          <AlertCircle className="h-4 w-4 text-chart-5" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold text-chart-5">{585}</div>
-          <p className="text-xs text-muted-foreground">Open issues</p>
-        </CardContent>
-      </Card>
-
-      <Card className="bg-card border-border">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-card-foreground">
-            Issues WIP
-          </CardTitle>
-          <Wrench className="h-4 w-4 text-chart-3" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold text-chart-3">{365}</div>
-          <p className="text-xs text-muted-foreground">Work in progress</p>
-        </CardContent>
-      </Card>
+      <Suspense>
+        <IssuesWip />
+      </Suspense>
     </div>
   );
 };

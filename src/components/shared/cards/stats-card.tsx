@@ -13,6 +13,7 @@ interface StatsCardProps {
     isPositive: boolean;
   };
   className?: string;
+  valueClassName?: string;
 }
 
 export default function StatsCard({
@@ -21,6 +22,7 @@ export default function StatsCard({
   subtitle,
   icon,
   className,
+  valueClassName,
 }: StatsCardProps) {
   return (
     <MotionProvider>
@@ -31,17 +33,18 @@ export default function StatsCard({
         )}
       >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
+          <CardTitle className="text-sm font-medium text-primary dark:text-white">
             {title}
           </CardTitle>
-          {icon && (
-            <div className="dark:bg-primary-green/20 bg-gray-50 p-3 rounded-lg">
-              {icon}
-            </div>
-          )}
+          {icon && <div className=" p-3 rounded-lg">{icon}</div>}
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-foreground text-primary-yellow">
+          <div
+            className={cn(
+              "text-2xl font-bold text-foreground text-primary-yellow",
+              valueClassName
+            )}
+          >
             {value}
           </div>
           {subtitle && (
