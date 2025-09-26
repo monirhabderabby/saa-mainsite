@@ -46,7 +46,7 @@ const ProfileCardAction = ({ data }: Props) => {
     <>
       <DropdownMenu open={dropdownMenu} onOpenChange={setDropdownMenu}>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline">
+          <Button variant="outline" size="icon">
             <EllipsisVertical />
           </Button>
         </DropdownMenuTrigger>

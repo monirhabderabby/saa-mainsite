@@ -21,10 +21,12 @@ const Page = async () => {
   // Map counts manually since MongoDB doesn't support `_count`
   const profilesWithStats = profiles.map((p) => {
     const deliveryCount = p.updateSheets.filter(
-      (u) => u.updateTo === "DELIVERY"
+      (u) => u.updateTo === "DELIVERY" && u.tlId && !u.doneById
     ).length;
 
-    const updatesCount = p.updateSheets.length;
+    const updatesCount = p.updateSheets.filter(
+      (p) => !p.doneById && p.updateTo !== "DELIVERY"
+    ).length;
     const issuesCount = p.issueSheets.length;
     const wipCount = p.issueSheets.filter((i) => i.status === "wip").length;
 

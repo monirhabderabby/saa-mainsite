@@ -7,7 +7,7 @@ import { Suspense } from "react";
 
 function CardSkeleton() {
   return (
-    <div className="h-[152px] w-full rounded-2xl shadow animate-pulse bg-white border-border" />
+    <div className="h-[152px] w-full rounded-2xl shadow animate-pulse bg-white dark:bg-white/10 border-border" />
   );
 }
 
@@ -29,7 +29,7 @@ const ProfileStatsoverview = () => {
         <IssuesOpen />
       </Suspense>
 
-      <Suspense>
+      <Suspense fallback={<CardSkeleton />}>
         <IssuesWip />
       </Suspense>
     </div>
