@@ -7,9 +7,8 @@ import {
 import { UserWithAllIncludes } from "@/types/user";
 import { Role } from "@prisma/client";
 import { Eye, MoreHorizontal, Shield, ShieldCheck } from "lucide-react";
-import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
-import { useMemo } from "react";
+import { useState } from "react";
 const AccountStatusModal = dynamic(
   () => import("../modals/add-account-status-modal"),
   {
@@ -33,20 +32,13 @@ interface Props {
   currentUserRole: Role;
 }
 
-const EmployeeAction = ({ data }: Props) => {
-  const { data: session, status } = useSession();
-
+const EmployeeAction = ({ data, currentUserRole }: Props) => {
+  const [open, setOpen] = useState(false);
   // Determine if current user is super admin
-  const isSuperAdmin = useMemo(
-    () => session?.user?.role === "SUPER_ADMIN",
-    [session]
-  );
-
-  // Loading state: don't render actions until session is known
-  if (status === "loading") return null;
+  const isSuperAdmin = currentUserRole || false;
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon">
           <MoreHorizontal className="w-4 h-4" />
@@ -64,6 +56,7 @@ const EmployeeAction = ({ data }: Props) => {
             </Button>
           }
           user={data}
+          onClose={() => setOpen(false)}
         />
 
         {isSuperAdmin && (
@@ -80,6 +73,7 @@ const EmployeeAction = ({ data }: Props) => {
             currentRole={data.role}
             userId={data.id}
             userName={data.fullName!}
+            onClose={() => setOpen(false)}
           />
         )}
 
@@ -94,6 +88,7 @@ const EmployeeAction = ({ data }: Props) => {
               Change Status
             </Button>
           }
+          onClose={() => setOpen(false)}
         />
       </DropdownMenuContent>
     </DropdownMenu>

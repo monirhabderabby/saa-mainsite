@@ -70,7 +70,7 @@ const UserTableContainer = ({ currentUserRole }: Props) => {
     <SkeletonWrapper isLoading={isLoading}>
       <Table
         columns={getEmployeeColumns({ currentUserRole })}
-        data={data?.data ?? []}
+        data={data?.data ? [...data.data] : []} // ✅ create a new array
         totalPages={data?.pagination?.totalPages ?? 1}
       />
     </SkeletonWrapper>

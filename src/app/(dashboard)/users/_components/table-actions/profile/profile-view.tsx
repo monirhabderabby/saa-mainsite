@@ -18,9 +18,14 @@ import { PermissionSwitch } from "./permission-switch";
 interface ProfileViewProps {
   trigger: ReactNode;
   user: UserWithAllIncludes;
+  onClose?: () => void;
 }
 
-export default function ProfileView({ trigger, user }: ProfileViewProps) {
+export default function ProfileView({
+  trigger,
+  user,
+  onClose,
+}: ProfileViewProps) {
   const [open, setOpen] = useState(false);
   const getInitials = (name: string) => {
     return name
@@ -32,7 +37,13 @@ export default function ProfileView({ trigger, user }: ProfileViewProps) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(val) => {
+        setOpen(val);
+        onClose?.();
+      }}
+    >
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="">
         <DialogHeader>

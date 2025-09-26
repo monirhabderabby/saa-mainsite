@@ -21,7 +21,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useUserFilterStore } from "@/zustand/users";
 import { Role } from "@prisma/client";
+import { useQueryClient } from "@tanstack/react-query";
 import { Loader, Shield, UserCog } from "lucide-react";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -49,6 +51,7 @@ interface RoleChangeModalProps {
   userName: string;
   currentRole: Role;
   trigger?: React.ReactNode;
+  onClose?: () => void;
 }
 
 export default function AddRoleChangeModal({
@@ -56,9 +59,23 @@ export default function AddRoleChangeModal({
   userName,
   currentRole,
   trigger,
+  onClose,
 }: RoleChangeModalProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, startTransition] = useTransition();
+
+  // Get current filters from Zustand
+  const {
+    page,
+    searchQuery,
+    serviceId,
+    accountStatus,
+    role,
+    departmentId,
+    teamId,
+  } = useUserFilterStore();
+
+  const queryClient = useQueryClient(); // 👈 create queryClient instance
 
   const form = useForm<RoleChangeSchemaType>({
     resolver: zodResolver(roleChangeSchema),
@@ -79,6 +96,22 @@ export default function AddRoleChangeModal({
         toast.success(res.message);
         form.reset({ userId, updatedRole: values.updatedRole });
         setOpen(false);
+        onClose?.();
+        // 👇 revalidate table query
+        // ✅ Revalidate ONLY the current query with filters
+        queryClient.invalidateQueries({
+          queryKey: [
+            "users",
+            page ?? "",
+            searchQuery ?? "",
+            serviceId ?? "",
+            accountStatus ?? "All",
+            role ?? "",
+            departmentId ?? "",
+            teamId ?? "",
+          ],
+          exact: true,
+        });
       });
     });
   };
@@ -109,10 +142,7 @@ export default function AddRoleChangeModal({
               name="updatedRole"
               render={({ field }) => (
                 <FormItem>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select new role" />
@@ -137,7 +167,10 @@ export default function AddRoleChangeModal({
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setOpen(false)}
+                onClick={() => {
+                  setOpen(false);
+                  onClose?.();
+                }}
               >
                 Cancel
               </Button>
