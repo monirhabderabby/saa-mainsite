@@ -8,6 +8,14 @@ import { AddManagerAction } from "@/actions/services/add-manager";
 import { editManagerAction } from "@/actions/services/edit-manager";
 import { Button } from "@/components/ui/button";
 import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -22,15 +30,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import { addManagerSchema, AddManagerSchemaType } from "@/schemas/services";
 import { Prisma } from "@prisma/client";
-import { Loader, Plus, UserPlus } from "lucide-react";
+import { Check, ChevronsUpDown, Loader, Plus, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
 type UserTypes = Prisma.UserGetPayload<{
@@ -135,24 +142,62 @@ export default function AddServiceManagerModal({
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      defaultValue={field.value}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a manager" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {users.map((user) => (
-                          <SelectItem value={user.id} key={user.id}>
-                            <div className="flex justify-between w-full">
-                              {`${user.fullName} (${user.employeeId})`}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className="w-full justify-between"
+                        >
+                          {field.value
+                            ? (() => {
+                                const selected = users.find(
+                                  (u) => u.id === field.value
+                                );
+                                return selected
+                                  ? `${selected.fullName} (${selected.employeeId})`
+                                  : "Select a manager";
+                              })()
+                            : "Select a manager"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+
+                      <PopoverContent className="w-full p-0">
+                        <Command>
+                          <CommandInput placeholder="Type name or employee id..." />
+                          {/* Constrain the list height and allow scrolling */}
+                          <CommandList
+                            className="max-h-60 overflow-y-auto"
+                            onWheel={(e) => e.stopPropagation()} // prevent parent scrolling
+                            style={{ WebkitOverflowScrolling: "touch" }} // iOS momentum scrolling
+                          >
+                            <CommandEmpty>No manager found.</CommandEmpty>
+                            <CommandGroup>
+                              {users.map((user) => (
+                                <CommandItem
+                                  key={user.id}
+                                  value={user.id}
+                                  onSelect={() => {
+                                    field.onChange(user.id);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      user.id === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {user.fullName} ({user.employeeId})
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -8,9 +8,9 @@ const Page = async () => {
   const department = await prisma.department.findMany();
 
   return (
-    <div className="grid grid-cols-12 gap-10">
+    <div className="grid grid-cols-2 gap-10">
       {department.map((item) => (
-        <Card className="max-w-md col-span-4" key={item.id}>
+        <Card className="" key={item.id}>
           <CardHeader>
             <div className="h-[300px] w-full  relative rounded-lg">
               <Image
