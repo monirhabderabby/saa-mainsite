@@ -50,6 +50,7 @@ const EmployeeAction = ({ data, currentUserRole }: Props) => {
             <Button
               variant="ghost"
               className="justify-start w-full gap-2" // <-- key
+              onClick={() => setOpen(true)}
             >
               <Eye className="w-4 h-4" />
               View Profile

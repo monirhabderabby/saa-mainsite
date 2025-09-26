@@ -25,7 +25,7 @@ const Page = async () => {
     ).length;
 
     const updatesCount = p.updateSheets.filter(
-      (p) => !p.doneById && p.updateTo !== "DELIVERY"
+      (p) => !p.doneById && p.tlId && p.updateTo !== "DELIVERY"
     ).length;
     const issuesCount = p.issueSheets.length;
     const wipCount = p.issueSheets.filter((i) => i.status === "wip").length;
