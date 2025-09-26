@@ -44,7 +44,6 @@ export default async function ServiTeaceCard({ service }: ServiceCardProps) {
           },
         },
       },
-      serviceId: service.id,
     },
   });
 

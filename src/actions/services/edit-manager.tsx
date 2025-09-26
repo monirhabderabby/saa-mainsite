@@ -63,21 +63,6 @@ export async function editManagerAction(data: AddManagerSchemaType) {
       };
     }
 
-    // 3. Check if user is already a manager of another service
-    const alreadyManager = await prisma.services.findFirst({
-      where: {
-        serviceManagerId,
-        NOT: { id: serviceId }, // allow if they’re already managing THIS service
-      },
-    });
-
-    if (alreadyManager) {
-      return {
-        success: false,
-        message: "This user is already managing another service.",
-      };
-    }
-
     // 4. Update the manager of the service
     await prisma.services.update({
       where: { id: serviceId },
@@ -88,6 +73,7 @@ export async function editManagerAction(data: AddManagerSchemaType) {
 
     // ✅ Revalidate path
     revalidatePath(`/teams`);
+    revalidatePath(`/teams/${serviceId}`);
 
     return {
       success: true,
