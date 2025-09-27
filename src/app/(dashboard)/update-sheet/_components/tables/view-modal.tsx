@@ -103,6 +103,21 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
                 </span>
               </p> */}
 
+              {data.attachments && (
+                <div className="text-sm">
+                  <span className="font-semibold">Attachments: </span>
+                  <Button asChild variant="link" effect="shine">
+                    <a
+                      href={data.attachments as string}
+                      className="hover:text-blue-500 transition-colors duration-300 "
+                      target="_blank"
+                    >
+                      {data.attachments?.slice(0, 40)}...
+                    </a>
+                  </Button>
+                </div>
+              )}
+
               {data.doneBy && (
                 <ClipboardCopy
                   label="Done By"
@@ -110,12 +125,14 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
                 />
               )}
             </div>
-            <p className="">
-              {/* <span className="font-semibold">Update To: </span> */}
-              <span className="text-muted-foreground">
-                <UpdateToBadge updateTo={data.updateTo} />
-              </span>
-            </p>
+            <div className="flex flex-col justify-between">
+              <p className="">
+                {/* <span className="font-semibold">Update To: </span> */}
+                <span className="text-muted-foreground">
+                  <UpdateToBadge updateTo={data.updateTo} />
+                </span>
+              </p>
+            </div>
           </div>
 
           <div className="bg-gray-100 dark:bg-white/5 p-[20px] rounded-[8px] relative mt-5">
@@ -162,6 +179,7 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
 
         <AlertDialogFooter className="px-5 pb-5">
           <AlertDialogCancel>Close</AlertDialogCancel>
+
           {data.doneById ? (
             <Button disabled variant="outline">
               Sent ✅

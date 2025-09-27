@@ -59,7 +59,7 @@ const Page = async () => {
         </div>
       </CardHeader>
       <CardContent>
-        <TableContainer />
+        <TableContainer currentUserRole={cu.user.role} />
       </CardContent>
     </Card>
   );

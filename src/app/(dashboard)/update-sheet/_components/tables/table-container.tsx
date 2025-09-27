@@ -8,6 +8,7 @@ import {
   UpdateSheetData,
 } from "@/helper/update-sheet/update-sheet";
 import { useUpdateSheetFilterState } from "@/zustand/update-sheet";
+import { Role } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import {
   ColumnDef,
@@ -18,7 +19,11 @@ import {
 import { AlertTriangle } from "lucide-react";
 import { updateSheetColumns } from "./update-sheet-columns";
 
-const TableContainer = () => {
+interface Props {
+  currentUserRole: Role;
+}
+
+const TableContainer = ({ currentUserRole }: Props) => {
   let {
     page,
     profileId,
@@ -80,7 +85,7 @@ const TableContainer = () => {
   return (
     <SkeletonWrapper isLoading={isLoading}>
       <Table
-        columns={updateSheetColumns}
+        columns={updateSheetColumns({ currentUserRole })}
         data={data?.data ?? []}
         totalPages={data?.pagination?.totalPages ?? 1}
       />
