@@ -35,8 +35,6 @@ const TlCheckComponent = ({
 
   const queryClient = useQueryClient();
 
-  console.log(isChecked);
-
   const onChange = () => {
     const previousState = isChecked;
     setIsChecked((p) => !p);
@@ -64,17 +62,17 @@ const TlCheckComponent = ({
   // 2. admins
   const isAdmins = adminRoles.includes(currentUserRole);
 
-  // 3. team leader of creator’s team
-  const isTeamLeader =
+  // 3. team leader under same service line
+  const isServiceLineTeamLeader =
     currentUserTeam?.responsibility === "Leader" &&
-    currentUserTeam.team.id === data.updateBy?.userTeams?.[0]?.teamId;
+    currentUserTeam.team.serviceId === data.updateBy?.serviceId;
 
   // 4. service manager of creator’s service
   const isServiceManager =
     data.updateBy.service?.serviceManagerId === currentUserId;
 
   const canCheck =
-    (isCreator || isAdmins || isTeamLeader || isServiceManager) &&
+    (isCreator || isAdmins || isServiceLineTeamLeader || isServiceManager) &&
     !data.doneById;
 
   return (
@@ -93,7 +91,9 @@ const TlCheckComponent = ({
           joiningDate={data.tlCheckAt}
           designation={data.tlBy?.designation.name ?? ""}
         />
-      ) : null}
+      ) : (
+        "N/A"
+      )}
     </div>
   );
 };
