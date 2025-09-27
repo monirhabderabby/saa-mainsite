@@ -7,6 +7,7 @@ import moment from "moment";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import DoneByComponent from "./done-by-component";
+import { CurrentUserTeam } from "./table-container";
 import TlCheckComponent from "./tl-check-component";
 import UpdateToComponents from "./update-to";
 import UpdatedByComponents from "./updated-by-component";
@@ -22,8 +23,14 @@ const CenteredHeader = (title: string) => {
 
 interface Props {
   currentUserRole: Role;
+  currentUserId: string;
+  currentUserTeam?: CurrentUserTeam | null;
 }
-export const updateSheetColumns = ({}: Props): ColumnDef<UpdateSheetData>[] => [
+export const updateSheetColumns = ({
+  currentUserId,
+  currentUserRole,
+  currentUserTeam,
+}: Props): ColumnDef<UpdateSheetData>[] => [
   {
     header: "Date",
     cell: ({ row }) => {
@@ -87,7 +94,14 @@ export const updateSheetColumns = ({}: Props): ColumnDef<UpdateSheetData>[] => [
   {
     accessorKey: "tlId",
     header: () => <p className="text-center">Tl Check</p>,
-    cell: ({ row }) => <TlCheckComponent data={row.original} />,
+    cell: ({ row }) => (
+      <TlCheckComponent
+        data={row.original}
+        currentUserId={currentUserId}
+        currentUserRole={currentUserRole}
+        currentUserTeam={currentUserTeam}
+      />
+    ),
   },
   {
     accessorKey: "updateTo",

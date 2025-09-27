@@ -96,7 +96,7 @@ export async function tlCheck(id: string) {
   }
 
   // Step 8: Toggle TL check
-  const isAlreadyChecked = entry.tlId === user.id;
+  const isAlreadyChecked = entry.tlId;
   const updated = await prisma.updateSheet.update({
     where: { id },
     data: {

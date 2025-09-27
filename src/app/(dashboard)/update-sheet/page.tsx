@@ -34,6 +34,18 @@ const Page = async () => {
   });
 
   const isWriteAccess = permission?.isMessageCreateAllowed ?? false;
+  const currentUsers = await prisma.userTeam.findFirst({
+    where: {
+      userId: cu.user.id,
+    },
+    include: {
+      team: {
+        include: {
+          service: true,
+        },
+      },
+    },
+  });
 
   return (
     <Card className="shadow-none ">
@@ -59,7 +71,11 @@ const Page = async () => {
         </div>
       </CardHeader>
       <CardContent>
-        <TableContainer currentUserRole={cu.user.role} />
+        <TableContainer
+          currentUserRole={cu.user.role}
+          currentUserId={cu.user.id}
+          currentUserTeam={currentUsers}
+        />
       </CardContent>
     </Card>
   );

@@ -8,7 +8,7 @@ import {
   UpdateSheetData,
 } from "@/helper/update-sheet/update-sheet";
 import { useUpdateSheetFilterState } from "@/zustand/update-sheet";
-import { Role } from "@prisma/client";
+import { Prisma, Role } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import {
   ColumnDef,
@@ -19,11 +19,27 @@ import {
 import { AlertTriangle } from "lucide-react";
 import { updateSheetColumns } from "./update-sheet-columns";
 
+export type CurrentUserTeam = Prisma.UserTeamGetPayload<{
+  include: {
+    team: {
+      include: {
+        service: true;
+      };
+    };
+  };
+}>;
+
 interface Props {
   currentUserRole: Role;
+  currentUserId: string;
+  currentUserTeam?: CurrentUserTeam | null;
 }
 
-const TableContainer = ({ currentUserRole }: Props) => {
+const TableContainer = ({
+  currentUserRole,
+  currentUserId,
+  currentUserTeam,
+}: Props) => {
   let {
     page,
     profileId,
@@ -85,7 +101,11 @@ const TableContainer = ({ currentUserRole }: Props) => {
   return (
     <SkeletonWrapper isLoading={isLoading}>
       <Table
-        columns={updateSheetColumns({ currentUserRole })}
+        columns={updateSheetColumns({
+          currentUserRole,
+          currentUserId,
+          currentUserTeam,
+        })}
         data={data?.data ?? []}
         totalPages={data?.pagination?.totalPages ?? 1}
       />
