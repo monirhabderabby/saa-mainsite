@@ -10,7 +10,7 @@ const ALLOWED_ROLES: Role[] = ["SUPER_ADMIN", "ADMIN"];
  * TL Check for an update sheet entry.
  *
  * Allowed if:
- * - Logged-in user is a Leader in the same team as the entry creator
+ * - Logged-in user is a Leader in the same service line as the entry creator
  * - Logged-in user is the Service Manager of the entry creator's service
  * - Logged-in user is Admin / Super Admin
  */
@@ -26,7 +26,7 @@ export async function tlCheck(id: string) {
 
   const { user } = session;
 
-  // Step 2: Fetch entry with creator info + their service + their team
+  // Step 2: Fetch entry with creator info + their service
   const entry = await prisma.updateSheet.findUnique({
     where: { id },
     select: {
@@ -36,8 +36,8 @@ export async function tlCheck(id: string) {
       updateBy: {
         select: {
           id: true,
-          service: { select: { serviceManagerId: true } },
-          userTeams: { select: { teamId: true } }, // entry creator’s team(s)
+          serviceId: true,
+          service: { select: { id: true, serviceManagerId: true } },
         },
       },
     },
@@ -50,12 +50,17 @@ export async function tlCheck(id: string) {
     };
   }
 
-  // Step 3: Fetch logged-in user role + team(s)
+  // Step 3: Fetch logged-in user role + teams with service
   const currentUser = await prisma.user.findUnique({
     where: { id: user.id },
     select: {
       role: true,
-      userTeams: { select: { teamId: true, responsibility: true } },
+      userTeams: {
+        select: {
+          responsibility: true,
+          team: { select: { serviceId: true } },
+        },
+      },
     },
   });
 
@@ -66,10 +71,11 @@ export async function tlCheck(id: string) {
     };
   }
 
-  // Step 4: Check if current user is leader of the same team as entry creator
-  const creatorTeamIds = entry.updateBy.userTeams.map((t) => t.teamId);
-  const isSameTeamLeader = currentUser.userTeams.some(
-    (ut) => creatorTeamIds.includes(ut.teamId) && ut.responsibility === "Leader"
+  // Step 4: Check if current user is Leader under the same service line
+  const isServiceLineTeamLeader = currentUser.userTeams.some(
+    (ut) =>
+      ut.responsibility === "Leader" &&
+      ut.team.serviceId === entry.updateBy.serviceId
   );
 
   // Step 5: Check if current user is Service Manager of entry creator’s service
@@ -84,14 +90,15 @@ export async function tlCheck(id: string) {
     select: { isMessageTLCheckAllowed: true },
   });
 
-  if (
-    (!isSameTeamLeader && !isServiceManager && !isAdmin) ||
-    !userPermission?.isMessageTLCheckAllowed
-  ) {
+  const canPerform =
+    (isServiceLineTeamLeader || isServiceManager || isAdmin) &&
+    userPermission?.isMessageTLCheckAllowed === true;
+
+  if (!canPerform) {
     return {
       success: false,
       message:
-        "You are not allowed to perform TL Check. Only the same team Leader, the Service Manager of this service, or an Admin can do this.",
+        "Access denied. Insufficient permissions to perform this operation.",
     };
   }
 

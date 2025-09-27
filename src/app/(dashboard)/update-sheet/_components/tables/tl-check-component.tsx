@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { UpdateSheetData } from "@/helper/update-sheet/update-sheet";
 import { Role } from "@prisma/client";
-import { useQueryClient } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -33,7 +32,7 @@ const TlCheckComponent = ({
   const [pending, startTransition] = useTransition();
   const [isChecked, setIsChecked] = useState(!!data.tlId);
 
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
   const onChange = () => {
     const previousState = isChecked;
@@ -46,8 +45,8 @@ const TlCheckComponent = ({
           setIsChecked(previousState);
           toast.error(result.message);
         } else {
-          toast.success(result.message);
-          queryClient.invalidateQueries({ queryKey: ["update-entries"] });
+          // toast.success(result.message);
+          // queryClient.invalidateQueries({ queryKey: ["update-entries"] });
         }
       } catch {
         setIsChecked(previousState);
