@@ -8,7 +8,7 @@ export async function downloadAttachment(url: string, name = "attachment") {
     url
   );
 
-  console.log("directDownload");
+  console.log("directDownload", !isDriveFolder);
 
   if (isDriveFolder) {
     return downloadGoogleDriveFolder(url, name);
@@ -18,9 +18,20 @@ export async function downloadAttachment(url: string, name = "attachment") {
   return directDownload(url, name);
 }
 
+function getDirectDownloadUrl(url: string) {
+  // Google Drive file pattern
+  const match = url.match(/\/file\/d\/([^/]+)/);
+  if (match) {
+    const fileId = match[1];
+    return `https://drive.google.com/uc?export=download&id=${fileId}`;
+  }
+  return url; // fallback
+}
+
 async function directDownload(url: string, name: string) {
   try {
-    const response = await fetch(url);
+    const directUrl = getDirectDownloadUrl(url);
+    const response = await fetch(directUrl);
     if (!response.ok) throw new Error("Failed to fetch file");
 
     const blob = await response.blob();
