@@ -8,18 +8,23 @@ export const updateSheetCreateSchema = z
   .object({
     profileId: z
       .string({ message: "Profile ID is required and cannot be empty" })
-      .min(1),
+      .min(1)
+      .trim(),
 
-    clientName: z.string({ message: "Please enter the client’s name" }).min(1),
+    clientName: z
+      .string({ message: "Please enter the client’s name" })
+      .min(1)
+      .trim(),
 
     orderId: z
       .string({ message: "Order ID is required to process this request" })
-      .min(1),
+      .min(1)
+      .trim(),
 
-    attachments: z.string().optional(), // will be validated conditionally
+    attachments: z.string().trim().optional(), // will be validated conditionally
 
-    commentFromOperation: z.string().optional(),
-    commentFromSales: z.string().optional(),
+    commentFromOperation: z.string().trim().optional(),
+    commentFromSales: z.string().trim().optional(),
 
     updateTo: z.enum(Object.values(UpdateTo) as [UpdateTo, ...UpdateTo[]], {
       message: "You must select a valid update status",
@@ -27,6 +32,7 @@ export const updateSheetCreateSchema = z
 
     message: z
       .string()
+      .trim()
       .refine(
         (val) => {
           const text = getTextFromHtml(val); // convert HTML -> plain text

@@ -71,8 +71,7 @@ const TlCheckComponent = ({
 
   // 4. service manager of creator’s service
   const isServiceManager =
-    currentUserTeam?.team?.service?.serviceManagerId === currentUserId &&
-    data.updateBy?.serviceId === currentUserTeam.team.service?.id;
+    data.updateBy.service?.serviceManagerId === currentUserId;
 
   const canCheck =
     (isCreator || isAdmins || isTeamLeader || isServiceManager) &&
