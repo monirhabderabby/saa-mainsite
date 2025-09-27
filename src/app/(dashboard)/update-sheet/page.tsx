@@ -47,8 +47,6 @@ const Page = async () => {
     },
   });
 
-  console.log(currentUsers);
-
   return (
     <Card className="shadow-none ">
       <CardHeader>
