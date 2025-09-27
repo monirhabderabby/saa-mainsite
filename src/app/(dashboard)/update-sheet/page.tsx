@@ -11,7 +11,12 @@ import prisma from "@/lib/prisma";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import FilterContainer from "./_components/filter-container";
+const FilterContainer = dynamic(
+  () => import("./_components/filter-container"),
+  {
+    ssr: false,
+  }
+);
 const TableContainer = dynamic(
   () => import("./_components/tables/table-container"),
   {
