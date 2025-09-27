@@ -74,6 +74,16 @@ const TlCheckComponent = ({
     (isCreator || isAdmins || isServiceLineTeamLeader || isServiceManager) &&
     !data.doneById;
 
+  // Extract team name safely
+  const getTeamName = () => {
+    if (!data.tlBy?.userTeams || data.tlBy.userTeams.length === 0) {
+      return "No team";
+    }
+
+    // Get the first team name, or check for a specific team if needed
+    return data.tlBy.userTeams[0]?.team?.name ?? "No team";
+  };
+
   return (
     <div className="flex justify-center items-center">
       {canCheck ? (
@@ -89,6 +99,7 @@ const TlCheckComponent = ({
           fullName={data.tlBy?.fullName ?? ""}
           joiningDate={data.tlCheckAt}
           designation={data.tlBy?.designation.name ?? ""}
+          teamName={getTeamName()}
         />
       ) : (
         "N/A"
