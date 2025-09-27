@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { UpdateSheetData } from "@/helper/update-sheet/update-sheet";
+import { Role } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import { Pencil } from "lucide-react";
 import moment from "moment";
@@ -19,7 +20,10 @@ const CenteredHeader = (title: string) => {
   return Comp;
 };
 
-export const updateSheetColumns: ColumnDef<UpdateSheetData>[] = [
+interface Props {
+  currentUserRole: Role;
+}
+export const updateSheetColumns = ({}: Props): ColumnDef<UpdateSheetData>[] => [
   {
     header: "Date",
     cell: ({ row }) => {
@@ -69,23 +73,6 @@ export const updateSheetColumns: ColumnDef<UpdateSheetData>[] = [
           }
           data={row.original}
         />
-      </div>
-    ),
-  },
-  {
-    accessorKey: "attachments",
-    header: CenteredHeader("Attachments"),
-    cell: ({ row }) => (
-      <div className="flex justify-center">
-        <Button asChild variant="link" effect="shine">
-          <a
-            href={row.original.attachments as string}
-            className="hover:text-blue-500 transition-colors duration-300 "
-            target="_blank"
-          >
-            {row.original.attachments?.slice(0, 20)}...
-          </a>
-        </Button>
       </div>
     ),
   },
