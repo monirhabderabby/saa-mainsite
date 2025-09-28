@@ -31,7 +31,9 @@ export const updateSheetCreateSchema = z
     }),
 
     message: z
-      .string()
+      .string({
+        message: "Please write your message here",
+      })
       .trim()
       .refine(
         (val) => {
