@@ -2,10 +2,12 @@ import { auth } from "@/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import prisma from "@/lib/prisma";
 import { Role } from "@prisma/client";
 import { Edit } from "lucide-react";
 import { redirect } from "next/navigation";
+import ProfileCardNavigationMenu from "./profile-card-navigation-menu";
 
 const roleLabels: Record<Role, string> = {
   [Role.OPERATION_MEMBER]: "OPERATION",
@@ -39,7 +41,7 @@ export default async function UserProfileCard() {
 
   const team = user.userTeams.length > 0 ? user.userTeams[0] : null;
   return (
-    <Card className="w-full max-w-sm h-full overflow-hidden bg-white dark:bg-white/5 shadow">
+    <Card className="w-full max-w-sm h-full overflow-hidden bg-white dark:bg-white/5 shadow ">
       {/* Header with curved green background */}
       <div className="h-32 bg-[linear-gradient(281.69deg,rgba(186,255,204,0.8)_-0.29%,#86B492_48.99%,#839D8A_101.56%)] relative">
         <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
@@ -111,6 +113,11 @@ export default async function UserProfileCard() {
             </span>
           </div>
         </div>
+      </div>
+
+      <div className="px-6 space-y-3">
+        <Label>Menus</Label>
+        <ProfileCardNavigationMenu />
       </div>
     </Card>
   );
