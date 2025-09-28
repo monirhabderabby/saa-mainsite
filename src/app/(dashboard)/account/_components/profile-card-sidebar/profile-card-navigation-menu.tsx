@@ -41,7 +41,7 @@ const ProfileCardNavigationMenu = () => {
             <li key={route.id}>
               <Link
                 href={route.href}
-                className={`flex items-center gap-3 rounded-md px-3 text-[14px] py-2
+                className={`flex items-center gap-3 rounded-md px-3 text-[14px] h-[40px]
           ${
             isActive
               ? "bg-primary dark:bg-customYellow-primary/10 text-primary-foreground dark:text-customYellow-primary"

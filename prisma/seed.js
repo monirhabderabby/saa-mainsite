@@ -11,6 +11,11 @@
  * - Two permission records for that user
  */
 
+import {
+  FSD_DESIGNATIONS,
+  MANAGEMENT_DESIGNATIONS,
+} from "@/constants/seeder/designations";
+import { PROFILE_NAMES } from "@/constants/seeder/profiles";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
@@ -20,45 +25,17 @@ const prisma = new PrismaClient();
 const DEPARTMENTS = [
   { name: "Sales", image: null },
   { name: "Operation", image: null },
+  { name: "BPU", image: null },
 ];
 
 const SERVICE_NAMES = [
-  "FSD",
+  "Google Ads",
   "SMM",
-  "Mobile App",
-  "SEM",
-  "DM",
+  "SEO",
   "CMS",
+  "FSD",
+  "App",
   "Management",
-];
-
-const PROFILE_NAMES = [
-  "linkbuilders_Fiverr",
-  "PPC_Buddy_Fiverr",
-  "webtechbd1_Fiverr",
-  "pagetech0_Fiverr",
-  "webdev_pro2_Fiverr",
-];
-
-const MANAGEMENT_DESIGNATIONS = [
-  "GM, ScaleUp Ads Agency",
-  "AGM, ScaleUp Ads Agency",
-  "GM, Operation",
-  "AGM, Operation",
-  "GM, Sales",
-  "AGM, Sales",
-];
-
-const FSD_DESIGNATIONS = [
-  "Project Manager",
-  "Team Leader",
-  "Assistant Team Leader",
-  "Sr. Sales Executive",
-  "Sales Executive",
-  "Trainee Sales Executive",
-  "Frontend Developer",
-  "Backend Developer",
-  "UI/UX Designer",
 ];
 
 /** Seed account */
@@ -92,7 +69,7 @@ async function upsertServices(names, departmentId) {
   return Promise.all(
     names.map((name) =>
       prisma.services.upsert({
-        where: { name },
+        where: { name_departmentId: { name, departmentId } },
         update: { departmentId }, // ensure linked to department
         create: { name, departmentId },
       })
@@ -195,7 +172,6 @@ async function main() {
   // 1. Departments
   const departments = await upsertDepartments(DEPARTMENTS);
   const operationDept = departments.find((d) => d.name === "Operation");
-  const salesDept = departments.find((d) => d.name === "Sales");
 
   if (!operationDept) throw new Error("Operation department not found");
 

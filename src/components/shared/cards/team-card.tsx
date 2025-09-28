@@ -36,15 +36,6 @@ export default async function ServiTeaceCard({ service }: ServiceCardProps) {
       fullName: true,
       employeeId: true,
     },
-    where: {
-      userTeams: {
-        none: {
-          team: {
-            name: "Management",
-          },
-        },
-      },
-    },
   });
 
   return (
@@ -61,9 +52,9 @@ export default async function ServiTeaceCard({ service }: ServiceCardProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem disabled>
+              {/* <DropdownMenuItem disabled>
                 <Link href={`/services/${service.id}`}>View Details</Link>
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
               {/* <DropdownMenuItem>Edit Service</DropdownMenuItem> */}
               <DropdownMenuItem asChild>
                 <Link href={`/teams/manage-teams/${service.id}`}>

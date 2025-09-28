@@ -112,6 +112,8 @@ model Services {
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
+    @@unique([name, departmentId])
 }
 
 model Designations {
@@ -132,6 +134,7 @@ model Designations {
 enum DepartmentName {
     Sales
     Operation
+    BPU
 }
 
 model Department {

@@ -14,7 +14,7 @@ const Page = async () => {
 
   if (!user) redirect("/login");
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full ">
       <PersonalInformation user={user} />
     </div>
   );
