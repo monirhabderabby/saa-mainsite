@@ -29,7 +29,7 @@ export default function ProfileToolTip({
           <div className="space-y-1">
             <h4 className="text-sm font-semibold">{fullName}</h4>
             <div className="text-sm">{designation}</div>
-            <p className="text-xs">Team: {teamName}</p>
+            {teamName && <p className="text-xs">Team: {teamName}</p>}
 
             <div className="text-muted-foreground text-xs">
               {moment(joiningDate).format("DD MMM, YYYY [at] h:mm A")}
