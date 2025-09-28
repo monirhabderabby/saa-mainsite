@@ -182,6 +182,7 @@ export type UpdateSheetData = Prisma.UpdateSheetGetPayload<{
             team: true;
           };
         };
+        service: true;
       };
     };
     updateBy: {
