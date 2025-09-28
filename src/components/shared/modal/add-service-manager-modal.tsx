@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useTransition } from "react";
+import React, { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 
 import { AddManagerAction } from "@/actions/services/add-manager";
@@ -37,6 +37,7 @@ import {
 import { cn } from "@/lib/utils";
 import { addManagerSchema, AddManagerSchemaType } from "@/schemas/services";
 import { Prisma } from "@prisma/client";
+import Fuse from "fuse.js";
 import { Check, ChevronsUpDown, Loader, Plus, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -65,6 +66,18 @@ export default function AddServiceManagerModal({
 }: AddMemberModalProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, startTransition] = useTransition();
+  const [query, setQuery] = React.useState("");
+
+  // Initialize Fuse
+  const fuse = new Fuse(users, {
+    keys: ["fullName", "employeeId"],
+    threshold: 0.3, // adjust: lower = stricter, higher = more fuzzy
+  });
+
+  // Get filtered users
+  const filteredUsers = query
+    ? fuse.search(query).map((res) => res.item)
+    : users;
 
   const form = useForm<AddManagerSchemaType>({
     resolver: zodResolver(addManagerSchema),
@@ -139,69 +152,74 @@ export default function AddServiceManagerModal({
             <FormField
               control={form.control}
               name="serviceManagerId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          className="w-full justify-between"
-                        >
-                          {field.value
-                            ? (() => {
-                                const selected = users.find(
-                                  (u) => u.id === field.value
-                                );
-                                return selected
-                                  ? `${selected.fullName} (${selected.employeeId})`
-                                  : "Select a manager";
-                              })()
-                            : "Select a manager"}
-                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </PopoverTrigger>
-
-                      <PopoverContent className="w-full p-0">
-                        <Command>
-                          <CommandInput placeholder="Type name or employee id..." />
-                          {/* Constrain the list height and allow scrolling */}
-                          <CommandList
-                            className="max-h-60 overflow-y-auto"
-                            onWheel={(e) => e.stopPropagation()} // prevent parent scrolling
-                            style={{ WebkitOverflowScrolling: "touch" }} // iOS momentum scrolling
+              render={({ field }) => {
+                return (
+                  <FormItem>
+                    <FormControl>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className="w-full justify-between"
                           >
-                            <CommandEmpty>No manager found.</CommandEmpty>
-                            <CommandGroup>
-                              {users.map((user) => (
-                                <CommandItem
-                                  key={user.id}
-                                  value={user.id}
-                                  onSelect={() => {
-                                    field.onChange(user.id);
-                                  }}
-                                >
-                                  <Check
-                                    className={cn(
-                                      "mr-2 h-4 w-4",
-                                      user.id === field.value
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                    )}
-                                  />
-                                  {user.fullName} ({user.employeeId})
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+                            {field.value
+                              ? (() => {
+                                  const selected = users.find(
+                                    (u) => u.id === field.value
+                                  );
+                                  return selected
+                                    ? `${selected.fullName} (${selected.employeeId})`
+                                    : "Select a manager";
+                                })()
+                              : "Select a manager"}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+
+                        <PopoverContent className="w-full p-0">
+                          <Command>
+                            <CommandInput
+                              placeholder="Type name or employee id..."
+                              value={query}
+                              onValueChange={setQuery}
+                            />
+                            <CommandList
+                              className="max-h-60 overflow-y-auto"
+                              onWheel={(e) => e.stopPropagation()}
+                              style={{ WebkitOverflowScrolling: "touch" }}
+                            >
+                              {filteredUsers.length === 0 && (
+                                <CommandEmpty>No manager found.</CommandEmpty>
+                              )}
+                              <CommandGroup>
+                                {filteredUsers.map((user) => (
+                                  <CommandItem
+                                    key={user.id}
+                                    value={user.id}
+                                    onSelect={() => field.onChange(user.id)}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        user.id === field.value
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                    {user.fullName} ({user.employeeId})
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
             />
 
             <div className="flex justify-end gap-3 pt-4">
