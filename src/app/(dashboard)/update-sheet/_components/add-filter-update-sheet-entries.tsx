@@ -92,19 +92,30 @@ export default function AddFilterUpdateSheetEntries({
   profiles,
 }: Props) {
   const [open, setOpen] = useState(false);
-  const { setAllValues, clearFilters } = useUpdateSheetFilterState();
+  const {
+    setAllValues,
+    clearFilters,
+    clientName,
+    done,
+    updateTo,
+    orderId,
+    profileId,
+    tl,
+    createdFrom,
+    sendFrom,
+  } = useUpdateSheetFilterState();
 
   const form = useForm<UpdateSheetFilter>({
     resolver: zodResolver(updateSheetFilter),
     defaultValues: {
-      clientName: undefined,
-      orderId: undefined,
-      profileId: undefined,
-      updateTo: undefined,
-      tl: undefined,
-      done: "notDone",
-      createdFrom: undefined,
-      sendFrom: undefined,
+      clientName: clientName ?? "",
+      orderId: orderId ?? undefined,
+      profileId: profileId ?? undefined,
+      updateTo: updateTo ?? undefined,
+      tl: tl ?? undefined,
+      done: done ?? "notDone",
+      createdFrom: createdFrom ? new Date(createdFrom) : undefined,
+      sendFrom: sendFrom ? new Date(sendFrom) : undefined,
     },
   });
 

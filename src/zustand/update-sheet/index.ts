@@ -70,7 +70,7 @@ export const useUpdateSheetFilterState = create<ProfileState>((set) => ({
       page: 1,
       updateTo: undefined,
       tl: undefined,
-      done: undefined,
+      done: "notDone",
       updateById: undefined,
       tlId: undefined,
       doneById: undefined,

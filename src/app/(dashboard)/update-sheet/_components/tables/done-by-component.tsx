@@ -23,8 +23,6 @@ const DoneByComponent = ({ data }: Props) => {
     return data.doneBy.userTeams[0]?.team?.name ?? "No team";
   };
 
-  console.log(getTeamName());
-
   return (
     <div className="flex justify-center items-center">
       {data.doneById && (
