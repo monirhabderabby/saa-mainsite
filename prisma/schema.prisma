@@ -26,13 +26,19 @@ enum PermissionTool {
 }
 
 model User {
-    id            String        @id @default(auto()) @map("_id") @db.ObjectId
-    fullName      String
-    nickName      String        @unique
-    email         String        @unique
+    id               String    @id @default(auto()) @map("_id") @db.ObjectId
+    fullName         String
+    nickName         String    @unique
+    email            String    @unique
+    image            String?
+    employeeId       String    @unique
+    dateOfBirth      DateTime?
+    parmanentAddress String?
+    presentAddress   String?
+    phone            String?
+
     emailVerified DateTime?
-    image         String?
-    employeeId    String        @unique
+
     accountStatus AccountStatus @default(PENDING)
     role          Role
     password      String
@@ -88,7 +94,7 @@ model ForgetPasswordLinks {
 
 model Services {
     id   String @id @default(auto()) @map("_id") @db.ObjectId
-    name String @unique
+    name String
 
     teams Team[]
     users User[]
