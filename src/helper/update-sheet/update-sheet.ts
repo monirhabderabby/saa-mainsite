@@ -101,6 +101,11 @@ export async function getUpdateSheets(options: {
           image: true,
           designation: true,
           nickName: true,
+          userTeams: {
+            select: {
+              team: true,
+            },
+          },
         },
       },
       tlBy: {
@@ -172,6 +177,11 @@ export type UpdateSheetData = Prisma.UpdateSheetGetPayload<{
         image: true;
         designation: true;
         nickName: true;
+        userTeams: {
+          select: {
+            team: true;
+          };
+        };
       };
     };
     updateBy: {

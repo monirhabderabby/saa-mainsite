@@ -26,15 +26,10 @@ export default function ProfileToolTip({
       <HoverCardTrigger asChild>{trigger}</HoverCardTrigger>
       <HoverCardContent className="w-fit">
         <div className="flex justify-between gap-4">
-          {/* <Avatar>
-            <AvatarImage src="/placeholder.avif" />
-            <AvatarFallback>VC</AvatarFallback>
-          </Avatar> */}
           <div className="space-y-1">
             <h4 className="text-sm font-semibold">{fullName}</h4>
-            <div className="text-sm">
-              {designation} {teamName && <span>at {teamName}</span>}
-            </div>
+            <div className="text-sm">{designation}</div>
+            <p className="text-xs">Team: {teamName}</p>
 
             <div className="text-muted-foreground text-xs">
               {moment(joiningDate).format("DD MMM, YYYY [at] h:mm A")}
