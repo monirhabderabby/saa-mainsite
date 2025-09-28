@@ -25,12 +25,12 @@ const PersonalInformation = ({ user }: Props) => {
   const [isEditingPersonal, setIsEditingPersonal] = useState(false);
 
   return (
-    <Card>
+    <Card className="bg-white/5">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
             <CardTitle>Personal Information</CardTitle>
-            <CardDescription>
+            <CardDescription className="mt-2">
               Your personal details and contact information
             </CardDescription>
           </div>
