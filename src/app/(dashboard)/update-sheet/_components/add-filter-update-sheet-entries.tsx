@@ -122,6 +122,7 @@ export default function AddFilterUpdateSheetEntries({
   function onSubmit(values: UpdateSheetFilter) {
     setAllValues({
       ...values,
+      page: 1,
     });
     setOpen(false);
   }
@@ -364,7 +365,7 @@ export default function AddFilterUpdateSheetEntries({
                     profileId: "",
                     updateTo: "", // 👈 must be string, not undefined
                     tl: "",
-                    done: "",
+                    done: "notDone",
                     createdFrom: undefined,
                     sendFrom: undefined,
                   });

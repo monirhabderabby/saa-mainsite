@@ -55,12 +55,26 @@ export default function AddUserFilterModal({
 }: Props) {
   const [open, setOpen] = useState(false);
 
-  const { setAllValues, resetFilters } = useUserFilterStore();
+  const {
+    setAllValues,
+    resetFilters,
+    departmentId,
+    serviceId,
+    teamId,
+    accountStatus,
+    role,
+    searchQuery,
+  } = useUserFilterStore();
 
   const form = useForm<EmployeeFilterType>({
     resolver: zodResolver(employeeFilterSchema),
     defaultValues: {
-      departmentId: undefined,
+      departmentId: departmentId ?? undefined,
+      serviceId: serviceId ?? undefined,
+      teamId: teamId ?? undefined,
+      accountStatus: accountStatus ?? undefined,
+      role: role ?? undefined,
+      searchQuery: searchQuery ?? undefined,
     },
   });
 
@@ -81,6 +95,7 @@ export default function AddUserFilterModal({
     setAllValues({
       ...values,
       accountStatus: (values.accountStatus ?? "") as AccountStatus | "",
+      page: 1,
     });
 
     setOpen(false);
