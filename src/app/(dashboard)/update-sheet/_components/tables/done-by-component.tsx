@@ -13,6 +13,16 @@ interface Props {
 }
 
 const DoneByComponent = ({ data }: Props) => {
+  // Extract team name safely
+  // Extract team name safely
+  const getTeamName = () => {
+    if (!data.doneBy?.userTeams || data.doneBy.userTeams.length === 0) {
+      return "No team";
+    }
+
+    return data.doneBy.userTeams[0]?.team?.name ?? "No team";
+  };
+
   return (
     <div className="flex justify-center items-center">
       {data.doneById && (
@@ -20,7 +30,8 @@ const DoneByComponent = ({ data }: Props) => {
           trigger={<Button variant="link">@{data.doneBy?.nickName}</Button>}
           fullName={data.doneBy?.fullName ?? ""}
           joiningDate={data.sendAt}
-          designation={data.doneBy?.designation.name ?? ""}
+          designation={data.doneBy?.designation?.name ?? ""}
+          teamName={getTeamName()}
         />
       )}
     </div>

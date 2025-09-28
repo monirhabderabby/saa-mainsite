@@ -13,6 +13,14 @@ interface Props {
 }
 
 const UpdatedByComponents = ({ data }: Props) => {
+  let teamName;
+
+  if (!data.tlBy?.userTeams || data.tlBy.userTeams.length === 0) {
+    teamName = "";
+  } else {
+    teamName = data.tlBy.userTeams[0]?.team?.name;
+  }
+
   return (
     <div className="flex justify-center">
       {data.updateById && (
@@ -21,6 +29,7 @@ const UpdatedByComponents = ({ data }: Props) => {
           fullName={data.updateBy?.fullName ?? ""}
           joiningDate={data.createdAt}
           designation={data.updateBy.designation.name ?? ""}
+          teamName={teamName}
         />
       )}
     </div>

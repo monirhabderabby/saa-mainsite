@@ -9,6 +9,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useUpdateSheetFilterState } from "@/zustand/update-sheet";
+import { useUserFilterStore } from "@/zustand/users";
 import { Prisma, Role } from "@prisma/client";
 import {
   Building,
@@ -119,10 +121,15 @@ const Sidebar = ({ cu }: Props) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const { clearFilters } = useUpdateSheetFilterState();
+  const { resetFilters } = useUserFilterStore();
 
   const pathname = usePathname();
 
   const onLogout = () => {
+    clearFilters();
+    resetFilters();
+
     setIsLoading(true);
     startTransition(() => {
       logoutAction().then((res) => {

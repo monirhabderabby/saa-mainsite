@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 export const loginSchema = z.object({
-  employeeId: z.string().min(1, { message: "Employee Id is required" }),
-  password: z
-    .string()
-    .min(6, { message: "Password must be at least 6 characters long" }),
+  employeeId: z.string({
+    message: "Please enter your Employee ID to continue.",
+  }),
+  password: z.string({ message: "A password is required to log in." }),
 });
 
 export type LoginSchemaValues = z.infer<typeof loginSchema>;

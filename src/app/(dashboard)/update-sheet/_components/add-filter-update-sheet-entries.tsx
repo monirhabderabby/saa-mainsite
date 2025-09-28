@@ -9,9 +9,16 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -19,14 +26,19 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { colorMap } from "@/components/ui/update-to-badge";
+import { cn } from "@/lib/utils";
 import {
   updateSheetFilter,
   UpdateSheetFilter,
@@ -34,7 +46,7 @@ import {
 import { useUpdateSheetFilterState } from "@/zustand/update-sheet";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Profile, UpdateTo } from "@prisma/client";
-import { Repeat } from "lucide-react";
+import { Check, ChevronsUpDown, Repeat } from "lucide-react";
 import dynamic from "next/dynamic";
 import { ReactNode, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -80,25 +92,37 @@ export default function AddFilterUpdateSheetEntries({
   profiles,
 }: Props) {
   const [open, setOpen] = useState(false);
-  const { setAllValues, clearFilters } = useUpdateSheetFilterState();
+  const {
+    setAllValues,
+    clearFilters,
+    clientName,
+    done,
+    updateTo,
+    orderId,
+    profileId,
+    tl,
+    createdFrom,
+    sendFrom,
+  } = useUpdateSheetFilterState();
 
   const form = useForm<UpdateSheetFilter>({
     resolver: zodResolver(updateSheetFilter),
     defaultValues: {
-      clientName: undefined,
-      orderId: undefined,
-      profileId: undefined,
-      updateTo: undefined,
-      tl: undefined,
-      done: "notDone",
-      createdFrom: undefined,
-      sendFrom: undefined,
+      clientName: clientName ?? "",
+      orderId: orderId ?? undefined,
+      profileId: profileId ?? undefined,
+      updateTo: updateTo ?? undefined,
+      tl: tl ?? undefined,
+      done: done ?? "notDone",
+      createdFrom: createdFrom ? new Date(createdFrom) : undefined,
+      sendFrom: sendFrom ? new Date(sendFrom) : undefined,
     },
   });
 
   function onSubmit(values: UpdateSheetFilter) {
     setAllValues({
       ...values,
+      page: 1,
     });
     setOpen(false);
   }
@@ -156,30 +180,61 @@ export default function AddFilterUpdateSheetEntries({
                 control={form.control}
                 name="profileId"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Profiles</FormLabel>
-                    <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select profile" />
-                        </SelectTrigger>
-
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectItem value="All">All</SelectItem>
-                            {profiles.map((p) => (
-                              <SelectItem value={p.id} key={p.id}>
-                                {p.name}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormDescription></FormDescription>
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Profile</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className={cn(
+                              "w-full justify-between",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value
+                              ? profiles.find((p) => p.id === field.value)?.name
+                              : "Select a profile"}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full min-w-[400px] p-0">
+                        <Command>
+                          <CommandInput placeholder="Search profiles..." />
+                          <CommandList>
+                            <CommandEmpty>No profile found.</CommandEmpty>
+                            <CommandGroup>
+                              {profiles.map((p) => (
+                                <CommandItem
+                                  key={p.id}
+                                  value={p.name} // 👈 use name for search
+                                  onSelect={() => {
+                                    // Toggle selection: if already selected, deselect it
+                                    if (field.value === p.id) {
+                                      field.onChange(""); // Deselect by setting to empty string
+                                    } else {
+                                      field.onChange(p.id); // Select the new item
+                                    }
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      field.value === p.id
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {p.name}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -310,7 +365,7 @@ export default function AddFilterUpdateSheetEntries({
                     profileId: "",
                     updateTo: "", // 👈 must be string, not undefined
                     tl: "",
-                    done: "",
+                    done: "notDone",
                     createdFrom: undefined,
                     sendFrom: undefined,
                   });

@@ -35,7 +35,7 @@ const SiteLayout = async ({ children }: Props) => {
         {/* Top Bar */}
         <Topbar name={user.fullName as string} />
 
-        <div className=" bg-[#F5F7FA] dark:bg-background p-6   h-[calc(100vh-160px)]">
+        <div className=" bg-[#F5F7FA] dark:bg-background p-6   h-[calc(100vh-160px)] pb-0">
           {children}
         </div>
       </div>

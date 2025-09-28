@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { UpdateSheetData } from "@/helper/update-sheet/update-sheet";
 import { Role } from "@prisma/client";
-import { useQueryClient } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -33,7 +32,7 @@ const TlCheckComponent = ({
   const [pending, startTransition] = useTransition();
   const [isChecked, setIsChecked] = useState(!!data.tlId);
 
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
   const onChange = () => {
     const previousState = isChecked;
@@ -46,8 +45,8 @@ const TlCheckComponent = ({
           setIsChecked(previousState);
           toast.error(result.message);
         } else {
-          toast.success(result.message);
-          queryClient.invalidateQueries({ queryKey: ["update-entries"] });
+          // toast.success(result.message);
+          // queryClient.invalidateQueries({ queryKey: ["update-entries"] });
         }
       } catch {
         setIsChecked(previousState);
@@ -75,6 +74,16 @@ const TlCheckComponent = ({
     (isCreator || isAdmins || isServiceLineTeamLeader || isServiceManager) &&
     !data.doneById;
 
+  // Extract team name safely
+  const getTeamName = () => {
+    if (!data.tlBy?.userTeams || data.tlBy.userTeams.length === 0) {
+      return "No team";
+    }
+
+    // Get the first team name, or check for a specific team if needed
+    return data.tlBy.userTeams[0]?.team?.name ?? "No team";
+  };
+
   return (
     <div className="flex justify-center items-center">
       {canCheck ? (
@@ -90,6 +99,7 @@ const TlCheckComponent = ({
           fullName={data.tlBy?.fullName ?? ""}
           joiningDate={data.tlCheckAt}
           designation={data.tlBy?.designation.name ?? ""}
+          teamName={getTeamName()}
         />
       ) : (
         "N/A"

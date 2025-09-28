@@ -206,10 +206,7 @@ export default function AddUpdateForm({ profiles, initialData }: Props) {
   return (
     <>
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-5  pb-10"
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5  ">
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-4 pt-2">
               <FormField
@@ -399,6 +396,8 @@ export default function AddUpdateForm({ profiles, initialData }: Props) {
                   restrictedWords={restrictedWords}
                   maxChars={2500}
                 />
+
+                <FormMessage />
               </FormItem>
             )}
           />
