@@ -81,7 +81,9 @@ const PersonalInformation = ({ user }: Props) => {
                   Date Of Birth
                 </Label>
                 <p className="text-sm">
-                  {moment(user.dateOfBirth).format("DD MMM, YYYY")}
+                  {user.dateOfBirth
+                    ? moment(user.dateOfBirth).format("DD MMM, YYYY")
+                    : "N/A"}
                 </p>
               </div>
             </div>
