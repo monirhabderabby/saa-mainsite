@@ -12,6 +12,7 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
 import { getEmployeeColumns } from "./employee-column";
 
@@ -68,11 +69,23 @@ const UserTableContainer = ({ currentUserRole }: Props) => {
   }
   return (
     <SkeletonWrapper isLoading={isLoading}>
-      <Table
-        columns={getEmployeeColumns({ currentUserRole })}
-        data={data?.data ? [...data.data] : []} // ✅ create a new array
-        totalPages={data?.pagination?.totalPages ?? 1}
-      />
+      <AnimatePresence mode="wait">
+        {!isLoading && (
+          <motion.div
+            key="user-table"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.4, ease: "easeInOut" }}
+          >
+            <Table
+              columns={getEmployeeColumns({ currentUserRole })}
+              data={data?.data ? [...data.data] : []}
+              totalPages={data?.pagination?.totalPages ?? 1}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </SkeletonWrapper>
   );
 };
