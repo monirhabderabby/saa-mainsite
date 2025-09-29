@@ -25,7 +25,7 @@ const PersonalInformation = ({ user }: Props) => {
   const [isEditingPersonal, setIsEditingPersonal] = useState(false);
 
   return (
-    <Card className="bg-white/5">
+    <Card className="dark:bg-white/5">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
