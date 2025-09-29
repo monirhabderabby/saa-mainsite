@@ -10,7 +10,7 @@ const Page = async () => {
   return (
     <div className="grid grid-cols-3 gap-10">
       {department.map((item) => (
-        <Card className="bg-white/5" key={item.id}>
+        <Card className="dark:bg-white/5" key={item.id}>
           <CardHeader>
             <div className="h-[300px] w-full  relative rounded-lg">
               <Image

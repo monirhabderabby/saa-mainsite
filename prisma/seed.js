@@ -11,11 +11,6 @@
  * - Two permission records for that user
  */
 
-import {
-  FSD_DESIGNATIONS,
-  MANAGEMENT_DESIGNATIONS,
-} from "@/constants/seeder/designations";
-import { PROFILE_NAMES } from "@/constants/seeder/profiles";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
@@ -28,6 +23,25 @@ const DEPARTMENTS = [
   { name: "BPU", image: null },
 ];
 
+const MANAGEMENT_DESIGNATIONS = [
+  "GM, ScaleUp Ads Agency",
+  "AGM, ScaleUp Ads Agency",
+  "GM, Operation",
+  "AGM, Operation",
+];
+
+const FSD_DESIGNATIONS = [
+  "Project Manager",
+  "Team Leader",
+  "Assistant Team Leader",
+  "Sr. Back-End Developer",
+  "Sr. Front-End Developer",
+  "Back-End Developer",
+  "Front-End Developer",
+  "Jr. Back-End Developer",
+  "Jr. Front-End Developer",
+];
+
 const SERVICE_NAMES = [
   "Google Ads",
   "SMM",
@@ -36,6 +50,81 @@ const SERVICE_NAMES = [
   "FSD",
   "App",
   "Management",
+];
+
+const PROFILE_NAMES = [
+  "linkbuilders_Fiverr",
+  "ppc_buddy_Fiverr",
+  "webtechbd1_Fiverr",
+  "pagetech0_Fiverr",
+  "webdev_pro2_Fiverr",
+  "adwords_buddy_Fiverr",
+  "adsfrenzy_Fiverr",
+  "adsdot_Fiverr",
+  "gads_dm_Fiverr",
+  "ppc_magnet_Fiverr",
+  "ad_analytic_Fiverr",
+  "semexpert_Fiverr",
+  "ads_strategix_Fiverr",
+  "ppcpro_Fiverr",
+  "ppcwave_Fiverr",
+  "rankeyfiy_Fiverr",
+  "rank_ranger_Fiverr",
+  "seo_boostify_Fiverr",
+  "growth_pro2_Fiverr",
+  "rankstorm_Fiverr",
+  "seo_spark1_Fiverr",
+  "endof_backlinks_Fiverr",
+  "seofx_Fiverr",
+  "cube_tech_Fiverr",
+  "growthorbit_Fiverr",
+  "smmtech_Fiverr",
+  "social_bee2_Fiverr",
+  "scaleup_ads_Fiverr",
+  "pmax_ads_Fiverr",
+  "amzppc_ads_Fiverr",
+  "smads_Fiverr",
+  "ads_dot_Fiverr",
+  "amazonads_Fiverr",
+  "scaling_ads_Fiverr",
+  "socialm_ads_Fiverr",
+  "ads_social1_Fiverr",
+  "ads_genius2_Fiverr",
+  "customweb_pro_Fiverr",
+  "custom_web2_Fiverr",
+  "ralive_Fiverr",
+  "web_coding1_Fiverr",
+  "pro_custom1_Fiverr",
+  "webverse_dev_Fiverr",
+  "devtech_pro_Fiverr",
+  "codeweaver1_Fiverr",
+  "pagefusion_Fiverr",
+  "landing_page_pr_Fiverr",
+  "pagecraft_Fiverr",
+  "wp_strategix_Fiverr",
+  "wp_coders1_Fiverr",
+  "sqpro24_Fiverr",
+  "devsquares_Fiverr",
+  "sqspace_pro_Fiverr",
+  "ecom_store3_Fiverr",
+  "storefusion_Fiverr",
+  "fusionkart_Fiverr",
+  "web_mania_Fiverr",
+  "sitewix_pro_Fiverr",
+  "ah_apptech_Fiverr",
+  "ibrahim_365_Fiverr",
+  "appify_coders_Fiverr",
+  "appx_tech_Fiverr",
+  "app_genius2_Fiverr",
+  "designqube_Fiverr",
+  "uxfusion_Fiverr",
+  "techspark1_Fiverr",
+  "pitchcraft_Fiverr",
+  "socialcraft_Fiverr",
+  "slidescape_Fiverr",
+  "smmcanvas_Fiverr",
+  "smmspark_Fiverr",
+  "smmclick_Fiverr",
 ];
 
 /** Seed account */
