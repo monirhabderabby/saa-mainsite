@@ -2,7 +2,46 @@ import { getTextFromHtml } from "@/lib/utils";
 import { UpdateTo } from "@prisma/client";
 import { z } from "zod";
 
-export const restrictedWords = ["pay", "email", "gmail", "mobile", "netlify"];
+export const restrictedWords = [
+  "adult content",
+  "bank",
+  "betting tips",
+  "buy",
+  "call me",
+  "casino tricks",
+  "credit",
+  "credit repair",
+  "crypto",
+  "crack",
+  "escort",
+  "email",
+  "exploit",
+  "fees",
+  "gambling",
+  "gmail",
+  "hack",
+  "id card",
+  "linkedin",
+  "loan approval",
+  "mobile",
+  "money",
+  "netlify",
+  "outlook",
+  "pay",
+  "paypal",
+  "payment",
+  "phone number",
+  "porn",
+  "private",
+  "skype",
+  "telegram",
+  "text me",
+  "transfer",
+  "western union",
+  "whatsapp",
+  "yahoo",
+  "outside",
+];
 
 export const updateSheetCreateSchema = z
   .object({
