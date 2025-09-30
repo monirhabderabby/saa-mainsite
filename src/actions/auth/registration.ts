@@ -2,6 +2,7 @@
 
 import { EmailVerification } from "@/email-templates/email-verification";
 import prisma from "@/lib/prisma";
+import { resend } from "@/lib/resend";
 import {
   registrationSchema,
   RegistrationSchemaValues,
@@ -83,12 +84,11 @@ export async function registerAction(data: RegistrationSchemaValues) {
           fullName,
           serviceId,
           password: hashedPassword,
-          accountStatus: "ACTIVE",
+          accountStatus: "PENDING",
           role:
             departmentName === "Sales" ? "SALES_MEMBER" : "OPERATION_MEMBER", // or another default role as per your schema
           designationId,
           departmentId,
-          emailVerified: new Date(),
           nickName,
         },
         select: {
@@ -122,20 +122,19 @@ export async function registerAction(data: RegistrationSchemaValues) {
         `/registration/verification/${verificationRes.token}`;
 
       // Render the EmailVerification component to HTML
-      await render(
+      const emailHtml = await render(
         EmailVerification({
           userName: user.fullName as string,
           verificationUrl,
         })
       );
 
-      // Enviar OTP por correo electrónico
-      // await resend.emails.send({
-      //   from: "ScaleUp Ads Agency <support@scaleupdevagency.com>",
-      //   to: [user.email as string],
-      //   subject: `Welcome to ScaleUp Ads Agency – Please verify your email`,
-      //   html: emailHtml,
-      // });
+      await resend.emails.send({
+        from: "ScaleUp Ads Agency <support@scaleupdevagency.com>",
+        to: [user.email as string],
+        subject: `Welcome to ScaleUp Ads Agency – Please verify your email`,
+        html: emailHtml,
+      });
 
       // create permissions in a single operation
       await tx.permissions.createMany({
