@@ -31,6 +31,14 @@ export async function loginAction(data: LoginSchemaValues) {
       };
     }
 
+    if (!user.emailVerified) {
+      return {
+        success: false,
+        message:
+          "It looks like your email isn’t verified yet. Please check your inbox (and spam folder) for the verification link, or request a new one to get started.",
+      };
+    }
+
     if (user.accountStatus !== "ACTIVE") {
       return {
         success: false,
