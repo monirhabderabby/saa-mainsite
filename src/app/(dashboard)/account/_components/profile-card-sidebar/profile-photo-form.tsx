@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { useEdgeStore } from "@/lib/edgestore";
 import { User } from "@prisma/client";
 import { Edit, Loader2 } from "lucide-react";
-import { useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 interface Props {
@@ -14,9 +15,9 @@ interface Props {
 }
 
 const ProfilePhotoForm = ({ user }: Props) => {
-  const [isUpdaringLiveUrl, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { edgestore } = useEdgeStore();
+  const router = useRouter();
 
   const [imageUrl, setImageUrl] = useState<string>(
     user?.image || "/placeholder.avif"
@@ -28,11 +29,21 @@ const ProfilePhotoForm = ({ user }: Props) => {
     fileInputRef.current?.click();
   };
 
+  const MAX_FILE_SIZE_MB = 1; // adjust to your backend limit
+
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
+
+    const fileSizeMB = file.size / (1024 * 1024);
+    if (fileSizeMB > MAX_FILE_SIZE_MB) {
+      toast.error(`File is too large. Max size is ${MAX_FILE_SIZE_MB}MB.`);
+      return;
+    }
+
+    const previousImage = imageUrl; // keep old image for rollback
 
     try {
       setUploading(true);
@@ -42,29 +53,34 @@ const ProfilePhotoForm = ({ user }: Props) => {
         file,
         onProgressChange: (p) => setProgress(p),
         options: {
-          replaceTargetUrl: user.image!,
-          manualFileName: `profile-photo/${user.nickName}`,
+          replaceTargetUrl: user.image || undefined,
+          manualFileName: `profile-photo/${user.nickName}-${Date.now()}`, // unique filename
         },
       });
 
       if (res?.url) {
         setImageUrl(res.url);
-        startTransition(() => {
-          UpdateProfilePhotoAction(res.url).then(async (res) => {
-            if (!res.success) {
-              toast.error(res.message);
-              await edgestore.profilePhotos.delete({
-                url: imageUrl,
-              });
-              return;
-            } else {
-              toast.success(res.message);
-            }
-          });
-        });
+
+        const updateRes = await UpdateProfilePhotoAction(res.url);
+
+        if (!updateRes.success) {
+          toast.error(updateRes.message);
+
+          // delete the failed upload
+          await edgestore.profilePhotos.delete({ url: res.url });
+
+          // restore old image
+          setImageUrl(previousImage);
+          return;
+        }
+
+        toast.success(updateRes.message);
+        router.refresh();
       }
     } catch (error) {
       console.error("Error uploading file:", error);
+      toast.error("Something went wrong while uploading the file.");
+      setImageUrl(previousImage); // rollback
     } finally {
       setUploading(false);
     }
@@ -111,10 +127,10 @@ const ProfilePhotoForm = ({ user }: Props) => {
         size="sm"
         type="button"
         onClick={handleUploadClick}
-        disabled={uploading || isUpdaringLiveUrl}
+        disabled={uploading}
         className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-green-500 hover:bg-green-600 shadow-lg p-0"
       >
-        {uploading || isUpdaringLiveUrl ? (
+        {uploading ? (
           <Loader2 className="w-4 h-4 text-white animate-spin" />
         ) : (
           <Edit className="w-4 h-4 text-white" />

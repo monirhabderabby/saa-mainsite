@@ -32,6 +32,7 @@ const DoneByComponent = ({ data }: Props) => {
           joiningDate={data.sendAt}
           designation={data.doneBy?.designation?.name ?? ""}
           teamName={getTeamName()}
+          profilePhoto={data.doneBy?.image ?? ""}
         />
       )}
     </div>
