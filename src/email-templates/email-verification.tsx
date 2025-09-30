@@ -23,7 +23,7 @@ const companyName = "ScaleUp Ads Agency";
 export const EmailVerification = ({
   userName = "User",
   verificationUrl = "https://example.com/verify",
-  companyLogo = "https://files.edgestore.dev/vkpagg64z2y0yvdx/saa/_public/black-logo.png",
+  companyLogo = "https://files.edgestore.dev/46caec8oilyqam7f/StaticFiles/_public/black-logo.svg",
 }: VerificationEmailProps) => {
   return (
     <Html>
@@ -33,7 +33,7 @@ export const EmailVerification = ({
         <Body className="bg-gray-100 my-auto mx-auto font-sans">
           <Container className="border border-solid border-gray-200 rounded my-10 mx-auto p-5 max-w-md bg-white">
             {/* Header with Logo */}
-            <Section className="mt-4 text-center flex justify-center mx-auto">
+            <Section className="mt-4 text-center flex justify-center mx-auto w-full">
               <Img src={companyLogo} alt="Logo" width="160" height="60" />
             </Section>
 
