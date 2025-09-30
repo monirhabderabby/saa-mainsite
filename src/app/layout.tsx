@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { EdgeStoreProvider } from "@/lib/edgestore";
 import { cn } from "@/lib/utils";
 import TanstackProvider from "@/providers/tanstack/tanstack-provider";
 import { ThemeProvider } from "@/providers/theme/theme-provider";
@@ -47,7 +48,9 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <TanstackProvider>{children}</TanstackProvider>
+            <TanstackProvider>
+              <EdgeStoreProvider>{children}</EdgeStoreProvider>
+            </TanstackProvider>
           </ThemeProvider>{" "}
           <Toaster richColors />
           <NextTopLoader showSpinner={false} color="#FFC300" />

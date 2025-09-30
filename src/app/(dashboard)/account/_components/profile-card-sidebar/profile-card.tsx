@@ -1,13 +1,15 @@
 import { auth } from "@/auth";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import prisma from "@/lib/prisma";
 import { Role } from "@prisma/client";
-import { Edit } from "lucide-react";
+import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
 import ProfileCardNavigationMenu from "./profile-card-navigation-menu";
+const ProfilePhotoForm = dynamic(() => import("./profile-photo-form"), {
+  ssr: false,
+});
 
 const roleLabels: Record<Role, string> = {
   [Role.OPERATION_MEMBER]: "OPERATION",
@@ -45,25 +47,7 @@ export default async function UserProfileCard() {
       {/* Header with curved green background */}
       <div className="h-32 bg-[linear-gradient(281.69deg,rgba(186,255,204,0.8)_-0.29%,#86B492_48.99%,#839D8A_101.56%)] relative">
         <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
-          <div className="relative">
-            <Avatar className="w-32 h-32 border-4 border-white shadow-lg">
-              <AvatarImage
-                src="/placeholder.avif"
-                alt={user.fullName as string}
-                className="object-cover"
-              />
-              <AvatarFallback className="text-2xl font-semibold bg-gray-200">
-                JS
-              </AvatarFallback>
-            </Avatar>
-            {/* Edit button */}
-            <Button
-              size="sm"
-              className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-green-500 hover:bg-green-600 shadow-lg p-0"
-            >
-              <Edit className="w-4 h-4 text-white" />
-            </Button>
-          </div>
+          <ProfilePhotoForm user={user} />
         </div>
       </div>
 
