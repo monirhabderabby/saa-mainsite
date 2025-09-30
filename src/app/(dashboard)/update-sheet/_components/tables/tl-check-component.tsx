@@ -100,6 +100,7 @@ const TlCheckComponent = ({
           joiningDate={data.tlCheckAt}
           designation={data.tlBy?.designation.name ?? ""}
           teamName={getTeamName()}
+          profilePhoto={data.tlBy?.image ?? ""}
         />
       ) : (
         "N/A"

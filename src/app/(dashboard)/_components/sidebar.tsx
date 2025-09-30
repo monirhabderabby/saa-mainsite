@@ -203,7 +203,7 @@ const Sidebar = ({ cu }: Props) => {
               <DropdownMenuTrigger asChild>
                 <div className="flex items-center justify-between gap-1 w-full cursor-pointer ">
                   <div className="flex items-center gap-3">
-                    <Avatar>
+                    <Avatar className="h-[35px] w-[35px]">
                       <AvatarImage src={cu.image ?? "/placeholder.avif"} />
                       <AvatarFallback>A</AvatarFallback>
                     </Avatar>

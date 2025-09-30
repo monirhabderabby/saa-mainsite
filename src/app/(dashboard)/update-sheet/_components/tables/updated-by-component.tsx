@@ -30,6 +30,7 @@ const UpdatedByComponents = ({ data }: Props) => {
           joiningDate={data.createdAt}
           designation={data.updateBy.designation.name ?? ""}
           teamName={teamName}
+          profilePhoto={data.updateBy.image ?? ""}
         />
       )}
     </div>
