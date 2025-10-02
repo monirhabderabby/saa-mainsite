@@ -10,9 +10,12 @@
     "db:seed": "node prisma/seed.js",
     "db:seed2": "node prisma/seed2.js",
     "email": "email dev --dir src/email-templates",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "dev:webhook": "ngrok http --url=nevaeh-benzal-jenell.ngrok-free.dev 3000"
   },
   "dependencies": {
+    "@arcjet/inspect": "^1.0.0-beta.12",
+    "@arcjet/next": "^1.0.0-beta.12",
     "@auth/prisma-adapter": "^2.10.0",
     "@edgestore/react": "^0.5.4",
     "@edgestore/server": "^0.5.4",

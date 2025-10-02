@@ -1,5 +1,21 @@
 import { z } from "zod";
 
+const restrictedUrlSchema = z
+  .string()
+  .url({ message: "Must be a valid URL" }) // step 1: must be a valid URL
+  .refine(
+    (val) =>
+      val === "" ||
+      val.startsWith("https://drive.google.com/file/d/") ||
+      val.startsWith("https://prnt.sc/"),
+    {
+      message:
+        "Only Google Drive (https://drive.google.com/file/d/<fileId>/view) or Lightshot (https://prnt.sc/<id>) links are allowed",
+    }
+  )
+  .optional()
+  .or(z.literal("")); // allow empty string
+
 export const issueSheetSchema = z
   .object({
     clientName: z
@@ -8,8 +24,12 @@ export const issueSheetSchema = z
     orderId: z.string().min(1, { message: "Please provide the order ID" }),
     profileId: z.string().min(1, { message: "Please select a profile" }),
     serviceId: z.string().min(1, { message: "Please select a service" }),
-    orderPageUrl: z.string().optional(),
-    inboxPageUrl: z.string().optional(),
+
+    // ✅ Only these two restricted
+    orderPageUrl: restrictedUrlSchema,
+    inboxPageUrl: restrictedUrlSchema,
+
+    // ✅ Free input allowed
     fileOrMeetingLink: z.string().optional(),
     specialNotes: z.string().optional(),
     noteForSales: z.string().optional(),
@@ -22,11 +42,10 @@ export const issueSheetSchema = z
     {
       message:
         "Please provide at least one: Order Page URL, Inbox Page URL, or File/Meeting Link",
-      path: ["urlGroup"], // virtual field
+      path: ["urlGroup"],
     }
   );
 
-// Extend type to include virtual field
 export type IssueSheetSchemaType = z.infer<typeof issueSheetSchema> & {
   urlGroup?: string;
 };
