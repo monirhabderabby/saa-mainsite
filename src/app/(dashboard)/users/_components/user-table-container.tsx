@@ -1,6 +1,7 @@
 "use client";
 import { DataTable } from "@/components/ui/data-table";
 import { PaginationControls } from "@/components/ui/pagination-controls";
+import { Skeleton } from "@/components/ui/skeleton";
 import SkeletonWrapper from "@/components/ui/skeleton-wrapper";
 import { UsersData } from "@/helper/users";
 import { useUserFilterStore } from "@/zustand/users";
@@ -15,6 +16,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
 import { getEmployeeColumns } from "./employee-column";
+// import { getEmployeeColumns } from "./employee-column";
 
 interface Props {
   currentUserRole: Role;
@@ -70,7 +72,17 @@ const UserTableContainer = ({ currentUserRole }: Props) => {
   return (
     <SkeletonWrapper isLoading={isLoading}>
       <AnimatePresence mode="wait">
-        {!isLoading && (
+        {isLoading ? (
+          <motion.div
+            key="table-skeleton"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="min-h-[200px] w-full rounded-lg bg-background border"
+          >
+            <TableSkeleton />
+          </motion.div>
+        ) : (
           <motion.div
             key="user-table"
             initial={{ opacity: 0, height: 0 }}
@@ -108,7 +120,7 @@ const Table = ({ data, columns, totalPages }: TableProps) => {
   });
   return (
     <>
-      <div className="bg-background">
+      <div className="bg-background ">
         <DataTable table={table} columns={columns} />
       </div>
       {totalPages > 1 && (
@@ -123,5 +135,26 @@ const Table = ({ data, columns, totalPages }: TableProps) => {
         </div>
       )}
     </>
+  );
+};
+
+const TableSkeleton = () => {
+  return (
+    <div className="divide-y divide-border">
+      {/* Fake header */}
+      <div className="flex px-4 py-3 gap-4">
+        {[...Array(5)].map((_, i) => (
+          <Skeleton key={i} className="h-4 w-24 rounded" />
+        ))}
+      </div>
+      {/* Fake rows */}
+      {[...Array(6)].map((_, row) => (
+        <div key={row} className="flex px-4 py-3 gap-4">
+          {[...Array(5)].map((_, col) => (
+            <Skeleton key={col} className="h-4 w-20 rounded" />
+          ))}
+        </div>
+      ))}
+    </div>
   );
 };
