@@ -44,7 +44,10 @@ export default function ProfileView({ trigger, user }: ProfileViewProps) {
           <div className="flex flex-col items-center space-y-4">
             <Avatar className="h-20 w-20">
               <AvatarImage
-                src={`/placeholder.svg?height=80&width=80&query=professional+profile+photo`}
+                src={
+                  user.image ??
+                  `/placeholder.svg?height=80&width=80&query=professional+profile+photo`
+                }
                 alt={user.fullName as string}
               />
               <AvatarFallback className="text-lg font-semibold">
