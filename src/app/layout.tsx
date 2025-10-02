@@ -40,7 +40,9 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={cn(raleway.className, "antialiased bg-background")}>
+      <body
+        className={cn(raleway.className, "antialiased bg-background relative")}
+      >
         <SessionProvider session={session}>
           <ThemeProvider
             attribute="class"
@@ -50,6 +52,9 @@ export default async function RootLayout({
           >
             <TanstackProvider>
               <EdgeStoreProvider>{children}</EdgeStoreProvider>
+              <p className="absolute bottom-2 right-7 text-[12px]">
+                Beta v1.0.0
+              </p>
             </TanstackProvider>
           </ThemeProvider>{" "}
           <Toaster richColors />

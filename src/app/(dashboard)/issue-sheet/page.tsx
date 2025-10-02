@@ -36,10 +36,36 @@ const Page = async () => {
   }
 
   // Fetch required data for profiles, teams, and services
-  const [profiles, teams, services] = await prisma.$transaction([
+  const [profiles, services, teams] = await prisma.$transaction([
     prisma.profile.findMany(),
-    prisma.team.findMany(),
-    prisma.services.findMany(),
+
+    prisma.services.findMany({
+      where: {
+        department: {
+          is: {
+            name: "Operation",
+          },
+        },
+        name: {
+          not: "Management",
+        },
+      },
+    }),
+
+    prisma.team.findMany({
+      where: {
+        service: {
+          department: {
+            is: {
+              name: "Operation",
+            },
+          },
+          name: {
+            not: "Management",
+          },
+        },
+      },
+    }),
   ]);
 
   // Check if the user has permission to create issues
