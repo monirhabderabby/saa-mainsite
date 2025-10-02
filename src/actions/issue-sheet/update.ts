@@ -131,14 +131,6 @@ export async function assignTeamIntoIssueSheet(
     };
   }
 
-  // ✅ Check team membership
-  const teamInfo = await prisma.userTeam.findFirst({
-    where: {
-      teamId,
-      userId: session.user.id,
-    },
-  });
-
   // ✅ Get issue sheet with service + manager info
   const issue = await prisma.issueSheet.findFirst({
     where: { id: issueSheetId },
@@ -146,9 +138,11 @@ export async function assignTeamIntoIssueSheet(
       service: {
         include: {
           serviceManager: {
-            select: {
-              id: true,
-              fullName: true,
+            select: { id: true, fullName: true },
+          },
+          teams: {
+            include: {
+              userTeams: true,
             },
           },
         },
@@ -163,21 +157,24 @@ export async function assignTeamIntoIssueSheet(
     };
   }
 
-  // 🟢 Check authorization:
-  // - Team Leader / Co-Leader
-  // - OR Project Manager of the issue's service
-  const isLeaderOrCoLeader =
-    teamInfo?.responsibility === "Leader" ||
-    teamInfo?.responsibility === "Coleader";
+  // 🟢 Check if current user is a Leader/Co-Leader in ANY team under this service
+  const isLeaderOrCoLeaderInService = issue.service?.teams.some((team) =>
+    team.userTeams.some(
+      (ut) =>
+        ut.userId === session.user.id &&
+        (ut.responsibility === "Leader" || ut.responsibility === "Coleader")
+    )
+  );
 
+  // 🟢 Check if current user is the Service Manager
   const isProjectManager =
     issue.service?.serviceManager?.id === session.user.id;
 
-  if (!isLeaderOrCoLeader && !isProjectManager) {
+  if (!isLeaderOrCoLeaderInService && !isProjectManager) {
     return {
       success: false,
       message:
-        "Only Leaders, Co-Leaders, or the Project Manager can assign the team to an issue sheet.",
+        "Only Leaders/Co-Leaders under the same service, or the Project Manager, can assign the team to an issue sheet.",
     };
   }
 

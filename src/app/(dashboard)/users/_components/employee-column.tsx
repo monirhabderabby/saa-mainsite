@@ -33,14 +33,14 @@ export const getEmployeeColumns = ({
       return (
         <div className="flex items-center gap-2">
           <div>
-            <Avatar className="h-[25px] w-[25px]">
-              <AvatarImage src="/placeholder.avif" />
+            <Avatar className="h-[30px] w-[30px]">
+              <AvatarImage src={data.image ?? "/placeholder.avif"} />
               <AvatarFallback>C</AvatarFallback>
             </Avatar>
           </div>
           <div>
             <h1>{data.fullName}</h1>
-            <p>{data.designation.name}</p>
+            <p className="text-[12px]">{data.designation.name}</p>
           </div>
         </div>
       );

@@ -10,7 +10,7 @@ import SkeletonWrapper from "@/components/ui/skeleton-wrapper";
 import { IssueSheetData } from "@/helper/issue-sheets/get-issue-sheets";
 import { Team } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
 interface Props {
@@ -19,6 +19,10 @@ interface Props {
 
 const TeamSelector = ({ data }: Props) => {
   const [pending, startTransition] = useTransition();
+  const [selectedTeam, setSelectedTeam] = useState<string | undefined>(
+    data.teamId ?? undefined
+  );
+
   const { data: teams, isLoading } = useQuery<Team[]>({
     queryKey: ["teams-by-serviceid", data.serviceId],
     queryFn: () =>
@@ -26,27 +30,24 @@ const TeamSelector = ({ data }: Props) => {
   });
 
   const onChange = (teamId: string) => {
+    const prevTeam = selectedTeam; // keep the old value for rollback
+    setSelectedTeam(teamId); // optimistic update immediately
+
     startTransition(() => {
       assignTeamIntoIssueSheet(teamId, data.id).then((res) => {
         if (!res.success) {
+          setSelectedTeam(prevTeam); // rollback
           toast.error(res.message);
           return;
         }
-
-        // handle success
-        toast.success(res.message);
       });
     });
   };
 
   return (
     <SkeletonWrapper isLoading={isLoading}>
-      <Select
-        value={data.teamId ?? undefined}
-        onValueChange={onChange}
-        disabled={pending}
-      >
-        <SelectTrigger className="focus:ring-0 ">
+      <Select value={selectedTeam} onValueChange={onChange} disabled={pending}>
+        <SelectTrigger className="focus:ring-0">
           <SelectValue placeholder="Select Team" />
         </SelectTrigger>
         <SelectContent>

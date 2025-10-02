@@ -10,9 +10,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import prisma from "@/lib/prisma";
 import { TeamResponsibility } from "@prisma/client";
-import { ArrowLeft, MoreHorizontal, Plus } from "lucide-react";
+import { MoreHorizontal, Plus } from "lucide-react";
 import dynamic from "next/dynamic";
-import Link from "next/link";
+import BackPrevPage from "./_components/back-previous-page";
 import RemoveMemberAction from "./_components/remove-member-action";
 import ResponsibilityAction from "./_components/responsibility-action";
 const TeamManageDropdown = dynamic(
@@ -81,11 +81,8 @@ export default async function ManageTeamsPage({
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <Link href="/teams">
-              <Button variant="ghost" size="icon">
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-            </Link>
+            <BackPrevPage />
+
             <div>
               <h1 className="text-lg font-bold text-balance">Manage Teams</h1>
               <p className="text-muted-foreground">

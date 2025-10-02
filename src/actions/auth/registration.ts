@@ -7,12 +7,25 @@ import {
   registrationSchema,
   RegistrationSchemaValues,
 } from "@/schemas/auth/registration";
+import arcjet, { request, validateEmail } from "@arcjet/next";
 import { Prisma, Role } from "@prisma/client";
 import { render } from "@react-email/render";
 import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
 
+const aj = arcjet({
+  key: process.env.ARCJET_KEY!, // Get your site key from https://app.arcjet.com
+  rules: [
+    validateEmail({
+      mode: "LIVE", // will block requests. Use "DRY_RUN" to log only
+      // block disposable, invalid, and email addresses with no MX records
+      deny: ["DISPOSABLE", "INVALID", "NO_MX_RECORDS"],
+    }),
+  ],
+});
+
 export async function registerAction(data: RegistrationSchemaValues) {
+  const req = await request();
   // ✅ Validate user input
   const parsed = registrationSchema.safeParse(data);
   if (!parsed.success) {
@@ -32,6 +45,19 @@ export async function registerAction(data: RegistrationSchemaValues) {
     departmentId,
     nickName,
   } = parsed.data;
+
+  // check email validity with arcjet
+  const decision = await aj.protect(req, {
+    email,
+  });
+
+  if (decision.isDenied()) {
+    return {
+      success: false,
+      message:
+        "The email address you entered cannot be used. Please try a valid, non-disposable email.",
+    };
+  }
 
   try {
     // ✅ Pre-check if email or employeeId already exists

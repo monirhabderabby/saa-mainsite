@@ -36,10 +36,36 @@ const Page = async () => {
   }
 
   // Fetch required data for profiles, teams, and services
-  const [profiles, teams, services] = await prisma.$transaction([
+  const [profiles, services, teams] = await prisma.$transaction([
     prisma.profile.findMany(),
-    prisma.team.findMany(),
-    prisma.services.findMany(),
+
+    prisma.services.findMany({
+      where: {
+        department: {
+          is: {
+            name: "Operation",
+          },
+        },
+        name: {
+          not: "Management",
+        },
+      },
+    }),
+
+    prisma.team.findMany({
+      where: {
+        service: {
+          department: {
+            is: {
+              name: "Operation",
+            },
+          },
+          name: {
+            not: "Management",
+          },
+        },
+      },
+    }),
   ]);
 
   // Check if the user has permission to create issues
@@ -88,12 +114,16 @@ const Page = async () => {
   const isManagement = currentUserDetails.service?.name === "Management";
   const isSalesPerson = currentUserSession.user.role === "SALES_MEMBER";
 
-  // Check if default filters should be ignored
-  const shouldIgnoreDefaultFilters = isManagement || isSalesPerson;
-
   // Get the user's associated team (if any)
   const userTeams = currentUserDetails.userTeams;
   const userTeam = (userTeams.length > 0 && userTeams[0]) || undefined;
+  const isTeamLeader =
+    (userTeam?.userId === currentUserSession.user.id &&
+      userTeam.responsibility === "Leader") ||
+    userTeam?.responsibility === "Coleader";
+
+  // Check if default filters should be ignored
+  const shouldIgnoreDefaultFilters = isManagement || isSalesPerson;
 
   return (
     <Card className="shadow-none">
@@ -116,7 +146,11 @@ const Page = async () => {
                   : (currentUserDetails?.serviceId ?? "")
               }
               currentUserTeamId={
-                shouldIgnoreDefaultFilters ? undefined : userTeam?.teamId
+                shouldIgnoreDefaultFilters
+                  ? undefined
+                  : isTeamLeader
+                    ? undefined
+                    : userTeam?.teamId
               }
               profiles={profiles}
               services={services}
