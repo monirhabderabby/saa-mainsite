@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -136,6 +136,9 @@ export default async function ServiTeaceCard({ service }: ServiceCardProps) {
                       key={userTeam.user.id}
                       className="w-8 h-8 border-2 border-background"
                     >
+                      <AvatarImage
+                        src={userTeam.user.image ?? "/placeholder.avif"}
+                      />
                       <AvatarFallback className="text-xs bg-slate-600 text-white font-medium">
                         {userTeam.user.fullName
                           ?.split(" ")
