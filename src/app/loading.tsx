@@ -1,6 +1,6 @@
 import BrandLoader from "@/components/shared/loader/brand-loader";
 
-const Loader = () => {
+const Loading = () => {
   return (
     <div className="min-h-[400px] flex justify-center items-center">
       <BrandLoader message="Getting things ready..." />
@@ -8,4 +8,4 @@ const Loader = () => {
   );
 };
 
-export default Loader;
+export default Loading;
