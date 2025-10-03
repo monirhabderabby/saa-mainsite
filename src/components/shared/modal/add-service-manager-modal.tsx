@@ -180,7 +180,7 @@ export default function AddServiceManagerModal({
                         <PopoverContent className="w-full p-0">
                           <Command>
                             <CommandInput
-                              placeholder="Type employee id..."
+                              placeholder="Type17002 employee id..."
                               onInput={(e) =>
                                 setQuery((e.target as HTMLInputElement).value)
                               }
