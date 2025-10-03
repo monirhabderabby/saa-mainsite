@@ -180,9 +180,10 @@ export default function AddServiceManagerModal({
                         <PopoverContent className="w-full p-0">
                           <Command>
                             <CommandInput
-                              placeholder="Type name or employee id..."
-                              value={query}
-                              onValueChange={setQuery}
+                              placeholder="Type employee id..."
+                              onInput={(e) =>
+                                setQuery((e.target as HTMLInputElement).value)
+                              }
                             />
                             <CommandList
                               className="max-h-60 overflow-y-auto"
@@ -196,7 +197,7 @@ export default function AddServiceManagerModal({
                                 {filteredUsers.map((user) => (
                                   <CommandItem
                                     key={user.id}
-                                    value={user.id}
+                                    value={user.employeeId}
                                     onSelect={() => field.onChange(user.id)}
                                   >
                                     <Check
