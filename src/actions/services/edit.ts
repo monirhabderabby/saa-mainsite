@@ -54,6 +54,7 @@ export async function editService(id: string, data: SerivceSchemaType) {
     const duplicateService = await prisma.services.findFirst({
       where: {
         name: parsedData.data.name,
+        departmentId: parsedData.data.departmentId, // ✅ check within same department
         NOT: { id },
       },
     });
@@ -61,7 +62,7 @@ export async function editService(id: string, data: SerivceSchemaType) {
     if (duplicateService) {
       return {
         success: false,
-        message: `A service named "${parsedData.data.name}" already exists.`,
+        message: `A service named "${parsedData.data.name}" already exists in this department.`,
       };
     }
 
