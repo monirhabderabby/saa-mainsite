@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const restrictedUrlSchema = z
   .string()
-  .url({ message: "Must be a valid URL" }) // step 1: must be a valid URL
+  .url({ message: "Must be a valid URL" })
   .refine(
     (val) =>
       val === "" ||
@@ -16,12 +16,23 @@ const restrictedUrlSchema = z
   .optional()
   .or(z.literal("")); // allow empty string
 
+const fiverrOrderIdRegex = /^FO[A-Z0-9]+$/; // matches FO followed by alphanumeric characters
+
 export const issueSheetSchema = z
   .object({
     clientName: z
       .string()
       .min(1, { message: "Please enter the client's name" }),
-    orderId: z.string().min(1, { message: "Please provide the order ID" }),
+
+    // ✅ Fiverr Order ID: optional, but if provided must match format
+    orderId: z
+      .string()
+      .optional()
+      .refine((val) => !val || fiverrOrderIdRegex.test(val), {
+        message:
+          "Order ID must be a valid Fiverr order ID (e.g., FO414327B25420)",
+      }),
+
     profileId: z.string().min(1, { message: "Please select a profile" }),
     serviceId: z.string().min(1, { message: "Please select a service" }),
 

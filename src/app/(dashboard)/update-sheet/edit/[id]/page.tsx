@@ -7,17 +7,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { canEditUpdateSheetEntry } from "@/lib/permissions/update-sheet/update-entry";
 import prisma from "@/lib/prisma";
-import { Role } from "@prisma/client";
 import { MoveLeft } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+
 const AccessDeniedCard = dynamic(
   () => import("@/components/ui/custom/access-denied-card"),
-  {
-    ssr: false,
-  }
+  { ssr: false }
 );
 
 const AddUpdateForm = dynamic(
@@ -29,24 +28,16 @@ const Page = async ({ params }: { params: { id: string } }) => {
   const cu = await auth();
   if (!cu?.user.id) redirect("/login");
 
-  // Step 1: Fetch entry + creator's teams + service
+  // Step 1: Ensure entry exists
   const entry = await prisma.updateSheet.findUnique({
     where: { id: params.id },
     include: {
       updateBy: {
         select: {
           id: true,
-          service: {
-            select: {
-              serviceManagerId: true,
-            },
-          },
-          userTeams: {
-            select: {
-              teamId: true,
-              responsibility: true,
-            },
-          },
+          serviceId: true,
+          service: { select: { serviceManagerId: true } },
+          userTeams: { select: { teamId: true, responsibility: true } },
         },
       },
     },
@@ -54,53 +45,21 @@ const Page = async ({ params }: { params: { id: string } }) => {
 
   if (!entry) notFound();
 
-  // Step 2: Fetch current user's teams + role
-  const currentUser = await prisma.user.findUnique({
-    where: { id: cu.user.id },
-    select: {
-      role: true,
-      userTeams: { select: { teamId: true, responsibility: true } },
-    },
-  });
-
-  if (!currentUser) {
-    return (
-      <div className="min-h-[80vh] flex justify-center items-center">
-        <AccessDeniedCard message="User not found." />
-      </div>
-    );
-  }
-
-  // Step 3: Check if user is leader of the same team as entry creator
-  const creatorTeamIds = entry.updateBy?.userTeams.map((t) => t.teamId) ?? [];
-  const isSameTeamLeader = currentUser.userTeams.some(
-    (ut) => creatorTeamIds.includes(ut.teamId) && ut.responsibility === "Leader"
+  // Step 2: Centralized permission check
+  const { canEdit, reason } = await canEditUpdateSheetEntry(
+    cu.user.id,
+    params.id
   );
-
-  // Step 4: Check if current user is service manager of entry creator's service
-  const isServiceManager =
-    entry.updateBy?.service?.serviceManagerId === cu.user.id;
-
-  // Step 5: Check if user is admin/super admin
-  const allowedRoles = ["SUPER_ADMIN", "ADMIN"] as Role[];
-  const isAdmin = cu.user.role && allowedRoles.includes(cu.user.role as Role);
-
-  // Step 6: Combine access rules
-  const canEdit =
-    cu.user.id === entry.updateById ||
-    isAdmin ||
-    isServiceManager ||
-    isSameTeamLeader;
 
   if (!canEdit) {
     return (
       <div className="min-h-[80vh] flex justify-center items-center">
-        <AccessDeniedCard />
+        <AccessDeniedCard message={reason} />
       </div>
     );
   }
 
-  // Step 5: Fetch profiles only if user can edit
+  // Step 3: Fetch profiles only if user can edit
   const profiles = await prisma.profile.findMany();
 
   return (
