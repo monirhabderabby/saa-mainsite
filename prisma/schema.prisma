@@ -327,9 +327,9 @@ enum IssueStatus {
 }
 
 model IssueSheet {
-    id         String @id @default(auto()) @map("_id") @db.ObjectId
+    id         String  @id @default(auto()) @map("_id") @db.ObjectId
     clientName String
-    orderId    String
+    orderId    String?
 
     specialNotes      String?
     orderPageUrl      String?

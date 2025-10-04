@@ -33,6 +33,7 @@ export const issueSheetColumns: ColumnDef<IssueSheetData>[] = [
         </div>
       );
     },
+    size: 180,
   },
   {
     accessorKey: "profile",
@@ -46,6 +47,7 @@ export const issueSheetColumns: ColumnDef<IssueSheetData>[] = [
   {
     accessorKey: "orderId",
     header: "Order ID",
+    size: 180,
   },
   {
     accessorKey: "serviceId",
