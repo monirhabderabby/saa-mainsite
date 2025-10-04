@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -139,6 +139,9 @@ export default async function ManageTeamsPage({
                         <div className="flex items-center gap-3">
                           <div className="relative">
                             <Avatar className="w-10 h-10">
+                              <AvatarImage
+                                src={member.user.image ?? "/placeholder.avif"}
+                              />
                               <AvatarFallback className="bg-primary/10 text-primary font-medium">
                                 {member.user.fullName}
                               </AvatarFallback>
