@@ -7,6 +7,7 @@ import moment from "moment";
 import Link from "next/link";
 import IssueSheetServiceLine from "./action/issue-sheet-service-line";
 import IssueSheetStatusAction from "./action/issue-sheet-status-action";
+import NoteForSales from "./action/note-for-sales";
 import SpecialNotes from "./action/special-notes";
 import StatusChangeBy from "./action/status-change-by";
 import TeamSelector from "./action/team-selector";
@@ -65,7 +66,7 @@ export const issueSheetColumns = ({
     },
     {
       accessorKey: "serviceId",
-      header: "Service Line",
+      header: "Service",
       cell: ({ row }) => <IssueSheetServiceLine data={row.original} />,
     },
     {
@@ -129,6 +130,7 @@ export const issueSheetColumns = ({
     {
       accessorKey: "noteForSales",
       header: "Note for Sales",
+      cell: ({ row }) => <NoteForSales data={row.original} />,
     },
     {
       accessorKey: "status",
