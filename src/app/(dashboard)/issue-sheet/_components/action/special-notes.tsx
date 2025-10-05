@@ -38,7 +38,9 @@ const SpecialNotes = ({ data }: Props) => {
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
-        <Button variant="link">Watch</Button>
+        <Button variant="link">
+          {data.specialNotes.slice(0, 10) + " ..."}
+        </Button>
       </HoverCardTrigger>
       <HoverCardContent className="flex items-start gap-2">
         {content}

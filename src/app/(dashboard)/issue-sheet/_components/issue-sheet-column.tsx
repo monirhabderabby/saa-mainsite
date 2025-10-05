@@ -48,7 +48,7 @@ export const issueSheetColumns = ({
           </div>
         );
       },
-      size: 180,
+      size: 250,
     },
     {
       accessorKey: "profile",

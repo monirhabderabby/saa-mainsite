@@ -47,7 +47,7 @@ const TeamSelector = ({ data }: Props) => {
   return (
     <SkeletonWrapper isLoading={isLoading}>
       <Select value={selectedTeam} onValueChange={onChange} disabled={pending}>
-        <SelectTrigger className="focus:ring-0">
+        <SelectTrigger className="focus:ring-0 w-[120px]">
           <SelectValue placeholder="Select Team" />
         </SelectTrigger>
         <SelectContent>
