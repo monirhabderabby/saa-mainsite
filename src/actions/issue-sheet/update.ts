@@ -5,29 +5,32 @@ import prisma from "@/lib/prisma";
 import { issueSheetSchema, IssueSheetSchemaType } from "@/schemas/issue-sheet";
 import { Role } from "@prisma/client";
 
-const allowedRoles: Role[] = ["SUPER_ADMIN", "ADMIN"];
+const ALLOWED_ROLES: Role[] = ["SUPER_ADMIN", "ADMIN"];
 
+/**
+ * Updates an existing Issue Sheet entry.
+ *
+ * Authorization rules:
+ * - ✅ SUPER_ADMIN and ADMIN can always edit.
+ * - ✅ Non-admin users can edit only if they have the ISSUE_SHEET permission with `isIssueUpdatAllowed = true`.
+ */
 export async function editIssueAction(id: string, data: IssueSheetSchemaType) {
   const session = await auth();
 
-  // 🔒 Authentication
-  if (!session || !session.user || !session.user.id) {
+  // 🔒 Step 1: Authentication
+  if (!session?.user?.id) {
     return {
       success: false,
       message: "You must be logged in to edit an issue.",
     };
   }
 
-  // 🔒 Authorization
-  if (!allowedRoles.includes(session.user.role as Role)) {
-    return {
-      success: false,
-      message: "You don't have permission to edit an issue.",
-    };
-  }
+  const { user } = session;
 
-  const permission = await prisma.permissions.findFirst({
+  // 🔒 Step 2: Fetch user-specific ISSUE_SHEET permission
+  const userPermission = await prisma.permissions.findFirst({
     where: {
+      userId: user.id, // ✅ Check permission for the logged-in user
       name: "ISSUE_SHEET",
     },
     select: {
@@ -35,24 +38,20 @@ export async function editIssueAction(id: string, data: IssueSheetSchemaType) {
     },
   });
 
-  // Check if permission exists
-  if (!permission) {
-    return {
-      success: false,
-      message: "Permission for issue sheet not found. Contact admin.",
-    };
-  }
+  // 🔒 Step 3: Determine if user is allowed
+  const isAdmin = ALLOWED_ROLES.includes(user.role as Role);
+  const hasPermission = userPermission?.isIssueUpdatAllowed === true;
 
-  // Check if editing is allowed
-  if (!permission.isIssueUpdatAllowed) {
+  if (!isAdmin && !hasPermission) {
     return {
       success: false,
-      message: "You do not have permission to edit issue sheets.",
+      message:
+        "You don't have permission to edit issue sheets. Contact your administrator.",
     };
   }
 
   try {
-    // Check if the issue exists
+    // Step 4: Ensure the issue exists
     const existingIssue = await prisma.issueSheet.findUnique({
       where: { id },
     });
@@ -64,7 +63,7 @@ export async function editIssueAction(id: string, data: IssueSheetSchemaType) {
       };
     }
 
-    // ✅ Validate data
+    // Step 5: Validate incoming data
     const parsed = issueSheetSchema.safeParse(data);
     if (!parsed.success) {
       return {
@@ -85,7 +84,7 @@ export async function editIssueAction(id: string, data: IssueSheetSchemaType) {
       fileOrMeetingLink,
     } = parsed.data;
 
-    // ✅ Update issue
+    // Step 6: Update issue
     const updatedIssue = await prisma.issueSheet.update({
       where: { id },
       data: {
@@ -99,13 +98,13 @@ export async function editIssueAction(id: string, data: IssueSheetSchemaType) {
         noteForSales: noteForSales || null,
         fileOrMeetingLink: fileOrMeetingLink || null,
         // Optionally track who last modified the issue
-        // updatedById: session.user.id as string,
+        // updatedById: user.id,
       },
     });
 
     return {
       success: true,
-      message: `Issue of client "${updatedIssue.clientName}" updated successfully.`,
+      message: `Issue for client "${updatedIssue.clientName}" updated successfully.`,
       data: updatedIssue,
     };
   } catch (error) {
@@ -113,88 +112,6 @@ export async function editIssueAction(id: string, data: IssueSheetSchemaType) {
     return {
       success: false,
       message: "Something went wrong while updating the issue.",
-    };
-  }
-}
-
-export async function assignTeamIntoIssueSheet(
-  teamId: string,
-  issueSheetId: string
-) {
-  const session = await auth();
-
-  // 🔒 Authentication
-  if (!session?.user?.id) {
-    return {
-      success: false,
-      message: "You must be logged in to edit an issue.",
-    };
-  }
-
-  // ✅ Get issue sheet with service + manager info
-  const issue = await prisma.issueSheet.findFirst({
-    where: { id: issueSheetId },
-    include: {
-      service: {
-        include: {
-          serviceManager: {
-            select: { id: true, fullName: true },
-          },
-          teams: {
-            include: {
-              userTeams: true,
-            },
-          },
-        },
-      },
-    },
-  });
-
-  if (!issue) {
-    return {
-      success: false,
-      message: "Issue sheet not found.",
-    };
-  }
-
-  // 🟢 Check if current user is a Leader/Co-Leader in ANY team under this service
-  const isLeaderOrCoLeaderInService = issue.service?.teams.some((team) =>
-    team.userTeams.some(
-      (ut) =>
-        ut.userId === session.user.id &&
-        (ut.responsibility === "Leader" || ut.responsibility === "Coleader")
-    )
-  );
-
-  // 🟢 Check if current user is the Service Manager
-  const isProjectManager =
-    issue.service?.serviceManager?.id === session.user.id;
-
-  if (!isLeaderOrCoLeaderInService && !isProjectManager) {
-    return {
-      success: false,
-      message:
-        "Only Leaders/Co-Leaders under the same service, or the Project Manager, can assign the team to an issue sheet.",
-    };
-  }
-
-  // ✅ Assign team into issue sheet
-  try {
-    const updatedIssueSheet = await prisma.issueSheet.update({
-      where: { id: issueSheetId },
-      data: { teamId },
-    });
-
-    return {
-      success: true,
-      message: "Team successfully assigned to the issue sheet.",
-      data: updatedIssueSheet,
-    };
-  } catch (error) {
-    console.error("Error assigning team:", error);
-    return {
-      success: false,
-      message: "Failed to assign team to issue sheet.",
     };
   }
 }

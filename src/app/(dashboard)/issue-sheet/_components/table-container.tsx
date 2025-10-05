@@ -7,6 +7,7 @@ import {
   IssueSheetData,
 } from "@/helper/issue-sheets/get-issue-sheets";
 import { useIssueSheetFilterState } from "@/zustand/issue-sheet";
+import { Role } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import {
   ColumnDef,
@@ -17,7 +18,12 @@ import {
 import { AlertTriangle } from "lucide-react";
 import { issueSheetColumns } from "./issue-sheet-column";
 
-const IssueTableContainer = () => {
+interface Props {
+  currentUserRole: Role;
+  canEdit: boolean;
+}
+
+const IssueTableContainer = ({ currentUserRole, canEdit }: Props) => {
   let {
     status: storeStatus,
     page,
@@ -75,7 +81,7 @@ const IssueTableContainer = () => {
   return (
     <SkeletonWrapper isLoading={isLoading}>
       <Table
-        columns={issueSheetColumns}
+        columns={issueSheetColumns({ canEdit, currentUserRole })}
         data={data?.data ?? []}
         totalPages={data?.pagination?.totalPages ?? 1}
       />

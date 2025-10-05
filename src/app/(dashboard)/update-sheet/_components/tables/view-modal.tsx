@@ -1,4 +1,4 @@
-import { markAsSent } from "@/actions/update-sheet/update";
+import { markAsSent } from "@/actions/update-sheet/mark-as-sent";
 import {
   AlertDialog,
   AlertDialogCancel,
