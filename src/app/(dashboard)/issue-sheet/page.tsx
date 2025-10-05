@@ -76,6 +76,7 @@ const Page = async () => {
     },
     select: {
       isIssueCreateAllowed: true,
+      isIssueUpdatAllowed: true,
     },
   });
 
@@ -125,6 +126,9 @@ const Page = async () => {
   // Check if default filters should be ignored
   const shouldIgnoreDefaultFilters = isManagement || isSalesPerson;
 
+  // can edit
+  const canEdit = permission?.isIssueUpdatAllowed ?? false;
+
   return (
     <Card className="shadow-none">
       <CardHeader>
@@ -173,7 +177,10 @@ const Page = async () => {
         </div>
       </CardHeader>
       <CardContent>
-        <IssueTableContainer />
+        <IssueTableContainer
+          currentUserRole={currentUserSession.user.role}
+          canEdit={canEdit}
+        />
       </CardContent>
     </Card>
   );

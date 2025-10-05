@@ -10,7 +10,7 @@ const ALLOWED_ROLES: Role[] = ["SUPER_ADMIN", "ADMIN"];
  * TL Check for an update sheet entry.
  *
  * Allowed if:
- * - Logged-in user is a Leader in the same service line as the entry creator
+ * - Logged-in user is a Leader **or Co-Leader** in the same service line as the entry creator
  * - Logged-in user is the Service Manager of the entry creator's service
  * - Logged-in user is Admin / Super Admin
  */
@@ -71,10 +71,10 @@ export async function tlCheck(id: string) {
     };
   }
 
-  // Step 4: Check if current user is Leader under the same service line
-  const isServiceLineTeamLeader = currentUser.userTeams.some(
+  // ✅ Step 4: Check if current user is Leader or Co-Leader under the same service line
+  const isServiceLineTeamLeaderOrCoLeader = currentUser.userTeams.some(
     (ut) =>
-      ut.responsibility === "Leader" &&
+      (ut.responsibility === "Leader" || ut.responsibility === "Coleader") &&
       ut.team.serviceId === entry.updateBy.serviceId
   );
 
@@ -91,7 +91,7 @@ export async function tlCheck(id: string) {
   });
 
   const canPerform =
-    (isServiceLineTeamLeader || isServiceManager || isAdmin) &&
+    (isServiceLineTeamLeaderOrCoLeader || isServiceManager || isAdmin) &&
     userPermission?.isMessageTLCheckAllowed === true;
 
   if (!canPerform) {

@@ -82,7 +82,7 @@ const TableContainer = ({
     ],
     queryFn: () =>
       fetch(
-        `/api/update-entries?profileId=${profileId}&updateTo=${updateTo}&clientName=${clientName}&orderId=${orderId}&page=${page}&limit=10&tl=${tl}&done=${done}&createdFrom=${createdFrom}&sendFroms=${sendFrom}`
+        `/api/update-entries?profileId=${profileId}&updateTo=${updateTo}&clientName=${clientName}&orderId=${orderId}&page=${page}&limit=25&tl=${tl}&done=${done}&createdFrom=${createdFrom}&sendFroms=${sendFrom}`
       ).then((res) => res.json()),
   });
 
@@ -128,6 +128,11 @@ const Table = ({ data, columns, totalPages }: TableProps) => {
     columns: columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      pagination: {
+        pageSize: 25,
+      },
+    },
   });
   return (
     <>
