@@ -19,7 +19,7 @@ const isValidUrl = (str: string) => {
   }
 };
 
-const SpecialNotes = ({ data }: Props) => {
+const NoteForSales = ({ data }: Props) => {
   if (!data.specialNotes) return null;
 
   const content = isValidUrl(data.specialNotes) ? (
@@ -38,9 +38,7 @@ const SpecialNotes = ({ data }: Props) => {
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
-        <Button variant="link">
-          {data.specialNotes.slice(0, 10) + " ..."}
-        </Button>
+        <Button variant="link">{data.specialNotes.slice(0, 10) + "..."}</Button>
       </HoverCardTrigger>
       <HoverCardContent className="flex items-start gap-2">
         {content}
@@ -49,4 +47,4 @@ const SpecialNotes = ({ data }: Props) => {
   );
 };
 
-export default SpecialNotes;
+export default NoteForSales;
