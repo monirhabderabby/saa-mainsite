@@ -1,4 +1,4 @@
-import { assignTeamIntoIssueSheet } from "@/actions/issue-sheet/update";
+import { assignTeamIntoIssueSheet } from "@/actions/issue-sheet/assign-team-into-sheet";
 import {
   Select,
   SelectContent,
