@@ -6,6 +6,7 @@ import { Pencil } from "lucide-react";
 import moment from "moment";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import CommentFormOperation from "./comment-from-operation";
 import DoneByComponent from "./done-by-component";
 import { CurrentUserTeam } from "./table-container";
 import TlCheckComponent from "./tl-check-component";
@@ -86,6 +87,7 @@ export const updateSheetColumns = ({
   {
     accessorKey: "commentFromOperation",
     header: "Comment (Operation)",
+    cell: ({ row }) => <CommentFormOperation data={row.original} />,
   },
   {
     accessorKey: "commentFromSales",
