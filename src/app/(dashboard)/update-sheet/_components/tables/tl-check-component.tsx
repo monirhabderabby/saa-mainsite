@@ -61,10 +61,10 @@ const TlCheckComponent = ({
   // 2. admins
   const isAdmins = adminRoles.includes(currentUserRole);
 
-  // 3. team leader under same service line
+  // 3. team leader or co-leader under same service line
   const isServiceLineTeamLeader =
-    currentUserTeam?.responsibility === "Leader" &&
-    currentUserTeam.team.serviceId === data.updateBy?.serviceId;
+    ["Leader", "Coleader"].includes(currentUserTeam?.responsibility ?? "") &&
+    currentUserTeam?.team?.serviceId === data.updateBy?.serviceId;
 
   // 4. service manager of creator’s service
   const isServiceManager =
