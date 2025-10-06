@@ -61,7 +61,10 @@ const CommentFormOperation = ({ data }: Props) => {
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
-        <Button variant="ghost" className={`${color.bg} ${color.hover}`}>
+        <Button
+          variant="ghost"
+          className={`${color.bg} ${color.hover} dark:text-black`}
+        >
           {data.commentFromOperation.slice(0, 10) + " ..."}
         </Button>
       </HoverCardTrigger>
