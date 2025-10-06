@@ -48,7 +48,18 @@ const Page = async ({ params }: { params: { id: string } }) => {
 
   const [profiles, services] = await prisma.$transaction([
     prisma.profile.findMany(),
-    prisma.services.findMany(),
+    prisma.services.findMany({
+      where: {
+        department: {
+          is: {
+            name: "Operation",
+          },
+        },
+        name: {
+          not: "Management",
+        },
+      },
+    }), // Note: fixed from 'services' to 'service'
   ]);
 
   if (!entry) notFound();
