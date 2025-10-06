@@ -72,11 +72,15 @@ export async function tlCheck(id: string) {
   }
 
   // ✅ Step 4: Check if current user is Leader or Co-Leader under the same service line
-  const isServiceLineTeamLeaderOrCoLeader = currentUser.userTeams.some(
-    (ut) =>
-      (ut.responsibility === "Leader" || ut.responsibility === "Coleader") &&
-      ut.team.serviceId === entry.updateBy.serviceId
-  );
+  const isServiceLineTeamLeaderOrCoLeader = currentUser.userTeams.some((ut) => {
+    const isLeaderOrCoLeader =
+      ut.responsibility === "Leader" || ut.responsibility === "Coleader";
+
+    const sameServiceLine =
+      ut.team?.serviceId && ut.team.serviceId === entry.updateBy?.serviceId;
+
+    return isLeaderOrCoLeader && sameServiceLine;
+  });
 
   // Step 5: Check if current user is Service Manager of entry creator’s service
   const isServiceManager = entry.updateBy.service?.serviceManagerId === user.id;
