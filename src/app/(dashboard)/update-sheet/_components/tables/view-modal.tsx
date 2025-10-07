@@ -11,9 +11,9 @@ import { ClipboardCopy } from "@/components/ui/custom/clipboard-copy";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import UpdateToBadge from "@/components/ui/update-to-badge";
 import { UpdateSheetData } from "@/helper/update-sheet/update-sheet";
+import { normalizeEditorHtml } from "@/lib/html-parse";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import DOMPurify from "dompurify";
 import { htmlToText } from "html-to-text";
 import { Check, Copy, Loader, Send } from "lucide-react";
 import moment from "moment";
@@ -31,9 +31,6 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
   const [pending, startTransition] = useTransition();
 
   const queryClient = useQueryClient();
-
-  // Sanitize the HTML content
-  const sanitizedHtml = DOMPurify.sanitize(data.message);
 
   const handleCopy = async () => {
     try {
@@ -59,6 +56,8 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
       queryClient.invalidateQueries({ queryKey: ["update-entries"] });
     });
   };
+
+  const normalizedHtml = normalizeEditorHtml(data.message);
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -139,7 +138,7 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
             <div className="absolute top-[20px] right-[20px]">
               <button
                 onClick={handleCopy}
-                className="relative p-1 rounded-md hover:bg-muted transition-colors duration-200 focus:outline-none "
+                className="relative p-1 rounded-md hover:bg-muted transition-colors duration-200 focus:outline-none"
                 aria-label={copied ? "Copied!" : "Copy to clipboard"}
               >
                 <div className="relative w-4 h-4">
@@ -162,11 +161,14 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
                 </div>
               </button>
             </div>
+
+            {/* ✅ Use normalized & styled HTML */}
             <div
               className="prose prose-sm max-w-none"
-              dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
+              dangerouslySetInnerHTML={{ __html: normalizedHtml }}
             />
           </div>
+
           {data.sendAt && (
             <p className="mt-5 text-[14px] text-muted-foreground">
               This message was sent to the client on{" "}
