@@ -185,32 +185,23 @@ export default function RichTextEditor({
       <style jsx global>{`
         .ProseMirror {
           min-height: 150px;
-          white-space: pre-wrap; /* allow normal text wrapping */
-          font-family: inherit; /* ✅ inherit Raleway from <body> */
-          font-size: 0.95rem; /* optional – adjust to your UI */
-          line-height: 1.6; /* nice readable spacing */
-          color: inherit; /* use global text color */
-        }
-
-        .ProseMirror pre {
-          white-space: pre; /* keep indentation in code blocks */
-          font-family:
-            ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono",
-            "Courier New", monospace; /* monospace only for code */
-          font-size: 0.9rem;
-          background: rgba(0, 0, 0, 0.04);
-          border-radius: 0.375rem;
-          padding: 0.5rem;
-          overflow: auto;
+          white-space: pre-wrap;
+          font-family: inherit;
         }
 
         .ProseMirror:focus {
           outline: none;
+          font-family: inherit;
         }
 
-        .ProseMirror p:empty::before {
-          content: "";
-          display: inline;
+        /* 👇 override default code/pre styles */
+        .ProseMirror pre,
+        .ProseMirror code {
+          font-family: inherit !important;
+          font-size: inherit;
+          background: none;
+          color: inherit;
+          padding: 0;
         }
       `}</style>
 
