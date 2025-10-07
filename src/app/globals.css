@@ -118,3 +118,12 @@
   }
 }
 /* brand loader end */
+
+.formatted-block {
+  white-space: pre-wrap; /* preserve spacing and indentation */
+  border-radius: 6px;
+  font-family: inherit; /* ✅ use Raleway font */
+  font-size: 0.95rem;
+  color: inherit;
+  overflow-x: auto;
+}
