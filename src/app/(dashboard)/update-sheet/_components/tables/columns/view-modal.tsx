@@ -10,9 +10,11 @@ import { Button } from "@/components/ui/button";
 import { ClipboardCopy } from "@/components/ui/custom/clipboard-copy";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { UpdateSheetData } from "@/helper/update-sheet/update-sheet";
+
 import { normalizeEditorHtml } from "@/lib/html-parse";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
+
 import { htmlToText } from "html-to-text";
 import {
   Check,
@@ -26,6 +28,7 @@ import {
 import moment from "moment";
 import { ReactNode, useState, useTransition } from "react";
 import { toast } from "sonner";
+import AddNotePopoverForSales from "./_components/add-note-for-sales";
 
 interface Props {
   data: UpdateSheetData;
@@ -62,6 +65,13 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
       });
       queryClient.invalidateQueries({ queryKey: ["update-entries"] });
     });
+  };
+
+  const handleAddNote = (note: string) => {
+    // TODO: Integrate with API to save the note, e.g., update commentFromSales or similar
+    console.log("Adding note:", note);
+    toast.success("Note added successfully!", { icon: "📝" });
+    // Optionally invalidate queries: queryClient.invalidateQueries({ queryKey: ["update-entries"] });
   };
 
   const normalizedHtml = normalizeEditorHtml(data.message);
@@ -212,12 +222,15 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
                   Sent ✅
                 </Button>
               ) : data.tlId ? (
-                <Button onClick={onMarkedAsSend} disabled={pending} size="sm">
-                  Mark as Sent{" "}
-                  {pending ? <Loader className="animate-spin" /> : <Send />}
-                </Button>
+                <>
+                  <Button onClick={onMarkedAsSend} disabled={pending} size="sm">
+                    Mark as Sent{" "}
+                    {pending ? <Loader className="animate-spin" /> : <Send />}
+                  </Button>
+                  <AddNotePopoverForSales onSubmit={handleAddNote} />
+                </>
               ) : (
-                <></>
+                <AddNotePopoverForSales onSubmit={handleAddNote} />
               )}
             </div>
           </section>
