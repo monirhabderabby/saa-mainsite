@@ -82,7 +82,7 @@ export default function RichTextEditor({
               editor?.commands.insertContent(doc.body.innerHTML);
             }
             return true;
-          } catch (err) {
+          } catch {
             // fall back to plain text route below
             // continue
           }
@@ -128,7 +128,7 @@ export default function RichTextEditor({
       // ignore
     }
 
-    let content = value || "";
+    const content = value || "";
 
     // If content is empty just set it
     if (!content) {
