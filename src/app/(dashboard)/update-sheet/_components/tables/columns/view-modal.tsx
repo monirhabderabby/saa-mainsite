@@ -9,13 +9,20 @@ import {
 import { Button } from "@/components/ui/button";
 import { ClipboardCopy } from "@/components/ui/custom/clipboard-copy";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import UpdateToBadge from "@/components/ui/update-to-badge";
 import { UpdateSheetData } from "@/helper/update-sheet/update-sheet";
 import { normalizeEditorHtml } from "@/lib/html-parse";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { htmlToText } from "html-to-text";
-import { Check, Copy, Loader, Send } from "lucide-react";
+import {
+  Check,
+  Copy,
+  ExternalLink,
+  FolderOpen,
+  Loader,
+  Send,
+  X,
+} from "lucide-react";
 import moment from "moment";
 import { ReactNode, useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -36,7 +43,7 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
     try {
       await navigator.clipboard.writeText(htmlToText(data.message));
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), 3000);
     } catch (err) {
       console.error("Failed to copy text: ", err);
     }
@@ -62,10 +69,25 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
-      <AlertDialogContent className="p-0">
-        <ScrollArea className="max-h-[70vh] p-8">
-          <div className="flex items-start justify-between">
-            <div className="space-y-3">
+      <AlertDialogContent className="p-0 gap-0">
+        <div className="flex items-center justify-between px-6 py-4  border-b border-border">
+          <h2 className="text-xl font-semibold text-foreground">
+            Message Details
+          </h2>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setOpen(false)}
+            className="h-8 w-8 rounded-md hover:bg-accent"
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </Button>
+        </div>
+
+        <ScrollArea className="max-h-[70vh] ">
+          <div className=" p-5  border-b border-border bg-muted/40">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <ClipboardCopy label="Profile Name" value={data.profile.name} />
               <ClipboardCopy
                 label="Client Name"
@@ -77,69 +99,61 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
                 label="Updated By"
                 value={data.updateBy.fullName as string}
               />
-              {data.commentFromOperation && (
-                <ClipboardCopy
-                  label="OP Comment"
-                  value={data.commentFromOperation as string}
-                />
-              )}
-              {data.commentFromSales && (
-                <ClipboardCopy
-                  label="Sales Comment"
-                  value={data.commentFromSales as string}
-                />
-              )}
+
               {data.tlId && (
                 <ClipboardCopy
                   label="TL Check"
                   value={data.tlBy?.fullName as string}
                 />
               )}
-              {/* <p className="text-sm">
-                <span className="font-semibold">Update To: </span>
-                <span className="text-muted-foreground">
-                  <UpdateToBadge updateTo={data.updateTo} />
-                </span>
-              </p> */}
-
-              {data.attachments && (
-                <div className="text-sm">
-                  <span className="font-semibold">Attachments: </span>
-                  <Button asChild variant="link" effect="shine">
-                    <a
-                      href={data.attachments as string}
-                      className="hover:text-blue-500 transition-colors duration-300 "
-                      target="_blank"
-                    >
-                      {data.attachments?.slice(0, 40)}...
-                    </a>
-                  </Button>
-                </div>
-              )}
-
-              {data.doneBy && (
+              {data.commentFromOperation && (
                 <ClipboardCopy
-                  label="Done By"
-                  value={data.doneBy?.fullName as string}
+                  label="OP Comment"
+                  value={data.commentFromOperation as string}
                 />
               )}
-            </div>
-            <div className="flex flex-col justify-between">
-              <p className="">
-                {/* <span className="font-semibold">Update To: </span> */}
-                <span className="text-muted-foreground">
-                  <UpdateToBadge updateTo={data.updateTo} />
-                </span>
-              </p>
+              <ClipboardCopy
+                label="Message sent to "
+                value={data.updateTo}
+                badge
+              />
+              {data.commentFromSales && (
+                <ClipboardCopy
+                  label="Sales Comment"
+                  value={data.commentFromSales as string}
+                />
+              )}
+              <div className="">
+                <h3 className="text-sm font-medium text-muted-foreground mb-3">
+                  Attachments
+                </h3>
+                <a
+                  href={data.attachments as string}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 bg-muted hover:bg-accent rounded-lg border border-border transition-colors group"
+                >
+                  <FolderOpen className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                  <span className="text-sm font-medium text-foreground">
+                    Open Attachments
+                  </span>
+                  <ExternalLink className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                </a>
+              </div>
             </div>
           </div>
 
-          <div className="bg-gray-100 dark:bg-white/5 p-[20px] rounded-[8px] relative mt-5">
-            <div className="absolute top-[20px] right-[20px]">
-              <button
+          {/* message */}
+          <div className="p-5 rounded-[8px] relative ">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-medium text-muted-foreground">
+                Completion Message
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={handleCopy}
-                className="relative p-1 rounded-md hover:bg-muted transition-colors duration-200 focus:outline-none"
-                aria-label={copied ? "Copied!" : "Copy to clipboard"}
+                className="h-8 gap-2 text-xs"
               >
                 <div className="relative w-4 h-4">
                   <Copy
@@ -159,7 +173,8 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
                     )}
                   />
                 </div>
-              </button>
+                {copied ? "Copied" : "Copy Message"}
+              </Button>
             </div>
 
             {/* ✅ Use normalized & styled HTML */}
@@ -179,23 +194,33 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
           )}
         </ScrollArea>
 
-        <AlertDialogFooter className="px-5 pb-5">
-          <AlertDialogCancel>Close</AlertDialogCancel>
+        <AlertDialogFooter className="flex items-center py-3 px-5 bg-muted/30 border-t border-border">
+          <section className="flex items-center justify-between w-full">
+            {!data.doneById && !data.tlId ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+                Waiting for Tl Check....
+              </div>
+            ) : (
+              <div></div>
+            )}
+            <div className="flex items-center gap-x-3">
+              <AlertDialogCancel>Close</AlertDialogCancel>
 
-          {data.doneById ? (
-            <Button disabled variant="outline">
-              Sent ✅
-            </Button>
-          ) : data.tlId ? (
-            <Button onClick={onMarkedAsSend} disabled={pending}>
-              Mark as Sent{" "}
-              {pending ? <Loader className="animate-spin" /> : <Send />}
-            </Button>
-          ) : (
-            <Button disabled variant="ghost">
-              Waiting for Tl Check....
-            </Button>
-          )}
+              {data.doneById ? (
+                <Button disabled variant="outline" size="sm">
+                  Sent ✅
+                </Button>
+              ) : data.tlId ? (
+                <Button onClick={onMarkedAsSend} disabled={pending} size="sm">
+                  Mark as Sent{" "}
+                  {pending ? <Loader className="animate-spin" /> : <Send />}
+                </Button>
+              ) : (
+                <></>
+              )}
+            </div>
+          </section>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
