@@ -90,6 +90,7 @@ const AddNotePopoverForSales = ({
                 <textarea
                   className="h-full w-full resize-none rounded-md bg-transparent px-4 py-3 text-sm outline-none text-foreground"
                   autoFocus
+                  placeholder="write your note here..."
                   value={note || ""}
                   onChange={(e) => setNote(e.target.value)}
                 />
