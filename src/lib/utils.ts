@@ -12,3 +12,10 @@ export function getTextFromHtml(html: string): string {
     selectors: [{ selector: "a", options: { ignoreHref: true } }],
   });
 }
+
+export function countTipTapCharacters(html: string): number {
+  // Get plain text
+  const text = getTextFromHtml(html);
+  // Remove line breaks and trim spaces, just like TipTap does
+  return text.replace(/\r?\n|\r/g, "").trim().length;
+}
