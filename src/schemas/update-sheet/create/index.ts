@@ -1,4 +1,4 @@
-import { getTextFromHtml } from "@/lib/utils";
+import { countTipTapCharacters, getTextFromHtml } from "@/lib/utils";
 import { UpdateTo } from "@prisma/client";
 import { z } from "zod";
 
@@ -75,11 +75,8 @@ export const updateSheetCreateSchema = z
       })
       .trim()
       .refine(
-        (val) => {
-          const text = getTextFromHtml(val); // convert HTML -> plain text
-          return text.length <= 2500;
-        },
-        { message: "Message cannot exceed 2500 characters" }
+        (val) => countTipTapCharacters(val) <= 2500,
+        "Message cannot exceed 2500 characters"
       )
       .refine((val) => {
         const text = getTextFromHtml(val).toLowerCase();
