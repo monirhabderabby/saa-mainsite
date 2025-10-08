@@ -6,7 +6,7 @@ import { Role } from "@prisma/client";
 import dynamic from "next/dynamic";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { CurrentUserTeam } from "./table-container";
+import { CurrentUserTeam } from "../table-container";
 const ProfileToolTip = dynamic(
   () => import("@/components/ui/profile-tooltip"),
   {
