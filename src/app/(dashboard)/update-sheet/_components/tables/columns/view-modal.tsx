@@ -1,3 +1,4 @@
+"use client";
 import { markAsSent } from "@/actions/update-sheet/mark-as-sent";
 import {
   AlertDialog,
@@ -15,6 +16,7 @@ import { normalizeEditorHtml } from "@/lib/html-parse";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 
+import { AddSalesNote } from "@/actions/update-sheet/add-sales-note";
 import { Role } from "@prisma/client";
 import { htmlToText } from "html-to-text";
 import {
@@ -37,10 +39,19 @@ interface Props {
   currentUserRole: Role;
 }
 
-const allowedSalesNote = ["ADMIN", "SUPER_ADMIN", "SALES_MEMBER"] as Role[];
+const allowedSalesNoteRoles = [
+  "ADMIN",
+  "SUPER_ADMIN",
+  "SALES_MEMBER",
+] as Role[];
 const allowedMarkAsSent = ["SALES_MEMBER", "ADMIN", "SUPER_ADMIN"] as Role[];
 
-const ViewUpdateSheetModal = ({ data, trigger, currentUserRole }: Props) => {
+const ViewUpdateSheetModal = ({
+  data: dbData,
+  trigger,
+  currentUserRole,
+}: Props) => {
+  const [data, setData] = useState(dbData);
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -72,16 +83,31 @@ const ViewUpdateSheetModal = ({ data, trigger, currentUserRole }: Props) => {
     });
   };
 
-  const handleAddNote = (note: string) => {
-    // TODO: Integrate with API to save the note, e.g., update commentFromSales or similar
-    console.log("Adding note:", note);
-    toast.success("Note added successfully!", { icon: "📝" });
-    // Optionally invalidate queries: queryClient.invalidateQueries({ queryKey: ["update-entries"] });
+  const onAddNoteSales = (note: string) => {
+    startTransition(() => {
+      AddSalesNote({
+        note,
+        messageId: data.id,
+      }).then((res) => {
+        if (!res.success) {
+          toast.error(res.message);
+          return;
+        }
+
+        // handle success
+        setData((prev) => {
+          return {
+            ...prev,
+            commentFromSales: note,
+          };
+        });
+      });
+    });
   };
 
   const normalizedHtml = normalizeEditorHtml(data.message);
 
-  const isAccessForNote = allowedSalesNote.includes(currentUserRole);
+  const isAccessForNote = allowedSalesNoteRoles.includes(currentUserRole);
   const isAccessForMarkAsSent = allowedMarkAsSent.includes(currentUserRole);
 
   return (
@@ -248,12 +274,18 @@ const ViewUpdateSheetModal = ({ data, trigger, currentUserRole }: Props) => {
                     </Button>
                   )}
                   {isAccessForNote && (
-                    <AddNotePopoverForSales onSubmit={handleAddNote} />
+                    <AddNotePopoverForSales
+                      initialData={data.commentFromSales}
+                      onSubmit={onAddNoteSales}
+                    />
                   )}
                 </>
               ) : (
                 isAccessForNote && (
-                  <AddNotePopoverForSales onSubmit={handleAddNote} />
+                  <AddNotePopoverForSales
+                    initialData={data.commentFromSales}
+                    onSubmit={onAddNoteSales}
+                  />
                 )
               )}
             </div>
