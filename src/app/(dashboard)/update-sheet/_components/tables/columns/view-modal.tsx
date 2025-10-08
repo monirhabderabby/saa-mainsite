@@ -1,3 +1,4 @@
+"use client";
 import { markAsSent } from "@/actions/update-sheet/mark-as-sent";
 import {
   AlertDialog,
@@ -15,6 +16,8 @@ import { normalizeEditorHtml } from "@/lib/html-parse";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 
+import { AddSalesNote } from "@/actions/update-sheet/add-sales-note";
+import { Role } from "@prisma/client";
 import { htmlToText } from "html-to-text";
 import {
   Check,
@@ -33,9 +36,22 @@ import AddNotePopoverForSales from "./_components/add-note-for-sales";
 interface Props {
   data: UpdateSheetData;
   trigger: ReactNode;
+  currentUserRole: Role;
 }
 
-const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
+const allowedSalesNoteRoles = [
+  "ADMIN",
+  "SUPER_ADMIN",
+  "SALES_MEMBER",
+] as Role[];
+const allowedMarkAsSent = ["SALES_MEMBER", "ADMIN", "SUPER_ADMIN"] as Role[];
+
+const ViewUpdateSheetModal = ({
+  data: dbData,
+  trigger,
+  currentUserRole,
+}: Props) => {
+  const [data, setData] = useState(dbData);
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -67,14 +83,32 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
     });
   };
 
-  const handleAddNote = (note: string) => {
-    // TODO: Integrate with API to save the note, e.g., update commentFromSales or similar
-    console.log("Adding note:", note);
-    toast.success("Note added successfully!", { icon: "📝" });
-    // Optionally invalidate queries: queryClient.invalidateQueries({ queryKey: ["update-entries"] });
+  const onAddNoteSales = (note: string) => {
+    startTransition(() => {
+      AddSalesNote({
+        note,
+        messageId: data.id,
+      }).then((res) => {
+        if (!res.success) {
+          toast.error(res.message);
+          return;
+        }
+
+        // handle success
+        setData((prev) => {
+          return {
+            ...prev,
+            commentFromSales: note,
+          };
+        });
+      });
+    });
   };
 
   const normalizedHtml = normalizeEditorHtml(data.message);
+
+  const isAccessForNote = allowedSalesNoteRoles.includes(currentUserRole);
+  const isAccessForMarkAsSent = allowedMarkAsSent.includes(currentUserRole);
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -209,11 +243,17 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
             {!data.doneById && !data.tlId ? (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-                Waiting for Tl Check....
+                Waiting for the Tl Check...
+              </div>
+            ) : !data.doneById && data.tlId ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                Waiting for sending message...
               </div>
             ) : (
               <div></div>
             )}
+
             <div className="flex items-center gap-x-3">
               <AlertDialogCancel>Close</AlertDialogCancel>
 
@@ -223,14 +263,30 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
                 </Button>
               ) : data.tlId ? (
                 <>
-                  <Button onClick={onMarkedAsSend} disabled={pending} size="sm">
-                    Mark as Sent{" "}
-                    {pending ? <Loader className="animate-spin" /> : <Send />}
-                  </Button>
-                  <AddNotePopoverForSales onSubmit={handleAddNote} />
+                  {isAccessForMarkAsSent && (
+                    <Button
+                      onClick={onMarkedAsSend}
+                      disabled={pending}
+                      size="sm"
+                    >
+                      Mark as Sent{" "}
+                      {pending ? <Loader className="animate-spin" /> : <Send />}
+                    </Button>
+                  )}
+                  {isAccessForNote && (
+                    <AddNotePopoverForSales
+                      initialData={data.commentFromSales}
+                      onSubmit={onAddNoteSales}
+                    />
+                  )}
                 </>
               ) : (
-                <AddNotePopoverForSales onSubmit={handleAddNote} />
+                isAccessForNote && (
+                  <AddNotePopoverForSales
+                    initialData={data.commentFromSales}
+                    onSubmit={onAddNoteSales}
+                  />
+                )
               )}
             </div>
           </section>
