@@ -82,6 +82,7 @@ export const updateSheetColumns = ({
     cell: ({ row }) => (
       <div className="flex justify-center">
         <ViewUpdateSheetModal
+          currentUserRole={currentUserRole}
           trigger={
             <Button variant="outline" size="sm">
               View

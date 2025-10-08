@@ -15,6 +15,7 @@ import { normalizeEditorHtml } from "@/lib/html-parse";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 
+import { Role } from "@prisma/client";
 import { htmlToText } from "html-to-text";
 import {
   Check,
@@ -33,9 +34,13 @@ import AddNotePopoverForSales from "./_components/add-note-for-sales";
 interface Props {
   data: UpdateSheetData;
   trigger: ReactNode;
+  currentUserRole: Role;
 }
 
-const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
+const allowedSalesNote = ["ADMIN", "SUPER_ADMIN", "SALES_MEMBER"] as Role[];
+const allowedMarkAsSent = ["SALES_MEMBER", "ADMIN", "SUPER_ADMIN"] as Role[];
+
+const ViewUpdateSheetModal = ({ data, trigger, currentUserRole }: Props) => {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -75,6 +80,9 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
   };
 
   const normalizedHtml = normalizeEditorHtml(data.message);
+
+  const isAccessForNote = allowedSalesNote.includes(currentUserRole);
+  const isAccessForMarkAsSent = allowedMarkAsSent.includes(currentUserRole);
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -209,11 +217,17 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
             {!data.doneById && !data.tlId ? (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-                Waiting for Tl Check....
+                Waiting for the Tl Check...
+              </div>
+            ) : !data.doneById && data.tlId ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                Waiting for sending message...
               </div>
             ) : (
               <div></div>
             )}
+
             <div className="flex items-center gap-x-3">
               <AlertDialogCancel>Close</AlertDialogCancel>
 
@@ -223,14 +237,24 @@ const ViewUpdateSheetModal = ({ data, trigger }: Props) => {
                 </Button>
               ) : data.tlId ? (
                 <>
-                  <Button onClick={onMarkedAsSend} disabled={pending} size="sm">
-                    Mark as Sent{" "}
-                    {pending ? <Loader className="animate-spin" /> : <Send />}
-                  </Button>
-                  <AddNotePopoverForSales onSubmit={handleAddNote} />
+                  {isAccessForMarkAsSent && (
+                    <Button
+                      onClick={onMarkedAsSend}
+                      disabled={pending}
+                      size="sm"
+                    >
+                      Mark as Sent{" "}
+                      {pending ? <Loader className="animate-spin" /> : <Send />}
+                    </Button>
+                  )}
+                  {isAccessForNote && (
+                    <AddNotePopoverForSales onSubmit={handleAddNote} />
+                  )}
                 </>
               ) : (
-                <AddNotePopoverForSales onSubmit={handleAddNote} />
+                isAccessForNote && (
+                  <AddNotePopoverForSales onSubmit={handleAddNote} />
+                )
               )}
             </div>
           </section>
