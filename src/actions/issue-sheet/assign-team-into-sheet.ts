@@ -67,7 +67,7 @@ export async function assignTeamIntoIssueSheet(
     team.userTeams.some(
       (ut) =>
         ut.userId === userId &&
-        ["Leader", "Co-Leader"].includes(ut.responsibility)
+        ["Leader", "Coleader"].includes(ut.responsibility)
     )
   );
 
