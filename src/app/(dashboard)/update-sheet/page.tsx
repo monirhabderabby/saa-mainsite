@@ -12,7 +12,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 const FilterContainer = dynamic(
-  () => import("./_components/filter-container"),
+  () => import("./_components/filters/filter-container"),
   {
     ssr: false,
   }

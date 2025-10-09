@@ -6,13 +6,21 @@ import { Pencil } from "lucide-react";
 import moment from "moment";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import CommentFormOperation from "./comment-from-operation";
-import DoneByComponent from "./done-by-component";
+import CommentFormOperation from "./columns/comment-from-operation";
+import DoneByComponent from "./columns/done-by-component";
+import TlCheckComponent from "./columns/tl-check-component";
 import { CurrentUserTeam } from "./table-container";
-import TlCheckComponent from "./tl-check-component";
-import UpdateToComponents from "./update-to";
-import UpdatedByComponents from "./updated-by-component";
-const ViewUpdateSheetModal = dynamic(() => import("./view-modal"), {
+const UpdateToComponents = dynamic(() => import("./columns/update-to"), {
+  ssr: false,
+});
+const UpdatedByComponents = dynamic(
+  () => import("./columns/updated-by-component"),
+  {
+    ssr: false,
+  }
+);
+
+const ViewUpdateSheetModal = dynamic(() => import("./columns/view-modal"), {
   ssr: false,
 });
 
@@ -74,6 +82,7 @@ export const updateSheetColumns = ({
     cell: ({ row }) => (
       <div className="flex justify-center">
         <ViewUpdateSheetModal
+          currentUserRole={currentUserRole}
           trigger={
             <Button variant="outline" size="sm">
               View
