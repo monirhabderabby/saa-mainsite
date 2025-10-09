@@ -29,8 +29,8 @@ const AddNotePopoverForSales = ({ initialData, onSubmit }: Props) => {
 
   const closeMenu = useCallback(() => {
     setIsOpen(false);
-    setNote(null);
-  }, []);
+    setNote(initialData ?? null);
+  }, [initialData]);
 
   useClickOutside({
     ref: formContainerRef,
@@ -69,7 +69,7 @@ const AddNotePopoverForSales = ({ initialData, onSubmit }: Props) => {
             layoutId={`popover-label-${uniqueId}`}
             className="text-sm"
           >
-            Add Note
+            {note ? "Change Note" : "Add Note"}
           </motion.span>
         </motion.button>
 
@@ -112,7 +112,7 @@ const AddNotePopoverForSales = ({ initialData, onSubmit }: Props) => {
                     type="submit"
                     aria-label="Submit note"
                   >
-                    Submit Note
+                    {initialData ? "Save Note" : "Submit Note"}
                   </button>
                 </div>
               </form>
