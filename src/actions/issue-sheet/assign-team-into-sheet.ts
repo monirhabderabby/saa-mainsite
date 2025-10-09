@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
+import { Role } from "@prisma/client";
 
 /**
  * Assigns a team to an existing Issue Sheet.
@@ -14,6 +15,8 @@ import prisma from "@/lib/prisma";
  * @param issueSheetId - The ID of the issue sheet to update.
  * @returns A success or failure response with an appropriate message.
  */
+
+const adminsAndSalesRoles = ["ADMIN", "SUPER_ADMIN", "SALES_MEMBER"] as Role[];
 export async function assignTeamIntoIssueSheet(
   teamId: string,
   issueSheetId: string
@@ -73,11 +76,13 @@ export async function assignTeamIntoIssueSheet(
 
   const isServiceManager = service.serviceManager?.id === userId;
 
-  if (!isLeaderOrCoLeader && !isServiceManager) {
+  const isAdminsOrSalesMember = adminsAndSalesRoles.includes(session.user.role);
+
+  if (!isLeaderOrCoLeader && !isServiceManager && !isAdminsOrSalesMember) {
     return {
       success: false,
       message:
-        "Access denied. Only Leaders, Co-Leaders, or the Service Manager of this service can assign a team to an issue sheet.",
+        "Access denied. Only Leaders, Co-Leaders, Service Managers, Admins, or Sales Members can assign a team to an issue sheet.",
     };
   }
 
