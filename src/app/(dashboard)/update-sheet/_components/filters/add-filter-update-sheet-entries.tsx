@@ -124,8 +124,6 @@ export default function AddFilterUpdateSheetEntries({
       ...values,
       page: 1,
     });
-
-    console.log(values);
     setOpen(false);
   }
 
