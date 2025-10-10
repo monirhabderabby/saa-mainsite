@@ -14,29 +14,41 @@ export async function GET(req: NextRequest) {
       { status: 401 }
     );
   }
+
   try {
     const searchParams = req.nextUrl.searchParams;
 
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
-    const profileId = searchParams.get("profileId") || undefined;
+
     const updateTo = searchParams.get("updateTo") || undefined;
     const clientName = searchParams.get("clientName") || undefined;
     const orderId = searchParams.get("orderId") || undefined;
+    const tl = searchParams.get("tl") || "All";
+    const done = searchParams.get("done") || "All";
 
-    const tl = searchParams.get("tl") || "All"; // tlChecked | notTlCheck | All
-    const done = searchParams.get("done") || "All"; // done | notDone | All
-
-    // New date filters
     const createdFrom = searchParams.get("createdFrom") || undefined;
     const createdTo = searchParams.get("createdTo") || undefined;
     const sendFrom = searchParams.get("sendFrom") || undefined;
     const sendTo = searchParams.get("sendTo") || undefined;
 
+    // ✅ Read multiple values
+    const rawProfileIds = searchParams.getAll("profileId");
+
+    // handle both `?profileId=a,b` and `?profileId=a&profileId=b`
+    const profileIds = rawProfileIds
+      .flatMap((id) => id.split(",")) // split comma-separated values
+      .map((id) => id.trim())
+      .filter(Boolean); // remove empty strings
+
+    // ✅ Normalize: if no specific IDs, treat as "All"
+    const hasSpecificProfiles =
+      profileIds.length > 0 && !profileIds.includes("All");
+
     const result = await getUpdateSheets({
       page,
       limit,
-      profileId,
+      profileIds: hasSpecificProfiles ? profileIds : undefined, // pass as array
       updateTo,
       clientName,
       orderId,

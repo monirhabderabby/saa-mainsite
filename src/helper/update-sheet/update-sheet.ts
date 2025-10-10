@@ -6,7 +6,7 @@ import { Prisma } from "@prisma/client";
 export async function getUpdateSheets(options: {
   page?: number;
   limit?: number;
-  profileId?: string;
+  profileIds?: string[];
   updateTo?: string;
   clientName?: string;
   orderId?: string;
@@ -20,7 +20,7 @@ export async function getUpdateSheets(options: {
   const {
     page = 1,
     limit = 10,
-    profileId,
+    profileIds,
     updateTo,
     clientName,
     orderId,
@@ -35,7 +35,12 @@ export async function getUpdateSheets(options: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const filters: any = {};
 
-  if (profileId && profileId !== "All") filters.profileId = profileId;
+  // ✅ Handle multiple profile IDs
+  if (profileIds && profileIds.length > 0) {
+    filters.profileId = {
+      in: profileIds,
+    };
+  }
   if (updateTo && updateTo !== "All") filters.updateTo = updateTo;
   if (clientName)
     filters.clientName = { contains: clientName, mode: "insensitive" };
