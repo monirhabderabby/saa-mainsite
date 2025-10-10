@@ -60,7 +60,15 @@ export const updateSheetCreateSchema = z
       .min(1)
       .trim(),
 
-    attachments: z.string().trim().optional(), // will be validated conditionally
+    attachments: z
+      .string({
+        message: "attachments should be an URL",
+      })
+      .trim()
+      .url({
+        message: "Attachments must be a valid URL",
+      })
+      .optional(), // will be validated conditionally
 
     commentFromOperation: z.string().trim().optional(),
     commentFromSales: z.string().trim().optional(),

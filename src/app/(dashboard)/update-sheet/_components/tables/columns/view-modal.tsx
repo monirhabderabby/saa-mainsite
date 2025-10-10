@@ -167,23 +167,25 @@ const ViewUpdateSheetModal = ({
                   value={data.commentFromSales as string}
                 />
               )}
-              <div className="">
-                <h3 className="text-sm font-medium text-muted-foreground mb-3">
-                  Attachments
-                </h3>
-                <a
-                  href={data.attachments as string}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-3 py-1.5 bg-muted hover:bg-accent rounded-lg border border-border transition-colors group"
-                >
-                  <FolderOpen className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                  <span className="text-sm font-medium text-foreground">
-                    Open Attachments
-                  </span>
-                  <ExternalLink className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
-                </a>
-              </div>
+              {data.attachments && (
+                <div className="">
+                  <h3 className="text-sm font-medium text-muted-foreground mb-3">
+                    Attachments
+                  </h3>
+                  <a
+                    href={data.attachments as string}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-muted hover:bg-accent rounded-lg border border-border transition-colors group"
+                  >
+                    <FolderOpen className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                    <span className="text-sm font-medium text-foreground">
+                      Open Attachments
+                    </span>
+                    <ExternalLink className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                  </a>
+                </div>
+              )}
             </div>
           </div>
 
