@@ -190,48 +190,66 @@ export default function AddFilterUpdateSheetEntries({
                             role="combobox"
                             className={cn(
                               "w-full justify-between",
-                              !field.value && "text-muted-foreground"
+                              !field.value?.length && "text-muted-foreground"
                             )}
                           >
-                            {field.value
-                              ? profiles.find((p) => p.id === field.value)?.name
-                              : "Select a profile"}
+                            {field.value?.length
+                              ? `${field.value.length} selected`
+                              : "Select profiles"}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
+
                       <PopoverContent className="w-full min-w-[400px] p-0">
                         <Command>
                           <CommandInput placeholder="Search profiles..." />
-                          <CommandList>
-                            <CommandEmpty>No profile found.</CommandEmpty>
+                          <CommandList
+                            className="max-h-60 overflow-y-auto" // ✅ scrollable height
+                            onWheel={(e) => e.stopPropagation()} // ✅ stop parent scroll
+                            style={{ WebkitOverflowScrolling: "touch" }} // ✅ smooth mobile scroll
+                          >
+                            {profiles.length === 0 && (
+                              <CommandEmpty>No profile found.</CommandEmpty>
+                            )}
                             <CommandGroup>
-                              {profiles.map((p) => (
-                                <CommandItem
-                                  key={p.id}
-                                  value={p.name} // 👈 use name for search
-                                  onSelect={() => {
-                                    // Toggle selection: if already selected, deselect it
-                                    if (field.value === p.id) {
-                                      field.onChange(""); // Deselect by setting to empty string
-                                    } else {
-                                      field.onChange(p.id); // Select the new item
-                                    }
-                                  }}
-                                >
-                                  <Check
-                                    className={cn(
-                                      "mr-2 h-4 w-4",
-                                      field.value === p.id
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                    )}
-                                  />
-                                  {p.name}
-                                </CommandItem>
-                              ))}
+                              {profiles.map((p) => {
+                                const selected = field.value?.includes(p.id);
+                                return (
+                                  <CommandItem
+                                    key={p.id}
+                                    value={p.name}
+                                    onSelect={() => {
+                                      const newValue = selected
+                                        ? field.value?.filter(
+                                            (id) => id !== p.id
+                                          )
+                                        : [...(field.value ?? []), p.id];
+                                      field.onChange(newValue);
+                                    }}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        selected ? "opacity-100" : "opacity-0"
+                                      )}
+                                    />
+                                    {p.name}
+                                  </CommandItem>
+                                );
+                              })}
                             </CommandGroup>
                           </CommandList>
+                          <div className="flex justify-end   border-t w-full border-border">
+                            <Button
+                              variant="ghost"
+                              className="w-full"
+                              size="sm"
+                              onClick={() => field.onChange([])} // ✅ Clear all
+                            >
+                              Clear All
+                            </Button>
+                          </div>
                         </Command>
                       </PopoverContent>
                     </Popover>
@@ -239,6 +257,7 @@ export default function AddFilterUpdateSheetEntries({
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="updateTo"
@@ -362,7 +381,7 @@ export default function AddFilterUpdateSheetEntries({
                   form.reset({
                     clientName: "",
                     orderId: "",
-                    profileId: "",
+                    profileId: [],
                     updateTo: "", // 👈 must be string, not undefined
                     tl: "",
                     done: "notDone",
