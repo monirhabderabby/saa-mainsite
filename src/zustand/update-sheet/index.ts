@@ -3,7 +3,7 @@ import { UpdateTo } from "@prisma/client";
 import { create } from "zustand";
 
 type ProfileState = {
-  profileId?: string;
+  profileId?: string[];
   page: number;
   updateTo: UpdateTo | "All" | undefined | string;
   tl?: string; // "tlChecked" | "notTlCheck" | "All";
@@ -18,7 +18,7 @@ type ProfileState = {
   clientName?: string;
   orderId?: string;
 
-  setProfileId: (id: string) => void;
+  setProfileId: (ids: string[]) => void;
   setPage: (page: number) => void;
   setAllValues: (data: UpdateSheetFilter & { page?: number }) => void;
   clearFilters: () => void;
@@ -40,7 +40,7 @@ export const useUpdateSheetFilterState = create<ProfileState>((set) => ({
   clientName: undefined,
   orderId: undefined,
 
-  setProfileId: (id) => set({ profileId: id }),
+  setProfileId: (ids) => set({ profileId: ids }),
   setPage: (page) => set({ page }),
 
   setAllValues: (data) =>
