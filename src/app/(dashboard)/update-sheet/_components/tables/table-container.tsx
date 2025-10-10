@@ -40,38 +40,40 @@ const TableContainer = ({
   currentUserId,
   currentUserTeam,
 }: Props) => {
-  let {
-    page,
+  const {
+    page: rawPage,
     profileId,
-    updateTo,
-    clientName,
-    orderId,
-    tl,
-    done,
-    createdFrom,
-    sendFrom,
+    updateTo: rawUpdateTo,
+    clientName: rawClientName,
+    orderId: rawOrderId,
+    tl: rawTl,
+    done: rawDone,
+    createdFrom: rawCreatedFrom,
+    sendFrom: rawSendFrom,
   } = useUpdateSheetFilterState();
 
-  profileId = profileId ?? "All";
-  page = page ?? 1;
-  updateTo = updateTo ?? "All";
-  clientName = clientName ?? "";
-  orderId = orderId ?? "";
-  tl = tl ?? "All";
-  done = done ?? "All";
-  createdFrom = createdFrom
-    ? new Date(createdFrom).toISOString().split("T")[0] // "2025-09-14"
+  // Apply defaults
+  const page = rawPage ?? 1;
+  const updateTo = rawUpdateTo ?? "All";
+  const clientName = rawClientName ?? "";
+  const orderId = rawOrderId ?? "";
+  const tl = rawTl ?? "All";
+  const done = rawDone ?? "All";
+  const createdFrom = rawCreatedFrom
+    ? new Date(rawCreatedFrom).toISOString().split("T")[0]
+    : "All";
+  const sendFrom = rawSendFrom
+    ? new Date(rawSendFrom).toISOString().split("T")[0]
     : "All";
 
-  sendFrom = sendFrom
-    ? new Date(sendFrom).toISOString().split("T")[0] // "2025-09-14"
-    : "All";
+  // Join profileIds for API
+  const profileIds = profileId?.join(",") ?? "All";
 
   const { data, isLoading, isError, error } = useQuery<GetUpdateSheetsReturn>({
     queryKey: [
       "update-entries",
       page,
-      profileId,
+      profileIds,
       updateTo,
       clientName,
       orderId,
@@ -82,7 +84,7 @@ const TableContainer = ({
     ],
     queryFn: () =>
       fetch(
-        `/api/update-entries?profileId=${profileId}&updateTo=${updateTo}&clientName=${clientName}&orderId=${orderId}&page=${page}&limit=25&tl=${tl}&done=${done}&createdFrom=${createdFrom}&sendFroms=${sendFrom}`
+        `/api/update-entries?profileId=${profileIds}&updateTo=${updateTo}&clientName=${clientName}&orderId=${orderId}&page=${page}&limit=25&tl=${tl}&done=${done}&createdFrom=${createdFrom}&sendFroms=${sendFrom}`
       ).then((res) => res.json()),
   });
 

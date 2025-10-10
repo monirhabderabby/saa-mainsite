@@ -12,8 +12,9 @@ export const updateToSchema = z
   .nullable()
   .optional();
 
+// src/schemas/update-sheet/filter.ts
 export const updateSheetFilter = z.object({
-  profileId: z.string().optional(),
+  profileId: z.array(z.string()).optional(), // ✅ array of strings
   updateTo: z.string().optional(),
   tl: z.string().optional(),
   done: z.string().optional(),
@@ -22,8 +23,8 @@ export const updateSheetFilter = z.object({
   doneById: z.string().optional(),
   sendFrom: z.date().optional(),
   sendTo: z.string().datetime().optional(),
-  createdFrom: z.date().optional(), // renamed
-  createdTo: z.string().optional(), // optional end of range
+  createdFrom: z.date().optional(),
+  createdTo: z.string().optional(),
   clientName: z.string().optional(),
   orderId: z.string().optional(),
 });
