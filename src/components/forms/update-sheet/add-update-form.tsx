@@ -311,7 +311,7 @@ export default function AddUpdateForm({ profiles, initialData }: Props) {
               <FormItem>
                 <FormLabel>Attachments</FormLabel>
                 <FormControl>
-                  <Input placeholder="" type="" {...field} />
+                  <Input {...field} />
                 </FormControl>
 
                 <FormMessage />

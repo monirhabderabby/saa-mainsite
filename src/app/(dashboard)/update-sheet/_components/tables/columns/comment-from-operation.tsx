@@ -64,6 +64,7 @@ const CommentFormOperation = ({ data }: Props) => {
         <Button
           variant="ghost"
           className={`${color.bg} ${color.hover} dark:text-black`}
+          size="sm"
         >
           {data.commentFromOperation.slice(0, 10) + " ..."}
         </Button>

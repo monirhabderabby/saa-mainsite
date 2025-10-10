@@ -67,10 +67,10 @@ export const updateSheetColumns = ({
     accessorKey: "clientName",
     header: "Client Name",
   },
-  {
-    accessorKey: "orderId",
-    header: "Order ID",
-  },
+  // {
+  //   accessorKey: "orderId",
+  //   header: "Order ID",
+  // },
   {
     accessorKey: "updateBy",
     header: CenteredHeader("Update By"),
@@ -101,6 +101,11 @@ export const updateSheetColumns = ({
   {
     accessorKey: "commentFromSales",
     header: "Comment (Sales)",
+    cell: ({ row }) => (
+      <p className="max-w-[150px] text-wrap text-red-500">
+        {row.original.commentFromSales ?? ""}
+      </p>
+    ),
   },
   {
     accessorKey: "tlId",
