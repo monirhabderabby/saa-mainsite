@@ -61,9 +61,7 @@ export const updateSheetCreateSchema = z
       .trim(),
 
     attachments: z
-      .string({
-        message: "attachments should be an URL",
-      })
+      .string()
       .trim()
       .url({
         message: "Attachments must be a valid URL",
