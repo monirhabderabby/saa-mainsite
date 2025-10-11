@@ -82,8 +82,9 @@ export async function canEditUpdateSheetEntry(
   const creatorTeamIds = entry.updateBy?.userTeams.map((t) => t.teamId) ?? [];
   const isSameTeamLeader = currentUser.userTeams.some(
     (ut) =>
-      creatorTeamIds.includes(ut.teamId) &&
-      ut.responsibility === TeamResponsibility.Leader
+      (creatorTeamIds.includes(ut.teamId) &&
+        ut.responsibility === TeamResponsibility.Leader) ||
+      ut.responsibility === TeamResponsibility.Coleader
   );
   if (isSameTeamLeader) {
     return { canEdit: true };
