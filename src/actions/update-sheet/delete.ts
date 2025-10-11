@@ -1,11 +1,8 @@
 "use server";
 
 import { auth } from "@/auth";
+import { canEditUpdateSheetEntry } from "@/lib/permissions/update-sheet/update-entry";
 import prisma from "@/lib/prisma";
-import { Role } from "@prisma/client";
-
-// Roles allowed to delete update sheet entries
-const ALLOWED_ROLES: Role[] = ["SUPER_ADMIN", "ADMIN"];
 
 export async function deleteUpdateSheetEntry(id: string) {
   // Step 1: Authenticate the user
@@ -33,15 +30,18 @@ export async function deleteUpdateSheetEntry(id: string) {
     }
 
     // Step 3: Check ownership OR role
-    const canDelete =
-      user.id === existingEntry.updateById ||
-      (user.role && ALLOWED_ROLES.includes(user.role as Role));
+    const { canEdit: canDelete, reason } = await canEditUpdateSheetEntry(
+      user.id!,
+      existingEntry.id
+    );
+    // const canDelete =
+    //   user.id === existingEntry.updateById ||
+    //   (user.role && ALLOWED_ROLES.includes(user.role as Role));
 
     if (!canDelete) {
       return {
         success: false,
-        message:
-          "You do not have permission to delete this entry. Only the creator or users with SUPER_ADMIN / ADMIN role can delete.",
+        message: reason,
       };
     }
 
