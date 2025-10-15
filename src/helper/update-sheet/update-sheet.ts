@@ -127,6 +127,9 @@ export async function getUpdateSheets(options: {
     skip: (page - 1) * limit,
     take: limit,
     orderBy: { createdAt: "desc" },
+    cacheStrategy: {
+      ttl: 300,
+    },
   });
 
   return {
