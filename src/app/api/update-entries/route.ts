@@ -1,7 +1,6 @@
 // app/api/updatesheets/route.ts
 import { auth } from "@/auth";
 import { getUpdateSheets } from "@/helper/update-sheet/update-sheet";
-import { redis } from "@/lib/redis/redis";
 import { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -46,28 +45,6 @@ export async function GET(req: NextRequest) {
     const hasSpecificProfiles =
       profileIds.length > 0 && !profileIds.includes("All");
 
-    // ✅ Generate a cache key based on all parameters
-    const cacheKey = `updateSheets:${JSON.stringify({
-      page,
-      limit,
-      profileIds: hasSpecificProfiles ? profileIds : undefined,
-      updateTo,
-      clientName,
-      orderId,
-      tl,
-      done,
-      createdFrom,
-      createdTo,
-      sendFrom,
-      sendTo,
-    })}`;
-
-    // Try fetching from Redis cache
-    const cached = await redis.get(cacheKey);
-    if (typeof cached === "string") {
-      return Response.json({ success: true, ...JSON.parse(cached) });
-    }
-
     const result = await getUpdateSheets({
       page,
       limit,
@@ -82,8 +59,6 @@ export async function GET(req: NextRequest) {
       sendFrom,
       sendTo,
     });
-
-    await redis.set(cacheKey, JSON.stringify(result), { ex: 300 });
 
     return Response.json({ success: true, ...result });
   } catch (error) {
