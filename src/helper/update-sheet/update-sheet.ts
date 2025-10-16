@@ -60,6 +60,7 @@ export async function getUpdateSheets(options: {
         equals: "",
       },
     };
+    filters.doneById = { equals: null };
   }
 
   // Created At Filters
