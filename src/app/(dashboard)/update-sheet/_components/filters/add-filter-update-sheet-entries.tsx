@@ -333,6 +333,9 @@ export default function AddFilterUpdateSheetEntries({
                         <SelectItem value="All">All</SelectItem>
                         <SelectItem value="done">Sent ✅</SelectItem>
                         <SelectItem value="notDone">Waiting ⏳</SelectItem>
+                        <SelectItem value="concern">
+                          Sales Concern ⚠️
+                        </SelectItem>
                       </SelectContent>
                     </Select>
 

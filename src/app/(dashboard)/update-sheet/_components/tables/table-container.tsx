@@ -86,6 +86,7 @@ const TableContainer = ({
       fetch(
         `/api/update-entries?profileId=${profileIds}&updateTo=${updateTo}&clientName=${clientName}&orderId=${orderId}&page=${page}&limit=25&tl=${tl}&done=${done}&createdFrom=${createdFrom}&sendFroms=${sendFrom}`
       ).then((res) => res.json()),
+    staleTime: 60 * 1000, // Data is considered "fresh" for 30s
   });
 
   if (isError) {
