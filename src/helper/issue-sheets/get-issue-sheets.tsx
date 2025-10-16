@@ -82,6 +82,7 @@ export async function getIssueSheets(options: {
         select: {
           fullName: true,
           designation: true,
+          nickName: true,
         },
       },
     },
@@ -116,6 +117,7 @@ export type IssueSheetData = Prisma.IssueSheetGetPayload<{
       select: {
         fullName: true;
         designation: true;
+        nickName: true;
       };
     };
   };
