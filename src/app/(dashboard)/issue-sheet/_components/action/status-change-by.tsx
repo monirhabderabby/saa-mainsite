@@ -18,9 +18,7 @@ const StatusChangeBy = ({ data }: Props) => {
       {data.statusChangedBy ? (
         <ProfileToolTip
           trigger={
-            <Button variant="link">
-              @{data.statusChangedBy?.fullName?.split(" ")[0]}
-            </Button>
+            <Button variant="link">@{data.statusChangedBy.nickName}</Button>
           }
           fullName={data.statusChangedBy?.fullName ?? ""}
           joiningDate={data.statusChangedAt}
