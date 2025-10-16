@@ -1,7 +1,7 @@
 "use client";
 
 import { DataTable } from "@/components/ui/data-table";
-import { PaginationControls } from "@/components/ui/pagination-controls";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import SkeletonWrapper from "@/components/ui/skeleton-wrapper";
 import {
   GetUpdateSheetsReturn,
@@ -9,14 +9,14 @@ import {
 } from "@/helper/update-sheet/update-sheet";
 import { useUpdateSheetFilterState } from "@/zustand/update-sheet";
 import { Prisma, Role } from "@prisma/client";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import {
   ColumnDef,
   getCoreRowModel,
-  getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import { AlertTriangle } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { updateSheetColumns } from "./update-sheet-columns";
 
 export type CurrentUserTeam = Prisma.UserTeamGetPayload<{
@@ -40,8 +40,9 @@ const TableContainer = ({
   currentUserId,
   currentUserTeam,
 }: Props) => {
+  const [currentPage, setCurrentPage] = useState(1);
+
   const {
-    page: rawPage,
     profileId,
     updateTo: rawUpdateTo,
     clientName: rawClientName,
@@ -52,8 +53,6 @@ const TableContainer = ({
     sendFrom: rawSendFrom,
   } = useUpdateSheetFilterState();
 
-  // Apply defaults
-  const page = rawPage ?? 1;
   const updateTo = rawUpdateTo ?? "All";
   const clientName = rawClientName ?? "";
   const orderId = rawOrderId ?? "";
@@ -66,13 +65,19 @@ const TableContainer = ({
     ? new Date(rawSendFrom).toISOString().split("T")[0]
     : "All";
 
-  // Join profileIds for API
   const profileIds = profileId?.join(",") ?? "All";
 
-  const { data, isLoading, isError, error } = useQuery<GetUpdateSheetsReturn>({
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery<GetUpdateSheetsReturn>({
     queryKey: [
       "update-entries",
-      page,
       profileIds,
       updateTo,
       clientName,
@@ -82,12 +87,36 @@ const TableContainer = ({
       createdFrom,
       sendFrom,
     ],
-    queryFn: () =>
+    initialPageParam: 1,
+    queryFn: ({ pageParam = 1, signal }) =>
       fetch(
-        `/api/update-entries?profileId=${profileIds}&updateTo=${updateTo}&clientName=${clientName}&orderId=${orderId}&page=${page}&limit=25&tl=${tl}&done=${done}&createdFrom=${createdFrom}&sendFroms=${sendFrom}`
+        `/api/update-entries?profileId=${profileIds}&updateTo=${updateTo}&clientName=${clientName}&orderId=${orderId}&page=${pageParam}&limit=25&tl=${tl}&done=${done}&createdFrom=${createdFrom}&sendFroms=${sendFrom}`,
+        {
+          signal,
+        }
       ).then((res) => res.json()),
-    staleTime: 60 * 1000, // Data is considered "fresh" for 30s
+    getNextPageParam: (lastPage) => {
+      if (lastPage.pagination.currentPage < lastPage.pagination.totalPages) {
+        return lastPage.pagination.currentPage + 1;
+      }
+      return undefined;
+    },
+    staleTime: 60 * 1000,
   });
+
+  // Prefetch next page in advance
+  useEffect(() => {
+    if (!data || !hasNextPage) return;
+
+    const nextPageNumber = currentPage + 1;
+    const nextPageLoaded = data.pages.some(
+      (page) => page.pagination.currentPage === nextPageNumber
+    );
+
+    if (!nextPageLoaded) {
+      fetchNextPage();
+    }
+  }, [currentPage, data, fetchNextPage, hasNextPage]);
 
   if (isError) {
     return (
@@ -101,6 +130,9 @@ const TableContainer = ({
     );
   }
 
+  // Flatten pages for table
+  const allData = data?.pages.flatMap((page) => page.data) ?? [];
+
   return (
     <SkeletonWrapper isLoading={isLoading}>
       <Table
@@ -109,8 +141,12 @@ const TableContainer = ({
           currentUserId,
           currentUserTeam,
         })}
-        data={data?.data ?? []}
-        totalPages={data?.pagination?.totalPages ?? 1}
+        data={allData}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        fetchNextPage={fetchNextPage}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
       />
     </SkeletonWrapper>
   );
@@ -121,38 +157,65 @@ export default TableContainer;
 interface TableProps {
   data: UpdateSheetData[];
   columns: ColumnDef<UpdateSheetData>[];
-  totalPages: number;
+  currentPage: number;
+  setCurrentPage: (page: number) => void;
+  fetchNextPage: () => void;
+  hasNextPage: boolean | undefined;
+  isFetchingNextPage: boolean;
 }
 
-const Table = ({ data, columns, totalPages }: TableProps) => {
-  const { setPage, page } = useUpdateSheetFilterState();
+const Table = ({
+  data,
+  columns,
+  setCurrentPage,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
+}: TableProps) => {
   const table = useReactTable({
     data,
-    columns: columns,
+    columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    initialState: {
-      pagination: {
-        pageSize: 25,
-      },
-    },
+    initialState: { pagination: { pageSize: 25 } },
   });
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const observerRef = useRef<HTMLDivElement>(null);
+
+  // Notify which page user is viewing
+  useEffect(() => {
+    const page = table.getState().pagination.pageIndex + 1;
+    setCurrentPage(page);
+  }, [setCurrentPage, table]);
+
+  useEffect(() => {
+    const observerTarget = observerRef.current;
+    if (!scrollRef.current || !observerTarget || !hasNextPage) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) fetchNextPage();
+      },
+      { root: scrollRef.current, rootMargin: "200px" }
+    );
+
+    observer.observe(observerTarget);
+    return () => {
+      observer.unobserve(observerTarget);
+      observer.disconnect();
+    };
+  }, [fetchNextPage, hasNextPage]);
+
   return (
-    <>
-      <div className="bg-background">
+    <div className="bg-background">
+      <ScrollArea className="h-[75vh] w-full" ref={scrollRef}>
         <DataTable table={table} columns={columns} />
-      </div>
-      {totalPages > 1 && (
-        <div className="mt-4 w-full  flex justify-end">
-          <div>
-            <PaginationControls
-              currentPage={page}
-              onPageChange={(page) => setPage(page)}
-              totalPages={totalPages}
-            />
-          </div>
-        </div>
-      )}
-    </>
+        {/* Invisible div at bottom to trigger next page */}
+        <div ref={observerRef} className="h-4" />
+        {isFetchingNextPage && (
+          <p className="text-center py-2 text-gray-500">Loading more...</p>
+        )}
+      </ScrollArea>
+    </div>
   );
 };
