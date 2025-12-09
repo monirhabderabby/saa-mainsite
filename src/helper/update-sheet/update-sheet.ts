@@ -1,17 +1,17 @@
 // lib/updateSheets.ts
 import { getDayRange } from "@/lib/date";
 import prisma from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma, UpdateTo } from "@prisma/client";
 
 export async function getUpdateSheets(options: {
   page?: number;
   limit?: number;
   profileIds?: string[];
-  updateTo?: string;
+  updateTo?: UpdateTo;
   clientName?: string;
   orderId?: string;
   tl?: "tlChecked" | "notTlCheck" | "All";
-  done?: "done" | "notDone" | "All";
+  done?: "done" | "notDone" | "concern" | "All";
   createdFrom?: string; // ISO date string
   createdTo?: string; // ISO date string
   sendFrom?: string; // ISO date string
@@ -33,7 +33,7 @@ export async function getUpdateSheets(options: {
   } = options;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const filters: any = {};
+  const filters: Prisma.UpdateSheetWhereInput = {};
 
   // ✅ Handle multiple profile IDs
   if (profileIds && profileIds.length > 0) {
@@ -41,7 +41,7 @@ export async function getUpdateSheets(options: {
       in: profileIds,
     };
   }
-  if (updateTo && updateTo !== "All") filters.updateTo = updateTo;
+  if (updateTo) filters.updateTo = updateTo;
   if (clientName)
     filters.clientName = { contains: clientName, mode: "insensitive" };
 
@@ -54,6 +54,14 @@ export async function getUpdateSheets(options: {
   // Done filter
   if (done === "done") filters.doneById = { not: null };
   if (done === "notDone") filters.doneById = { equals: null };
+  if (done === "concern") {
+    filters.commentFromSales = {
+      not: {
+        equals: "",
+      },
+    };
+    filters.doneById = { equals: null };
+  }
 
   // Created At Filters
   if (

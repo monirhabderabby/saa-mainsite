@@ -45,7 +45,7 @@ const TlCheckComponent = ({
           setIsChecked(previousState);
           toast.error(result.message);
         } else {
-          // toast.success(result.message);
+          toast.success(result.message);
           // queryClient.invalidateQueries({ queryKey: ["update-entries"] });
         }
       } catch {
