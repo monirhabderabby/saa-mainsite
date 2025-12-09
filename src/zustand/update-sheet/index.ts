@@ -6,21 +6,29 @@ type ProfileState = {
   profileId?: string[];
   page: number;
   updateTo: UpdateTo | "All" | undefined | string;
-  tl?: string; // "tlChecked" | "notTlCheck" | "All";
-  done?: string; // "done" | "notDone" | "All";
+  tl?: string;
+  done?: string;
   updateById?: string;
   tlId?: string;
   doneById?: string;
   sendFrom?: string;
   sendTo?: string;
-  createdFrom?: string; // renamed
-  createdTo?: string; // optional range
+  createdFrom?: string;
+  createdTo?: string;
   clientName?: string;
   orderId?: string;
 
+  // ✅ ADD SERVICE ID
+  serviceId?: string;
+
+  // (teamId needs adding later if you want)
+  setServiceId: (id: string) => void;
+
   setProfileId: (ids: string[]) => void;
   setPage: (page: number) => void;
-  setAllValues: (data: UpdateSheetFilter & { page?: number }) => void;
+  setAllValues: (
+    data: UpdateSheetFilter & { page?: number; serviceId?: string }
+  ) => void;
   clearFilters: () => void;
 };
 
@@ -39,6 +47,9 @@ export const useUpdateSheetFilterState = create<ProfileState>((set) => ({
   createdTo: undefined,
   clientName: undefined,
   orderId: undefined,
+
+  // ✅ DEFAULT serviceId
+  serviceId: undefined,
 
   setProfileId: (ids) => set({ profileId: ids }),
   setPage: (page) => set({ page }),
@@ -61,9 +72,13 @@ export const useUpdateSheetFilterState = create<ProfileState>((set) => ({
       createdTo: (data.createdTo as string | undefined) ?? state.createdTo,
       clientName: data.clientName ?? state.clientName,
       orderId: data.orderId ?? state.orderId,
+
+      // ✅ Apply serviceId
+      serviceId: data.serviceId ?? state.serviceId,
     })),
 
-  // ✅ Clear all filters
+  setServiceId: (id: string) => set({ serviceId: id }),
+
   clearFilters: () =>
     set({
       profileId: undefined,
@@ -80,5 +95,8 @@ export const useUpdateSheetFilterState = create<ProfileState>((set) => ({
       createdTo: undefined,
       clientName: undefined,
       orderId: undefined,
+
+      // ✅ Reset serviceId on clear
+      serviceId: undefined,
     }),
 }));

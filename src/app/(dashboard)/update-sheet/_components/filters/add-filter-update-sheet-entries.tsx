@@ -45,7 +45,7 @@ import {
 } from "@/schemas/update-sheet/filter";
 import { useUpdateSheetFilterState } from "@/zustand/update-sheet";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Profile, UpdateTo } from "@prisma/client";
+import { Profile, Services, UpdateTo } from "@prisma/client";
 import { Check, ChevronsUpDown, Repeat } from "lucide-react";
 import dynamic from "next/dynamic";
 import { ReactNode, useState } from "react";
@@ -86,10 +86,13 @@ interface Props {
   trigger: ReactNode;
   profiles: Profile[];
   currentUserServiceId?: string;
+  services: Services[];
 }
 export default function AddFilterUpdateSheetEntries({
   trigger,
   profiles,
+  services,
+  currentUserServiceId,
 }: Props) {
   const [open, setOpen] = useState(false);
   const {
@@ -103,6 +106,7 @@ export default function AddFilterUpdateSheetEntries({
     tl,
     createdFrom,
     sendFrom,
+    serviceId,
   } = useUpdateSheetFilterState();
 
   const form = useForm<UpdateSheetFilter>({
@@ -116,6 +120,7 @@ export default function AddFilterUpdateSheetEntries({
       done: done ?? "notDone",
       createdFrom: createdFrom ? new Date(createdFrom) : undefined,
       sendFrom: sendFrom ? new Date(sendFrom) : undefined,
+      serviceId: serviceId ?? "All",
     },
   });
 
@@ -175,7 +180,7 @@ export default function AddFilterUpdateSheetEntries({
                 )}
               />
             </div>
-            <div className="w-full grid grid-cols-2 gap-5">
+            <div className="w-full grid grid-cols-3 gap-5">
               <FormField
                 control={form.control}
                 name="profileId"
@@ -292,6 +297,39 @@ export default function AddFilterUpdateSheetEntries({
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="serviceId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Service Line</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value ?? undefined} // 👈 cast so TS is happy
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue
+                            defaultChecked
+                            placeholder="Select Service Line"
+                          />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="All">All</SelectItem>
+                        {services.map((item) => (
+                          <SelectItem value={item.id} key={item.id}>
+                            {item.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
             <div className="w-full grid grid-cols-2 gap-5">
               <FormField
@@ -390,6 +428,7 @@ export default function AddFilterUpdateSheetEntries({
                     done: "notDone",
                     createdFrom: undefined,
                     sendFrom: undefined,
+                    serviceId: currentUserServiceId ?? "All",
                   });
                 }}
                 type="button"

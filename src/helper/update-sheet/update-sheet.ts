@@ -16,6 +16,7 @@ export async function getUpdateSheets(options: {
   createdTo?: string; // ISO date string
   sendFrom?: string; // ISO date string
   sendTo?: string; // ISO date string
+  serviceId?: string;
 }) {
   const {
     page = 1,
@@ -30,6 +31,7 @@ export async function getUpdateSheets(options: {
     createdTo,
     sendFrom,
     sendTo,
+    serviceId,
   } = options;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -97,6 +99,11 @@ export async function getUpdateSheets(options: {
     filters.sendAt = { gte: start, lte: end };
   } else if ((!sendFrom || sendFrom === "All") && sendTo && sendTo !== "All") {
     filters.sendAt = { lte: new Date(sendTo) };
+  }
+
+  // service line matcher
+  if (serviceId && serviceId !== "All") {
+    filters.serviceId = serviceId;
   }
 
   const totalItems = await prisma.updateSheet.count({
