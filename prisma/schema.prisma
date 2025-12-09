@@ -110,8 +110,9 @@ model Services {
     departmentId String?     @db.ObjectId
     department   Department? @relation(fields: [departmentId], references: [id], onDelete: Cascade)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    createdAt    DateTime      @default(now())
+    updatedAt    DateTime      @updatedAt
+    updateSheets UpdateSheet[]
 
     @@unique([name, departmentId])
 }
@@ -178,8 +179,9 @@ model Team {
     departmentId String?     @db.ObjectId
     department   Department? @relation(fields: [departmentId], references: [id], onDelete: Cascade)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    createdAt    DateTime      @default(now())
+    updatedAt    DateTime      @updatedAt
+    updateSheets UpdateSheet[]
 }
 
 model Permissions {
@@ -314,6 +316,12 @@ model UpdateSheet {
 
     profileId String  @db.ObjectId
     profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+    teamId String? @db.ObjectId
+    team   Team?   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+    serviceId String?   @db.ObjectId
+    service   Services? @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
     createdAt DateTime @default(now())
 }
