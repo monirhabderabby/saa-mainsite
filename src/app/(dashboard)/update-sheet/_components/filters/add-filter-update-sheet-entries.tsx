@@ -48,7 +48,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Profile, Services, UpdateTo } from "@prisma/client";
 import { Check, ChevronsUpDown, Repeat } from "lucide-react";
 import dynamic from "next/dynamic";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 const SmartDatePicker = dynamic(
   () => import("@/components/ui/custom/smart-date-picker"),
@@ -85,14 +85,14 @@ export const allowUpdateTo = [
 interface Props {
   trigger: ReactNode;
   profiles: Profile[];
-  currentUserServiceId?: string;
+  cuServiceId?: string;
   services: Services[];
 }
 export default function AddFilterUpdateSheetEntries({
   trigger,
   profiles,
   services,
-  currentUserServiceId,
+  cuServiceId,
 }: Props) {
   const [open, setOpen] = useState(false);
   const {
@@ -107,6 +107,7 @@ export default function AddFilterUpdateSheetEntries({
     createdFrom,
     sendFrom,
     serviceId,
+    setServiceId,
   } = useUpdateSheetFilterState();
 
   const form = useForm<UpdateSheetFilter>({
@@ -120,7 +121,7 @@ export default function AddFilterUpdateSheetEntries({
       done: done ?? "notDone",
       createdFrom: createdFrom ? new Date(createdFrom) : undefined,
       sendFrom: sendFrom ? new Date(sendFrom) : undefined,
-      serviceId: serviceId ?? "All",
+      serviceId: cuServiceId ?? serviceId ?? "All",
     },
   });
 
@@ -131,6 +132,12 @@ export default function AddFilterUpdateSheetEntries({
     });
     setOpen(false);
   }
+
+  useEffect(() => {
+    if (cuServiceId && !serviceId) {
+      setServiceId(cuServiceId);
+    }
+  }, [cuServiceId, serviceId, setServiceId]);
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -428,7 +435,7 @@ export default function AddFilterUpdateSheetEntries({
                     done: "notDone",
                     createdFrom: undefined,
                     sendFrom: undefined,
-                    serviceId: currentUserServiceId ?? "All",
+                    serviceId: cuServiceId ?? "All",
                   });
                 }}
                 type="button"

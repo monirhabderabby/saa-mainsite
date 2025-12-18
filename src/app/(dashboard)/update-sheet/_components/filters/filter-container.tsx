@@ -44,14 +44,27 @@ const FilterContainer = async ({ userId }: Props) => {
     },
   });
 
-  const isManagement = currentUser.service?.name === "Management";
+  // const isManagement = currentUser.service?.name === "Management";
+
+  const userInfo = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      serviceId: true,
+    },
+  });
+
+  if (!userInfo) {
+    redirect("/login");
+  }
+
+  const currentUserServiceid = userInfo.serviceId;
 
   return (
     <div>
       <AddFilterUpdateSheetEntries
-        currentUserServiceId={
-          isManagement ? undefined : (currentUser.serviceId ?? "")
-        }
+        cuServiceId={currentUserServiceid!}
         profiles={profiles ?? []}
         services={serviceLine ?? []}
         trigger={
