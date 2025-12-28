@@ -1,0 +1,398 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Profile } from "@prisma/client";
+import { ArrowLeft, Check, ChevronsUpDown, Plus, X } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useFieldArray, useForm } from "react-hook-form";
+import * as z from "zod";
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { cn } from "@/lib/utils";
+
+const formSchema = z.object({
+  shift: z.string().min(1, "Shift is required"),
+  title: z.string().min(1, "Title is required"),
+  assignments: z
+    .array(
+      z.object({
+        person: z.string().min(1, "Person name is required"),
+        profiles: z
+          .array(z.string().min(1, "Profile is required"))
+          .min(1, "At least one profile is required"),
+      })
+    )
+    .min(1, "At least one assignment is required"),
+});
+
+type FormValues = z.infer<typeof formSchema>;
+
+interface Props {
+  profiles: Profile[];
+  users: { id: string; fullName: string }[];
+}
+
+export default function CreateStationUpdateForm({ profiles, users }: Props) {
+  const router = useRouter();
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      shift: "",
+      title: "",
+      assignments: [{ person: "", profiles: [""] }],
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "assignments",
+  });
+
+  const onSubmit = (data: FormValues) => {
+    console.log(data);
+  };
+
+  return (
+    <main className="flex-1 p-5">
+      <div className="mb-6">
+        <Link href="/station-update">
+          <Button variant="ghost" className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Back to Updates
+          </Button>
+        </Link>
+      </div>
+
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">Create Station Update</h1>
+        <p className="text-muted-foreground">
+          Submit a new station update with profile assignments
+        </p>
+      </div>
+
+      <Card className="max-w-4xl">
+        <CardHeader>
+          <CardTitle>Station Update Details</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="shift"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Shift</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select shift" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="morning">Morning Shift</SelectItem>
+                        <SelectItem value="day">Day Shift</SelectItem>
+                        <SelectItem value="night">Night Shift</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g., Dev Station Update"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <FormLabel>Profile Assignments</FormLabel>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => append({ person: "", profiles: [""] })}
+                    className="gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add Person
+                  </Button>
+                </div>
+
+                <div className="space-y-4">
+                  {fields.map((field, index) => (
+                    <Card key={field.id} className="border-2">
+                      <CardContent className="space-y-4 pt-6">
+                        <div className="flex items-start gap-4">
+                          <FormField
+                            control={form.control}
+                            name={`assignments.${index}.person`}
+                            render={({ field }) => (
+                              <FormItem className="flex-1">
+                                <FormLabel>Assigned Person</FormLabel>
+                                <FormControl>
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <FormControl>
+                                        <Button
+                                          variant="outline"
+                                          role="combobox"
+                                          className={cn(
+                                            "w-full justify-between",
+                                            !field.value &&
+                                              "text-muted-foreground"
+                                          )}
+                                        >
+                                          {field.value
+                                            ? users.find(
+                                                (p) => p.id === field.value
+                                              )?.fullName
+                                            : "Select a person"}
+                                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                        </Button>
+                                      </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-full min-w-[400px] p-0">
+                                      <Command>
+                                        <CommandInput placeholder="Search profiles..." />
+                                        <CommandList>
+                                          <CommandEmpty>
+                                            No User found.
+                                          </CommandEmpty>
+                                          <CommandGroup>
+                                            {users.map((p) => (
+                                              <CommandItem
+                                                key={p.id}
+                                                value={p.fullName} // 👈 use name for search
+                                                onSelect={() => {
+                                                  field.onChange(p.id); // 👈 still store id
+                                                }}
+                                              >
+                                                <Check
+                                                  className={cn(
+                                                    "mr-2 h-4 w-4",
+                                                    field.value === p.id
+                                                      ? "opacity-100"
+                                                      : "opacity-0"
+                                                  )}
+                                                />
+                                                {p.fullName}
+                                              </CommandItem>
+                                            ))}
+                                          </CommandGroup>
+                                        </CommandList>
+                                      </Command>
+                                    </PopoverContent>
+                                  </Popover>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          {fields.length > 1 && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => remove(index)}
+                              className="mt-8 text-destructive hover:text-destructive"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <FormLabel className="text-sm text-muted-foreground">
+                              Assigned Profiles
+                            </FormLabel>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                const profiles = form.getValues(
+                                  `assignments.${index}.profiles`
+                                );
+                                form.setValue(`assignments.${index}.profiles`, [
+                                  ...profiles,
+                                  "",
+                                ]);
+                              }}
+                              className="h-8 gap-1 text-xs"
+                            >
+                              <Plus className="h-3 w-3" />
+                              Add Profile
+                            </Button>
+                          </div>
+
+                          {form
+                            .watch(`assignments.${index}.profiles`)
+                            .map((_, profileIndex) => (
+                              <FormField
+                                key={profileIndex}
+                                control={form.control}
+                                name={`assignments.${index}.profiles.${profileIndex}`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <div className="flex items-start gap-2">
+                                      <FormControl>
+                                        <Popover>
+                                          <PopoverTrigger asChild>
+                                            <FormControl>
+                                              <Button
+                                                variant="outline"
+                                                role="combobox"
+                                                className={cn(
+                                                  "w-full justify-between",
+                                                  !field.value &&
+                                                    "text-muted-foreground"
+                                                )}
+                                              >
+                                                {field.value
+                                                  ? profiles.find(
+                                                      (p) =>
+                                                        p.id === field.value
+                                                    )?.name
+                                                  : "Select a profile"}
+                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                              </Button>
+                                            </FormControl>
+                                          </PopoverTrigger>
+                                          <PopoverContent className="w-full min-w-[400px] p-0">
+                                            <Command>
+                                              <CommandInput placeholder="Search profiles..." />
+                                              <CommandList>
+                                                <CommandEmpty>
+                                                  No profile found.
+                                                </CommandEmpty>
+                                                <CommandGroup>
+                                                  {profiles.map((p) => (
+                                                    <CommandItem
+                                                      key={p.id}
+                                                      value={p.name} // 👈 use name for search
+                                                      onSelect={() => {
+                                                        field.onChange(p.id); // 👈 still store id
+                                                      }}
+                                                    >
+                                                      <Check
+                                                        className={cn(
+                                                          "mr-2 h-4 w-4",
+                                                          field.value === p.id
+                                                            ? "opacity-100"
+                                                            : "opacity-0"
+                                                        )}
+                                                      />
+                                                      {p.name}
+                                                    </CommandItem>
+                                                  ))}
+                                                </CommandGroup>
+                                              </CommandList>
+                                            </Command>
+                                          </PopoverContent>
+                                        </Popover>
+                                      </FormControl>
+                                      {form.watch(
+                                        `assignments.${index}.profiles`
+                                      ).length > 1 && (
+                                        <Button
+                                          type="button"
+                                          variant="ghost"
+                                          size="icon"
+                                          onClick={() => {
+                                            const profiles = form.getValues(
+                                              `assignments.${index}.profiles`
+                                            );
+                                            form.setValue(
+                                              `assignments.${index}.profiles`,
+                                              profiles.filter(
+                                                (_, i) => i !== profileIndex
+                                              )
+                                            );
+                                          }}
+                                          className="h-10 w-10"
+                                        >
+                                          <X className="h-4 w-4" />
+                                        </Button>
+                                      )}
+                                    </div>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button type="submit" className="w-full">
+                  Submit Station Update
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => router.push("/station-update")}
+                  className="w-full"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </main>
+  );
+}
