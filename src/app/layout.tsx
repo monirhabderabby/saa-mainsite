@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { EdgeStoreProvider } from "@/lib/edgestore";
+import prisma from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 import TanstackProvider from "@/providers/tanstack/tanstack-provider";
 import { ThemeProvider } from "@/providers/theme/theme-provider";
@@ -37,6 +38,14 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
+
+  const remaining = await prisma.updateSheet.count({
+    where: {
+      OR: [{ serviceId: null }],
+    },
+  });
+
+  console.log("Remaining without serviceId:", remaining);
 
   return (
     <html lang="en">
