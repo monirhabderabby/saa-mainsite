@@ -1,7 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -24,7 +30,6 @@ import { ArrowLeft, Check, ChevronsUpDown, Plus, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useFieldArray, useForm } from "react-hook-form";
-import * as z from "zod";
 
 import {
   Popover,
@@ -32,6 +37,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
+import { createStationUpdate } from "@/actions/station-update/create";
 import {
   Command,
   CommandEmpty,
@@ -41,23 +47,9 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
-
-const formSchema = z.object({
-  shift: z.string().min(1, "Shift is required"),
-  title: z.string().min(1, "Title is required"),
-  assignments: z
-    .array(
-      z.object({
-        person: z.string().min(1, "Person name is required"),
-        profiles: z
-          .array(z.string().min(1, "Profile is required"))
-          .min(1, "At least one profile is required"),
-      })
-    )
-    .min(1, "At least one assignment is required"),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { stationForm, StationFormValues } from "@/schemas/station-update";
+import { useTransition } from "react";
+import { toast } from "sonner";
 
 interface Props {
   profiles: Profile[];
@@ -65,14 +57,15 @@ interface Props {
 }
 
 export default function CreateStationUpdateForm({ profiles, users }: Props) {
+  const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<StationFormValues>({
+    resolver: zodResolver(stationForm),
     defaultValues: {
       shift: "",
       title: "",
-      assignments: [{ person: "", profiles: [""] }],
+      assignments: [{ userId: "", profiles: [""] }],
     },
   });
 
@@ -81,13 +74,23 @@ export default function CreateStationUpdateForm({ profiles, users }: Props) {
     name: "assignments",
   });
 
-  const onSubmit = (data: FormValues) => {
-    console.log(data);
+  const onSubmit = (data: StationFormValues) => {
+    startTransition(() => {
+      createStationUpdate(data).then((res) => {
+        if (!res.success) {
+          toast.error(res.message);
+          return;
+        }
+
+        toast.success(res.message);
+        form.reset();
+      });
+    });
   };
 
   return (
-    <main className="flex-1 p-5">
-      <div className="mb-6">
+    <main className="flex-1">
+      <div className="mb-0">
         <Link href="/station-update">
           <Button variant="ghost" className="gap-2">
             <ArrowLeft className="h-4 w-4" />
@@ -96,16 +99,12 @@ export default function CreateStationUpdateForm({ profiles, users }: Props) {
         </Link>
       </div>
 
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Create Station Update</h1>
-        <p className="text-muted-foreground">
-          Submit a new station update with profile assignments
-        </p>
-      </div>
-
-      <Card className="max-w-4xl">
+      <Card>
         <CardHeader>
-          <CardTitle>Station Update Details</CardTitle>
+          <CardTitle>Create Station Update</CardTitle>
+          <CardDescription className="text-muted-foreground">
+            Submit a new station update with profile assignments
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -157,7 +156,7 @@ export default function CreateStationUpdateForm({ profiles, users }: Props) {
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => append({ person: "", profiles: [""] })}
+                    onClick={() => append({ userId: "", profiles: [""] })}
                     className="gap-2"
                   >
                     <Plus className="h-4 w-4" />
@@ -172,7 +171,7 @@ export default function CreateStationUpdateForm({ profiles, users }: Props) {
                         <div className="flex items-start gap-4">
                           <FormField
                             control={form.control}
-                            name={`assignments.${index}.person`}
+                            name={`assignments.${index}.userId`}
                             render={({ field }) => (
                               <FormItem className="flex-1">
                                 <FormLabel>Assigned Person</FormLabel>
@@ -376,17 +375,16 @@ export default function CreateStationUpdateForm({ profiles, users }: Props) {
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-4">
-                <Button type="submit" className="w-full">
-                  Submit Station Update
-                </Button>
+              <div className="flex justify-end gap-3 pt-4">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => router.push("/station-update")}
-                  className="w-full"
                 >
                   Cancel
+                </Button>
+                <Button type="submit" disabled={isPending}>
+                  Submit Now
                 </Button>
               </div>
             </form>
