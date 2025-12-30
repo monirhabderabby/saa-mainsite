@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/popover";
 
 import { createStationUpdate } from "@/actions/station-update/create";
+import { updateStationUpdate } from "@/actions/station-update/edit";
 import {
   Command,
   CommandEmpty,
@@ -48,25 +49,55 @@ import {
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { stationForm, StationFormValues } from "@/schemas/station-update";
-import { useTransition } from "react";
+import { Prisma } from "@prisma/client";
+import { useEffect, useTransition } from "react";
 import { toast } from "sonner";
+
+type StationUpdateWithRelations = Prisma.StationUpdateGetPayload<{
+  include: {
+    assignments: {
+      include: {
+        user: true;
+        profiles: {
+          include: {
+            profile: true;
+          };
+        };
+      };
+    };
+  };
+}>;
 
 interface Props {
   profiles: Profile[];
   users: { id: string; fullName: string }[];
+  initialData?: StationUpdateWithRelations;
 }
 
-export default function CreateStationUpdateForm({ profiles, users }: Props) {
+export default function CreateStationUpdateForm({
+  profiles,
+  users,
+  initialData,
+}: Props) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   const form = useForm<StationFormValues>({
     resolver: zodResolver(stationForm),
-    defaultValues: {
-      shift: "",
-      title: "",
-      assignments: [{ userId: "", profiles: [""] }],
-    },
+    defaultValues: initialData
+      ? {
+          shift: initialData.shift,
+          title: initialData.title,
+          assignments: initialData.assignments.map((a) => ({
+            userId: a.userId,
+            profiles: a.profiles.map((p) => p.profile.id), // 👈 extract profile ids
+          })),
+        }
+      : {
+          shift: "",
+          title: "",
+          assignments: [{ userId: "", profiles: [""] }],
+        },
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -75,18 +106,43 @@ export default function CreateStationUpdateForm({ profiles, users }: Props) {
   });
 
   const onSubmit = (data: StationFormValues) => {
-    startTransition(() => {
-      createStationUpdate(data).then((res) => {
-        if (!res.success) {
-          toast.error(res.message);
-          return;
-        }
-
-        toast.success(res.message);
-        form.reset();
+    if (initialData) {
+      startTransition(() => {
+        updateStationUpdate(initialData.id, data).then((res) => {
+          if (!res.success) {
+            toast.error(res.message);
+            return;
+          }
+          toast.success(res.message);
+        });
       });
-    });
+    } else {
+      startTransition(() => {
+        createStationUpdate(data).then((res) => {
+          if (!res.success) {
+            toast.error(res.message);
+            return;
+          }
+
+          toast.success(res.message);
+          form.reset();
+        });
+      });
+    }
   };
+
+  useEffect(() => {
+    if (initialData) {
+      form.reset({
+        shift: initialData.shift,
+        title: initialData.title,
+        assignments: initialData.assignments.map((a) => ({
+          userId: a.userId,
+          profiles: a.profiles.map((p) => p.profile.id),
+        })),
+      });
+    }
+  }, [initialData, form]);
 
   return (
     <main className="flex-1">
@@ -101,9 +157,12 @@ export default function CreateStationUpdateForm({ profiles, users }: Props) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Create Station Update</CardTitle>
+          <CardTitle>
+            {initialData ? "Edit" : "Create"} Station Update
+          </CardTitle>
           <CardDescription className="text-muted-foreground">
-            Submit a new station update with profile assignments
+            {initialData ? "Edit Your" : "Submit a new"} station update with
+            profile assignments
           </CardDescription>
         </CardHeader>
         <CardContent>

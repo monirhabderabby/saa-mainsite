@@ -8,9 +8,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import prisma from "@/lib/prisma";
-import { Calendar, ChevronRight, Pencil, Plus, User } from "lucide-react";
+import { Calendar, ChevronRight, Plus, User } from "lucide-react";
 import moment from "moment";
 import Link from "next/link";
+import StationActions from "./_components/station-actions";
 
 const Page = async () => {
   const stations = await prisma.stationUpdate.findMany({
@@ -90,13 +91,7 @@ const Page = async () => {
                   </div>
                 </div>
 
-                <div>
-                  <Button size="icon" variant="outline" asChild>
-                    <Link href={`/station-update/edit/${station.id}`}>
-                      <Pencil className="size-4" />
-                    </Link>
-                  </Button>
-                </div>
+                <StationActions stationId={station.id} />
               </div>
             </CardHeader>
             <CardContent>
