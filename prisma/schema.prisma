@@ -61,7 +61,8 @@ model User {
     tlCheckEntries      UpdateSheet[]   @relation("TLChecks")
     doneByEntries       UpdateSheet[]   @relation("DoneByChecks")
 
-    // 👇 Add relation to services managed by this user
+    assignments StationAssignment[]
+
     managedServices Services[] @relation("ServiceManager")
 
     issueSheets         IssueSheet[]
@@ -110,8 +111,9 @@ model Services {
     departmentId String?     @db.ObjectId
     department   Department? @relation(fields: [departmentId], references: [id], onDelete: Cascade)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    createdAt    DateTime      @default(now())
+    updatedAt    DateTime      @updatedAt
+    updateSheets UpdateSheet[]
 
     @@unique([name, departmentId])
 }
@@ -155,14 +157,14 @@ model Profile {
     id   String @id @default(auto()) @map("_id") @db.ObjectId
     name String @unique
 
-    // ref
+    assignments StationAssignmentProfile[]
+
     updateSheets UpdateSheet[]
+    issueSheets  IssueSheet[]
 
-    // 
-    issueSheets IssueSheet[]
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    createdAt          DateTime            @default(now())
+    updatedAt          DateTime            @updatedAt
+    stationAssignments StationAssignment[]
 }
 
 model Team {
@@ -178,8 +180,9 @@ model Team {
     departmentId String?     @db.ObjectId
     department   Department? @relation(fields: [departmentId], references: [id], onDelete: Cascade)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    createdAt    DateTime      @default(now())
+    updatedAt    DateTime      @updatedAt
+    updateSheets UpdateSheet[]
 }
 
 model Permissions {
@@ -315,6 +318,12 @@ model UpdateSheet {
     profileId String  @db.ObjectId
     profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
+    teamId String? @db.ObjectId
+    team   Team?   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+    serviceId String?   @db.ObjectId
+    service   Services? @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
     createdAt DateTime @default(now())
 }
 
@@ -372,4 +381,50 @@ model Settings {
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+}
+
+model StationUpdate {
+    id    String @id @default(auto()) @map("_id") @db.ObjectId
+    shift String
+    title String
+
+    assignments StationAssignment[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model StationAssignment {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    stationId String        @db.ObjectId
+    station   StationUpdate @relation(fields: [stationId], references: [id], onDelete: Cascade)
+
+    userId String @db.ObjectId
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    profiles StationAssignmentProfile[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    profile   Profile? @relation(fields: [profileId], references: [id])
+    profileId String?  @db.ObjectId
+
+    @@unique([stationId, userId])
+    @@index([stationId])
+    @@index([userId])
+}
+
+model StationAssignmentProfile {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    assignmentId String            @db.ObjectId
+    assignment   StationAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+
+    profileId String  @db.ObjectId
+    profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+    @@unique([assignmentId, profileId])
+    @@index([assignmentId])
+    @@index([profileId])
 }

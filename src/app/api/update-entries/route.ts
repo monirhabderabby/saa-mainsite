@@ -39,6 +39,7 @@ export async function GET(req: NextRequest) {
 
     // ✅ Read multiple values
     const rawProfileIds = searchParams.getAll("profileId");
+    const serviceId = searchParams.get("serviceId") || undefined;
 
     // handle both `?profileId=a,b` and `?profileId=a&profileId=b`
     const profileIds = rawProfileIds
@@ -63,6 +64,7 @@ export async function GET(req: NextRequest) {
       createdTo,
       sendFrom,
       sendTo,
+      serviceId,
     });
 
     return Response.json({ success: true, ...result });
