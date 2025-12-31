@@ -1,20 +1,26 @@
 import { z } from "zod";
 
+// const restrictedUrlSchema = z
+//   .string()
+//   .url({ message: "Must be a valid URL" })
+//   .refine(
+//     (val) =>
+//       val === "" ||
+//       val.startsWith("https://drive.google.com/file/d/") ||
+//       val.startsWith("https://prnt.sc/"),
+//     {
+//       message:
+//         "Only Google Drive (https://drive.google.com/file/d/<fileId>/view) or Lightshot (https://prnt.sc/<id>) links are allowed",
+//     }
+//   )
+//   .optional()
+//   .or(z.literal("")); // allow empty string
+
 const restrictedUrlSchema = z
   .string()
   .url({ message: "Must be a valid URL" })
-  .refine(
-    (val) =>
-      val === "" ||
-      val.startsWith("https://drive.google.com/file/d/") ||
-      val.startsWith("https://prnt.sc/"),
-    {
-      message:
-        "Only Google Drive (https://drive.google.com/file/d/<fileId>/view) or Lightshot (https://prnt.sc/<id>) links are allowed",
-    }
-  )
   .optional()
-  .or(z.literal("")); // allow empty string
+  .or(z.literal(""));
 
 const fiverrOrderIdRegex = /^FO[A-Z0-9]+$/; // matches FO followed by alphanumeric characters
 
