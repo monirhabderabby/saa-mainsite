@@ -69,6 +69,39 @@ export async function createUpdateSheetEntries(
       };
     }
 
+    const currentUsers = await prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      select: {
+        serviceId: true,
+        userTeams: {
+          select: {
+            teamId: true,
+          },
+        },
+      },
+    });
+
+    if (!currentUsers) {
+      return {
+        success: false,
+        message:
+          "You are not assigned to any team. Please contact an administrator.",
+      };
+    }
+
+    const teamId = currentUsers.userTeams[0]?.teamId;
+    const serviceId = currentUsers.serviceId;
+
+    if (!serviceId) {
+      return {
+        success: false,
+        message:
+          "Unable to create entry because your service association is missing.",
+      };
+    }
+
     // Step 5: Create the update sheet entry
     const newUpdateSheetEntry = await prisma.updateSheet.create({
       data: {
@@ -78,6 +111,8 @@ export async function createUpdateSheetEntries(
         doneById: null,
         tlCheckAt: null,
         updatedAt: new Date(),
+        teamId,
+        serviceId,
       },
     });
 

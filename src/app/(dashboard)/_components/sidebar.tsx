@@ -99,9 +99,21 @@ const routes = [
       "SALES_MEMBER",
     ] as Role[],
   },
-
   {
     id: 8,
+    label: "Station",
+    icon: Laptop,
+    href: "/station-update",
+    access: [
+      "SUPER_ADMIN",
+      "ADMIN",
+      "SALES_MEMBER",
+      "OPERATION_MEMBER",
+    ] as Role[],
+  },
+
+  {
+    id: 9,
     label: "Settings",
     icon: Settings,
     href: "/settings",

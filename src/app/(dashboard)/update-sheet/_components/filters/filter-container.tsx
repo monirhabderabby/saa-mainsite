@@ -15,8 +15,6 @@ interface Props {
 }
 
 const FilterContainer = async ({ userId }: Props) => {
-  const profiles = await prisma.profile.findMany();
-
   const currentUser = await prisma.user.findUnique({
     where: {
       id: userId,
@@ -33,14 +31,42 @@ const FilterContainer = async ({ userId }: Props) => {
 
   if (!currentUser) redirect("/login");
 
-  const isManagement = currentUser.service?.name === "Management";
+  const profiles = await prisma.profile.findMany();
+  const department = await prisma.department.findUnique({
+    where: {
+      name: "Operation",
+    },
+  });
+
+  const serviceLine = await prisma.services.findMany({
+    where: {
+      departmentId: department?.id,
+    },
+  });
+
+  // const isManagement = currentUser.service?.name === "Management";
+
+  const userInfo = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      serviceId: true,
+    },
+  });
+
+  if (!userInfo) {
+    redirect("/login");
+  }
+
+  const currentUserServiceid = userInfo.serviceId;
+
   return (
     <div>
       <AddFilterUpdateSheetEntries
-        currentUserServiceId={
-          isManagement ? undefined : (currentUser.serviceId ?? "")
-        }
+        cuServiceId={currentUserServiceid!}
         profiles={profiles ?? []}
+        services={serviceLine ?? []}
         trigger={
           <Button variant="outline">
             <Filter /> Filter
