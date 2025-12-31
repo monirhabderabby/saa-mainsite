@@ -1,6 +1,5 @@
 import { auth } from "@/auth";
 import { EdgeStoreProvider } from "@/lib/edgestore";
-import prisma from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 import TanstackProvider from "@/providers/tanstack/tanstack-provider";
 import { ThemeProvider } from "@/providers/theme/theme-provider";
@@ -10,6 +9,8 @@ import { Raleway } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
 import { Toaster } from "sonner";
 import "./globals.css";
+
+import "@/lib/cron/station";
 
 const raleway = Raleway({
   subsets: ["latin"],
@@ -38,14 +39,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
-
-  const remaining = await prisma.updateSheet.count({
-    where: {
-      OR: [{ serviceId: null }],
-    },
-  });
-
-  console.log("Remaining without serviceId:", remaining);
 
   return (
     <html lang="en">

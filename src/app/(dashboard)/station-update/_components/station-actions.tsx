@@ -32,14 +32,14 @@ const StationActions = ({ stationId }: Props) => {
   };
 
   return (
-    <div className="space-x-5">
+    <div className="space-x-3">
       <Button size="icon" variant="outline" asChild>
         <Link href={`/station-update/edit/${stationId}`}>
           <Pencil className="size-4" />
         </Link>
       </Button>
       <Button variant="destructive" size="sm" onClick={() => setOpen(true)}>
-        <Trash /> Delete
+        <Trash />
       </Button>
 
       <AlertModal

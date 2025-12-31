@@ -1,5 +1,5 @@
+import { auth } from "@/auth";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,12 +8,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import prisma from "@/lib/prisma";
-import { Calendar, ChevronRight, Plus, User } from "lucide-react";
+import { Role } from "@prisma/client";
+import { Calendar, ChevronRight, User } from "lucide-react";
 import moment from "moment";
-import Link from "next/link";
+import { redirect } from "next/navigation";
 import StationActions from "./_components/station-actions";
+import StationHeaderAction from "./_components/station-header-action";
+const allowedEdit = ["ADMIN", "SALES_MEMBER", "SUPER_ADMIN"] as Role[];
 
 const Page = async () => {
+  const cu = await auth();
+
+  if (!cu || !cu.user || !cu.user.role) redirect("/login");
+
   const stations = await prisma.stationUpdate.findMany({
     include: {
       assignments: {
@@ -28,6 +35,8 @@ const Page = async () => {
       },
     },
   });
+
+  const isActionAccess = allowedEdit.includes(cu.user.role);
 
   const getShiftBadgeVariant = (shift: string) => {
     switch (shift) {
@@ -56,14 +65,7 @@ const Page = async () => {
             you need.
           </CardDescription>
         </div>
-        <div className="flex items-center gap-5">
-          <Link href="/station-update/new">
-            <Button>
-              <Plus className="h-4 w-4" />
-              New Update
-            </Button>
-          </Link>
-        </div>
+        {isActionAccess && <StationHeaderAction />}
       </div>
 
       <div className="mt-5 grid gap-5">
@@ -91,7 +93,7 @@ const Page = async () => {
                   </div>
                 </div>
 
-                <StationActions stationId={station.id} />
+                {isActionAccess && <StationActions stationId={station.id} />}
               </div>
             </CardHeader>
             <CardContent>
