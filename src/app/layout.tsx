@@ -3,6 +3,7 @@ import { EdgeStoreProvider } from "@/lib/edgestore";
 import { cn } from "@/lib/utils";
 import TanstackProvider from "@/providers/tanstack/tanstack-provider";
 import { ThemeProvider } from "@/providers/theme/theme-provider";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 import { Raleway } from "next/font/google";
@@ -61,6 +62,7 @@ export default async function RootLayout({
           </ThemeProvider>{" "}
           <Toaster richColors />
           <NextTopLoader showSpinner={false} color="#FFC300" />
+          <GoogleAnalytics gaId={process.env.GOOGLE_ANALYTICS_ID!} />
         </SessionProvider>
       </body>
     </html>
