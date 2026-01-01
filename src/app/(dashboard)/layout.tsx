@@ -42,7 +42,7 @@ const SiteLayout = async ({ children }: Props) => {
           </div>
         </div>
       </div>
-      <NewYearCelebration />
+      <NewYearCelebration employeeId={user.employeeId} />
     </>
   );
 };
