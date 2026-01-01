@@ -7,17 +7,22 @@ import Cookies from "js-cookie";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 
-export function NewYearCelebration() {
+interface Props {
+  employeeId: string;
+}
+
+export function NewYearCelebration({ employeeId }: Props) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Check if user has already seen the celebration
-    const hasSeenCelebration = Cookies.get("has-seen-new-year-2025");
+    if (!employeeId) return;
+
+    const cookieKey = `has-seen-new-year-2025-${employeeId}`;
+    const hasSeenCelebration = Cookies.get(cookieKey);
 
     if (!hasSeenCelebration) {
       setIsVisible(true);
 
-      // Trigger confetti
       const duration = 5 * 1000;
       const animationEnd = Date.now() + duration;
       const defaults = {
@@ -30,13 +35,9 @@ export function NewYearCelebration() {
       const randomInRange = (min: number, max: number) =>
         Math.random() * (max - min) + min;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const interval: any = setInterval(() => {
+      const interval = setInterval(() => {
         const timeLeft = animationEnd - Date.now();
-
-        if (timeLeft <= 0) {
-          return clearInterval(interval);
-        }
+        if (timeLeft <= 0) return clearInterval(interval);
 
         const particleCount = 50 * (timeLeft / duration);
 
@@ -52,10 +53,12 @@ export function NewYearCelebration() {
         });
       }, 250);
 
-      // Mark as seen
-      Cookies.set("has-seen-new-year-2025", "true", { expires: 365 });
+      Cookies.set(cookieKey, "true", {
+        expires: 365,
+        sameSite: "lax",
+      });
     }
-  }, []);
+  }, [employeeId]);
 
   if (!isVisible) return null;
 

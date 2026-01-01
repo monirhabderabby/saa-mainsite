@@ -35,6 +35,12 @@ interface Props {
   currentUserTeam?: CurrentUserTeam | null;
 }
 
+const hideServicelineDefaultFilters = [
+  "ADMIN",
+  "SUPER_ADMIN",
+  "SALES_MEMBER",
+] as Role[];
+
 const TableContainer = ({
   currentUserRole,
   currentUserId,
@@ -68,7 +74,9 @@ const TableContainer = ({
 
   const profileIds = profileId?.join(",") ?? "All";
 
-  const serviceId = rawServiceId ?? "All";
+  const serviceId = hideServicelineDefaultFilters.includes(currentUserRole)
+    ? "All"
+    : (rawServiceId ?? "All");
 
   const {
     data,

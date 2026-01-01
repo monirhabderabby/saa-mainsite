@@ -56,7 +56,7 @@ export default async function RootLayout({
             <TanstackProvider>
               <EdgeStoreProvider>{children}</EdgeStoreProvider>
               <p className="absolute bottom-2 right-7 text-[12px]">
-                Beta v1.0.7
+                Beta v1.0.8
               </p>
             </TanstackProvider>
           </ThemeProvider>{" "}
