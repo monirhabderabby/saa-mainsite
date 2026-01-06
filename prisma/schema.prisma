@@ -68,8 +68,11 @@ model User {
     issueSheets         IssueSheet[]
     statusChangeOnIssue IssueSheet[] @relation("issueShetStatusChange")
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    createdAt       DateTime         @default(now())
+    updatedAt       DateTime         @updatedAt
+    tasks           Tasks?           @relation(fields: [tasksId], references: [id])
+    tasksId         String?          @db.ObjectId
+    taskAssignments TaskAssignment[]
 }
 
 model UserVerification {
@@ -114,6 +117,7 @@ model Services {
     createdAt    DateTime      @default(now())
     updatedAt    DateTime      @updatedAt
     updateSheets UpdateSheet[]
+    tasks        Tasks[]
 
     @@unique([name, departmentId])
 }
@@ -427,4 +431,46 @@ model StationAssignmentProfile {
     @@unique([assignmentId, profileId])
     @@index([assignmentId])
     @@index([profileId])
+}
+
+enum TaskStatus {
+    PENDING
+    IN_PROGRESS
+    DONE
+}
+
+model Tasks {
+    id    String @id @default(auto()) @map("_id") @db.ObjectId
+    title String
+
+    // 👇 Service line relationship
+    serviceId String   @db.ObjectId
+    service   Services @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+    // 👇 assignments per user
+    assignments TaskAssignment[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    users     User[]
+}
+
+model TaskAssignment {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    taskId String @db.ObjectId
+    task   Tasks  @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+    userId String @db.ObjectId
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    status TaskStatus @default(PENDING)
+    doneAt DateTime?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@unique([taskId, userId]) // prevents duplicate assignment
+    @@index([taskId])
+    @@index([userId])
 }
