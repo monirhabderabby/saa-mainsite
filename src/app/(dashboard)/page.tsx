@@ -1,8 +1,5 @@
 import { auth } from "@/auth";
-import { Button } from "@/components/ui/button";
-import { ExternalLink, FileSlidersIcon } from "lucide-react";
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 const SalesMemberOverview = dynamic(
   () => import("./_components/sales-member-overview/sales-member-overview"),
@@ -38,7 +35,7 @@ export default async function Home() {
     return (
       <div className="space-y-5">
         <OperationMemberOverview />
-        <Button variant="outline" asChild>
+        {/* <Button variant="outline" asChild>
           <Link
             className="w-[200px] h-[110px] flex flex-col gap-2"
             href="/tools/tasks-management"
@@ -48,7 +45,7 @@ export default async function Home() {
               Tasks <ExternalLink />
             </div>
           </Link>
-        </Button>
+        </Button> */}
       </div>
     );
   }
