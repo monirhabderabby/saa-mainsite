@@ -49,7 +49,7 @@ export async function createStationUpdate(data: StationFormValues) {
 
     return {
       success: true,
-      message: "Station update successfully",
+      message: "Station Created successfully",
       data: result,
     };
   } catch (error) {
@@ -58,6 +58,7 @@ export async function createStationUpdate(data: StationFormValues) {
     return {
       success: false,
       message: "Failed to create station update",
+      errror: error,
     };
   }
 }
