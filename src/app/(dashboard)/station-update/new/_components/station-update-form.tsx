@@ -111,6 +111,7 @@ export default function CreateStationUpdateForm({
         updateStationUpdate(initialData.id, data).then((res) => {
           if (!res.success) {
             toast.error(res.message);
+            console.log("updateError", res);
             return;
           }
           toast.success(res.message);
@@ -121,11 +122,13 @@ export default function CreateStationUpdateForm({
         createStationUpdate(data).then((res) => {
           if (!res.success) {
             toast.error(res.message);
+            console.log("CreateError", res);
             return;
           }
 
           toast.success(res.message);
           form.reset();
+          console.log(res);
         });
       });
     }

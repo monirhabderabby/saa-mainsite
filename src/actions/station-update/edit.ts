@@ -65,6 +65,7 @@ export async function updateStationUpdate(id: string, data: StationFormValues) {
     return {
       success: false,
       message: "Failed to update station update",
+      error: error,
     };
   }
 }
