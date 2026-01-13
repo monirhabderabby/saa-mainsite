@@ -7,7 +7,7 @@ interface Props {
 
 const UpdateToComponents = ({ data }: Props) => {
   return (
-    <div className="w-[110%] ">
+    <div className="w-[110%] whitespace-nowrap">
       <UpdateToBadge updateTo={data.updateTo} />
     </div>
   );

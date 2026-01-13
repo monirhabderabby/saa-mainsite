@@ -42,7 +42,7 @@ export const issueSheetColumns = ({
         const formattedDate = moment(createdAt).format("DD MMM, YYYY");
         const formattedTime = moment(createdAt).format("hh:mm A");
         return (
-          <div>
+          <div className="flex flex-col items-center whitespace-nowrap">
             <h5>{formattedDate}</h5>
             <p>{formattedTime}</p>
           </div>

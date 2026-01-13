@@ -30,10 +30,14 @@ export default async function Home() {
   const role = cu.user.role;
 
   if (role === "SUPER_ADMIN" || role === "ADMIN") {
-    return <SuperAdminOverViewContainer />;
+    return (
+      <div>
+        <SuperAdminOverViewContainer />
+      </div>
+    );
   } else if (role === "OPERATION_MEMBER") {
     return (
-      <div className="space-y-5">
+      <div className="space-y-5 p-5 md:p-0">
         <OperationMemberOverview />
         {/* <Button variant="outline" asChild>
           <Link
@@ -49,5 +53,9 @@ export default async function Home() {
       </div>
     );
   }
-  return <SalesMemberOverview />;
+  return (
+    <div className="p-5 md:p-0">
+      <SalesMemberOverview />
+    </div>
+  );
 }

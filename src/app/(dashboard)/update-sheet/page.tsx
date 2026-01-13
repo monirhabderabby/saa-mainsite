@@ -55,10 +55,10 @@ const Page = async () => {
   return (
     <Card className="shadow-none ">
       <CardHeader>
-        <div className="flex justify-between items-center w-full">
+        <div className="flex justify-between items-center w-full gap-x-5">
           <div>
             <CardTitle>Entries</CardTitle>
-            <CardDescription>
+            <CardDescription className="text-xs md:text-sm">
               All update entries in one place — apply filters to quickly find
               what you need.
             </CardDescription>
