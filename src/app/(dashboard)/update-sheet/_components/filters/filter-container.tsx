@@ -69,7 +69,7 @@ const FilterContainer = async ({ userId }: Props) => {
         services={serviceLine ?? []}
         trigger={
           <Button variant="outline">
-            <Filter /> Filter
+            <Filter /> <span className="hidden md:block">Filter</span>
           </Button>
         }
       />

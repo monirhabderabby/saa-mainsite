@@ -50,13 +50,13 @@ export const updateSheetColumns = ({
       const formattedTime = moment(createdAt).format("hh:mm A"); // e.g., 11:48 AM
 
       return (
-        <div>
+        <div className="flex flex-col items-center whitespace-nowrap">
           <h5>{formattedDate}</h5>
           <p>{formattedTime}</p>
         </div>
       );
     },
-    size: 180,
+    size: 150,
   },
   {
     accessorKey: "profile",

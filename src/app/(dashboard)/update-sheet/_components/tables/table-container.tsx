@@ -1,7 +1,6 @@
 "use client";
 
 import { DataTable } from "@/components/ui/data-table";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import SkeletonWrapper from "@/components/ui/skeleton-wrapper";
 import {
   GetUpdateSheetsReturn,
@@ -220,14 +219,11 @@ const Table = ({
 
   return (
     <div className="bg-background">
-      <ScrollArea className="h-[75vh] w-full" ref={scrollRef}>
-        <DataTable table={table} columns={columns} />
-        {/* Invisible div at bottom to trigger next page */}
-        <div ref={observerRef} className="h-4" />
-        {isFetchingNextPage && (
-          <p className="text-center py-2 text-gray-500">Loading more...</p>
-        )}
-      </ScrollArea>
+      <DataTable table={table} columns={columns} />
+      <div ref={observerRef} className="h-4" />
+      {isFetchingNextPage && (
+        <p className="text-center py-2 text-gray-500">Loading more...</p>
+      )}
     </div>
   );
 };

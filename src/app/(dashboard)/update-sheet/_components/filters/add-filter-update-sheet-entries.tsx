@@ -145,7 +145,7 @@ export default function AddFilterUpdateSheetEntries({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Filters</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogDescription className="text-xs md:text-sm">
             Use these filters to narrow down the update sheet entries. You can
             filter by profile, client, order ID, update type, TL check, status,
             and dates. Click &quot;Reset&quot; to clear all filters.
@@ -187,7 +187,7 @@ export default function AddFilterUpdateSheetEntries({
                 )}
               />
             </div>
-            <div className="w-full grid grid-cols-3 gap-5">
+            <div className="w-full grid grid-cols-2 md:grid-cols-3 gap-5 mt-5">
               <FormField
                 control={form.control}
                 name="profileId"

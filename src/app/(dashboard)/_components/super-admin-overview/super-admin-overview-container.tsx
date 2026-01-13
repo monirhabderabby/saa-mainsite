@@ -16,7 +16,7 @@ const SuperAdminOverViewContainer = async () => {
   return (
     <div className="h-full ">
       <header className="border-b border-primary-yellow/50 dark:border-primary-yellow/10  ">
-        <div className=" px-6 py-4">
+        <div className="  py-4">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl font-semibold text-foreground">
@@ -34,7 +34,7 @@ const SuperAdminOverViewContainer = async () => {
         </div>
       </header>
 
-      <main className="p-5">
+      <main className="p-0 pt-5">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Employee Stats */}

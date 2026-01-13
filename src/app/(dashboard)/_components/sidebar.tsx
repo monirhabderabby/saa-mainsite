@@ -127,9 +127,10 @@ interface Props {
       designation: true;
     };
   }>;
+  onNavigationLink?: (state: boolean) => void;
 }
 
-const Sidebar = ({ cu }: Props) => {
+const Sidebar = ({ cu, onNavigationLink }: Props) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -192,6 +193,7 @@ const Sidebar = ({ cu }: Props) => {
                   <li key={route.id}>
                     <Link
                       href={route.href}
+                      onClick={() => onNavigationLink?.(false)}
                       className={`flex items-center gap-3 rounded-md px-3 text-[14px] py-2
           ${
             isActive

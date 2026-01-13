@@ -41,7 +41,7 @@ const SiteLayout = async ({ children }: Props) => {
           {/* Top Bar */}
           <Topbar name={user.fullName as string} cu={user} />
 
-          <div className=" bg-[#F5F7FA] dark:bg-background h-[calc(100vh-64px)] overflow-y-auto md:p-6">
+          <div className=" bg-[#F5F7FA] dark:bg-background h-[calc(100vh-64px)] overflow-y-auto md:p-5">
             {children}
           </div>
         </div>
