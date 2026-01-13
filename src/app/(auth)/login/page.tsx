@@ -11,7 +11,7 @@ const Page = () => {
         <div className="absolute top-10 right-10">
           <ThemeToggle />
         </div>
-        <Card className="w-full max-w-md shadow-lg">
+        <Card className="w-full max-w-md md:shadow-lg shadow-none mt-5 md:mt-0">
           <CardHeader>
             <div className="flex flex-col justify-center items-center">
               <LogoImageForLogin />

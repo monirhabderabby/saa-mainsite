@@ -16,7 +16,7 @@ const Page = async () => {
   const designations = await prisma.designations.findMany();
   return (
     <MotionProvider>
-      <div className="h-screen flex justify-center items-center dark:bg-white/5 relative">
+      <div className="min-h-screen flex justify-center items-center dark:bg-white/5 relative">
         <div className="absolute top-10 right-10">
           <ThemeToggle />
         </div>

@@ -4,7 +4,9 @@ import prisma from "@/lib/prisma";
 import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
-import Topbar from "./_components/top-bar";
+const Topbar = dynamic(() => import("./_components/top-bar"), {
+  ssr: false,
+});
 const Sidebar = dynamic(() => import("./_components/sidebar"), {
   ssr: false,
 });
@@ -31,13 +33,15 @@ const SiteLayout = async ({ children }: Props) => {
   return (
     <>
       <div className="flex  flex-col h-screen">
-        <Sidebar cu={user} />
+        <aside className="hidden md:block">
+          <Sidebar cu={user} />
+        </aside>
         {/* Main Content */}
-        <div className="ml-60 flex flex-1 flex-col h-full">
+        <div className="md:ml-60 flex flex-1 flex-col h-full">
           {/* Top Bar */}
-          <Topbar name={user.fullName as string} />
+          <Topbar name={user.fullName as string} cu={user} />
 
-          <div className=" bg-[#F5F7FA] dark:bg-background h-[calc(100vh-64px)] overflow-y-auto p-6">
+          <div className=" bg-[#F5F7FA] dark:bg-background h-[calc(100vh-64px)] overflow-y-auto md:p-6">
             {children}
           </div>
         </div>
