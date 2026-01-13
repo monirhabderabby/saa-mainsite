@@ -132,13 +132,12 @@ const Page = async () => {
   return (
     <Card className="shadow-none">
       <CardHeader>
-        <div className="flex justify-between items-center w-full">
+        <div className="flex justify-between items-center w-full gap-x-10">
           <div>
             <CardTitle>Issue Sheet</CardTitle>
-            <CardDescription className="max-w-[600px] mt-2">
-              Track all issues raised by the sales team and their resolution
-              progress by the operations team. Apply filters to quickly find
-              open, in-progress, or resolved issues.
+            <CardDescription className="max-w-[600px] mt-2 text-xs md:text-sm">
+              Monitor sales issues and their resolution. Use filters to quickly
+              track progress and status.
             </CardDescription>
           </div>
           <div className="flex items-center gap-5">
