@@ -92,17 +92,19 @@ export default async function ServiTeaceCard({ service }: ServiceCardProps) {
           </DropdownMenu>
         </div>
 
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+        <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
           <div className="flex items-center gap-1">
             <Users className="w-4 h-4" />
-            <span>{totalMembers} members</span>
+            <span className="text-xs md:text-sm">{totalMembers} members</span>
           </div>
           <div className="flex items-center gap-1">
-            <span>{totalTeams} teams</span>
+            <span className="text-xs md:text-sm">{totalTeams} teams</span>
           </div>
           <div className="flex items-center gap-1">
             <User className="w-4 h-4" />{" "}
-            <span>{service.serviceManager?.fullName}</span>
+            <span className="text-xs md:text-sm">
+              {service.serviceManager?.fullName}
+            </span>
           </div>
         </div>
       </CardHeader>

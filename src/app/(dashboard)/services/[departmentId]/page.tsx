@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { CardDescription, CardTitle } from "@/components/ui/card";
 
 import prisma from "@/lib/prisma";
 import dynamic from "next/dynamic";
@@ -29,15 +30,13 @@ const Page = async ({ params }: { params: { departmentId: string } }) => {
   });
 
   return (
-    <div className="space-y-8 pb-10">
-      <div className="flex justify-between items-center space-y-8">
+    <div className="space-y-8 pb-10 p-5 md:p-0">
+      <div className="flex justify-between items-center  gap-x-5 h-full">
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-foreground">
-            Service Overview
-          </h1>
-          <p className="text-muted-foreground">
+          <CardTitle>Service Overview</CardTitle>
+          <CardDescription className="max-w-[600px] mt-2 text-xs md:text-sm">
             Monitor your services and designations at a glance
-          </p>
+          </CardDescription>
         </div>
 
         <AddServiceDialog

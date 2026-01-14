@@ -31,7 +31,7 @@ export default async function Home() {
 
   if (role === "SUPER_ADMIN" || role === "ADMIN") {
     return (
-      <div>
+      <div className="p-5 md:p-0">
         <SuperAdminOverViewContainer />
       </div>
     );

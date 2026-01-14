@@ -56,16 +56,18 @@ const Page = async () => {
   };
 
   return (
-    <main className="flex-1">
-      <div className="flex bg-transparent border-none shadow-none justify-between items-center w-full">
+    <main className="flex-1 p-5 md:p-0">
+      <div className="flex flex-col md:flex-row bg-transparent border-none shadow-none justify-between items-start md:items-center w-full gap-y-5">
         <div>
           <CardTitle>Entries</CardTitle>
-          <CardDescription>
+          <CardDescription className="text-xs md:text-sm">
             All update entries in one place — apply filters to quickly find what
             you need.
           </CardDescription>
         </div>
-        {isActionAccess && <StationHeaderAction />}
+        {isActionAccess && (
+          <StationHeaderAction isStationAvailable={Boolean(stations.length)} />
+        )}
       </div>
 
       <div className="mt-5 grid gap-5">
