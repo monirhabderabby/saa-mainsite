@@ -76,7 +76,7 @@ export default async function ManageTeamsPage({
   });
 
   return (
-    <div className="">
+    <div className="p-5 md:p-0">
       <div className="">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -84,8 +84,10 @@ export default async function ManageTeamsPage({
             <BackPrevPage />
 
             <div>
-              <h1 className="text-lg font-bold text-balance">Manage Teams</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-sm md:text-lg font-bold text-balance">
+                Manage Teams
+              </h1>
+              <p className="text-xs text-muted-foreground">
                 {teams[0]?.service?.name ?? ""} Service
               </p>
             </div>
@@ -95,7 +97,7 @@ export default async function ManageTeamsPage({
             trigger={
               <Button effect="gooeyLeft">
                 <Plus className="w-4 h-4 mr-1" />
-                Add Team
+                <span>Add Team</span>
               </Button>
             }
           />
@@ -138,11 +140,11 @@ export default async function ManageTeamsPage({
                       >
                         <div className="flex items-center gap-3">
                           <div className="relative">
-                            <Avatar className="w-10 h-10">
+                            <Avatar className="md:w-10 w-6 h-6 md:h-10">
                               <AvatarImage
                                 src={member.user.image ?? "/placeholder.avif"}
                               />
-                              <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                              <AvatarFallback className="bg-primary/10 text-primary font-medium text-sm md:text-base">
                                 {member.user.fullName}
                               </AvatarFallback>
                             </Avatar>
@@ -151,10 +153,10 @@ export default async function ManageTeamsPage({
                             /> */}
                           </div>
                           <div>
-                            <div className="font-medium">
+                            <div className="font-medium text-xs md:text-base">
                               {member.user.fullName}
                             </div>
-                            <div className="text-sm text-muted-foreground">
+                            <div className="text-[10px] md:text-sm text-muted-foreground">
                               {member.user.designation.name}
                             </div>
                           </div>
@@ -162,7 +164,7 @@ export default async function ManageTeamsPage({
                         <div className="flex items-center gap-2">
                           <Badge
                             variant="outline"
-                            className="text-xs capitalize"
+                            className="text-[10px] md:text-xs  capitalize"
                           >
                             {responsibilityLabels[member.responsibility]}
                           </Badge>

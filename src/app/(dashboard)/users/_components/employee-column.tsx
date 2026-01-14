@@ -31,7 +31,7 @@ export const getEmployeeColumns = ({
       const data = row.original;
 
       return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 whitespace-nowrap">
           <div>
             <Avatar className="h-[30px] w-[30px]">
               <AvatarImage src={data.image ?? "/placeholder.avif"} />
@@ -87,7 +87,11 @@ export const getEmployeeColumns = ({
     cell: ({ row }) => {
       const date = row.original.createdAt;
 
-      return <p>{moment(date).format("DD MMM, YYYY")}</p>;
+      return (
+        <p className="whitespace-nowrap">
+          {moment(date).format("DD MMM, YYYY")}
+        </p>
+      );
     },
   },
   {

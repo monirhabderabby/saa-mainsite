@@ -58,7 +58,7 @@ const Page = async ({ params }: { params: { departmentId: string } }) => {
   };
 
   return (
-    <div className="space-y-10 pb-10">
+    <div className="space-y-10 pb-10 p-5 md:p-0">
       <TeamStatsOverview stats={stats} />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
         {services.map((n) => (

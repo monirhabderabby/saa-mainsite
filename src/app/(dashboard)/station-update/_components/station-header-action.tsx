@@ -8,7 +8,11 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
-const StationHeaderAction = () => {
+interface Props {
+  isStationAvailable: boolean;
+}
+
+const StationHeaderAction = ({ isStationAvailable }: Props) => {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -25,10 +29,12 @@ const StationHeaderAction = () => {
     });
   };
   return (
-    <div className="flex items-center gap-5">
-      <Button variant="destructive" onClick={() => setOpen(true)}>
-        <Trash /> Clear Station
-      </Button>
+    <div className="flex items-center  gap-5">
+      {isStationAvailable && (
+        <Button variant="destructive" onClick={() => setOpen(true)}>
+          <Trash /> Clear Station
+        </Button>
+      )}
       <Link href="/station-update/new">
         <Button>
           <Plus className="h-4 w-4" />
