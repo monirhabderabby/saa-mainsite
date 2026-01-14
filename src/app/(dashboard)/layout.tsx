@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { NewYearCelebration } from "@/components/new-year-celebration";
+import { MobileFeatureUnlock } from "@/components/popup-notifications/mobile-feature-unlock";
 import prisma from "@/lib/prisma";
 import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
@@ -46,7 +46,8 @@ const SiteLayout = async ({ children }: Props) => {
           </div>
         </div>
       </div>
-      <NewYearCelebration employeeId={user.employeeId} />
+      {/* <NewYearCelebration employeeId={user.employeeId} /> */}
+      <MobileFeatureUnlock employeeId={user.employeeId} />
     </>
   );
 };
