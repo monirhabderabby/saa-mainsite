@@ -13,7 +13,7 @@ function CardSkeleton() {
 
 const AccountLayout = ({ children }: Props) => {
   return (
-    <div className="flex flex-1 gap-x-5 overflow-hidden h-full">
+    <div className="flex flex-col md:flex-row flex-1 gap-x-5 overflow-hidden h-auto gap-y-5">
       <Suspense fallback={<CardSkeleton />}>
         <UserProfileCard />
       </Suspense>
