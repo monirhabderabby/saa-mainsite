@@ -42,7 +42,7 @@ const Page = async () => {
   });
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 p-5 md:p-0">
       <div className="flex justify-between items-center">
         <h1 className="font-semibold leading-none tracking-tight text-[20px]">
           Profiles
