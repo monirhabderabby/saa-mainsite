@@ -73,7 +73,9 @@ model User {
 
     tasksId            String?             @db.ObjectId
     projectAssignments ProjectAssignment[]
-    projects           Project[]
+
+    projects      Project[]
+    salesProjects Project[] @relation("SalesPersonProjects")
 }
 
 model UserVerification {
@@ -454,10 +456,14 @@ model Project {
     profileId String  @db.ObjectId
     profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
+    salesPersonId String @db.ObjectId
+    salesPerson   User   @relation("SalesPersonProjects", fields: [salesPersonId], references: [id], onDelete: Cascade)
+
     instructionSheet String
     orderDate        DateTime
     deadline         DateTime
     value            Int
+    monetaryValue    Int
     shift            String
 
     teamId String @db.ObjectId

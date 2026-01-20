@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -6,9 +5,33 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Plus } from "lucide-react";
+import prisma from "@/lib/prisma";
+import dynamic from "next/dynamic";
+const AddProjectModal = dynamic(
+  () => import("./_components/add-project-modal"),
+  {
+    ssr: false,
+  },
+);
 
-const Page = () => {
+const Page = async () => {
+  const profiles = await prisma.profile.findMany();
+  const users = await prisma.user.findMany({
+    where: {
+      role: "SALES_MEMBER",
+    },
+  });
+
+  const teams = await prisma.team.findMany({
+    where: {
+      service: {
+        name: "FSD",
+      },
+    },
+  });
+
+  if (!profiles)
+    throw new Error("Profiles not found. route: /tools/fsd-project");
   return (
     <Card>
       <CardHeader className=" w-full">
@@ -19,14 +42,12 @@ const Page = () => {
               Manage and track all your fsd projects
             </CardDescription>
           </div>
-          <Button
-            variant="default"
-            effect="expandIcon"
-            icon={Plus}
-            iconPlacement="right"
-          >
-            New Project
-          </Button>
+
+          <AddProjectModal
+            profiles={profiles}
+            users={users ?? []}
+            teams={teams}
+          />
         </div>
       </CardHeader>
 
