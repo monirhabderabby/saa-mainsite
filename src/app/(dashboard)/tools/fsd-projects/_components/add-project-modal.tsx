@@ -1,4 +1,5 @@
 "use client";
+import { createProject } from "@/actions/tools/fsd-projects/create";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -60,6 +61,7 @@ import {
 import Image from "next/image";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 type UserTypes = Prisma.UserGetPayload<{
   select: {
@@ -97,7 +99,27 @@ export default function AddProjectModal({ profiles, users, teams }: Props) {
 
   function onSubmit(values: ProjectCreateSchemaType) {
     startTransition(() => {
-      console.log(values);
+      createProject(values).then((res) => {
+        if (!res.success) {
+          toast.error(res.message);
+          return;
+        }
+
+        toast.success(res.message);
+        form.reset({
+          clientName: "",
+          orderId: "",
+          profileId: "",
+          salesPersonId: "",
+          orderDate: undefined,
+          deadline: undefined,
+          shift: "",
+          teamId: "",
+          value: 0,
+          monetaryValue: 0,
+          instructionSheet: "",
+        });
+      });
     });
   }
 
@@ -113,14 +135,17 @@ export default function AddProjectModal({ profiles, users, teams }: Props) {
           New Project
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full flex flex-col h-full  pr-3">
+      <SheetContent className="w-full flex flex-col h-full px-2">
         <SheetHeader>
           <SheetTitle>New Project</SheetTitle>
         </SheetHeader>
         <Separator />
         <ScrollArea className="flex-1 pr-4">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 ">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-3 px-1"
+            >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex items-center gap-x-3 mt-5 col-span-2">
                   <Building className="size-4 text-primary-yellow" />{" "}
@@ -347,8 +372,11 @@ export default function AddProjectModal({ profiles, users, teams }: Props) {
                   name="shift"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Deadline </FormLabel>
-                      <Select {...field}>
+                      <FormLabel>Shift</FormLabel>
+                      <Select
+                        value={field.value ?? ""}
+                        onValueChange={field.onChange}
+                      >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select Shift" />
                         </SelectTrigger>
@@ -368,7 +396,10 @@ export default function AddProjectModal({ profiles, users, teams }: Props) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Team</FormLabel>
-                      <Select {...field}>
+                      <Select
+                        value={field.value ?? ""}
+                        onValueChange={field.onChange}
+                      >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select Team" />
                         </SelectTrigger>
@@ -396,8 +427,20 @@ export default function AddProjectModal({ profiles, users, teams }: Props) {
                   name="value"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Deadline </FormLabel>
-                      <Input type="number" {...field} placeholder="eg: 500" />
+                      <FormLabel>Value </FormLabel>
+                      <Input
+                        type="number"
+                        {...field}
+                        placeholder="eg: 500"
+                        value={field.value ?? ""}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value === ""
+                              ? undefined
+                              : Number(e.target.value),
+                          )
+                        }
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -408,7 +451,19 @@ export default function AddProjectModal({ profiles, users, teams }: Props) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Monetary Value </FormLabel>
-                      <Input type="number" {...field} placeholder="eg: 500" />
+                      <Input
+                        type="number"
+                        {...field}
+                        placeholder="eg: 500"
+                        value={field.value ?? ""}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value === ""
+                              ? undefined
+                              : Number(e.target.value),
+                          )
+                        }
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -448,6 +503,7 @@ export default function AddProjectModal({ profiles, users, teams }: Props) {
                   )}
                 />
               </div>
+
               <div className="flex justify-end gap-x-4">
                 <Button
                   variant="outline"

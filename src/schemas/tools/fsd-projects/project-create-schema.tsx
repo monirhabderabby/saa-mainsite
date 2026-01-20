@@ -13,7 +13,7 @@ export const projectCreateSchema = z.object({
   orderDate: z.date(),
   deadline: z.date(),
 
-  value: z.number().int().positive("Value must be a positive number"),
+  value: z.number().min(1, "Value must be a positive number"),
   monetaryValue: z
     .number()
     .int()
