@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -6,7 +7,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import prisma from "@/lib/prisma";
+import { Filter } from "lucide-react";
 import dynamic from "next/dynamic";
+import FsdProjectTableContainer from "./_components/fsd-project-table-container";
 const ProjectStatsCard = dynamic(
   () => import("./_components/project-stats-card"),
   {
@@ -71,25 +74,6 @@ function calculateChange(current: number, previous: number) {
 }
 
 const Page = async () => {
-  const profiles = await prisma.profile.findMany();
-
-  if (!profiles)
-    throw new Error("Profiles not found. route: /tools/fsd-project");
-
-  const users = await prisma.user.findMany({
-    where: {
-      role: "SALES_MEMBER",
-    },
-  });
-
-  const teams = await prisma.team.findMany({
-    where: {
-      service: {
-        name: "FSD",
-      },
-    },
-  });
-
   // total projects
   const currentTotalProjects = await prisma.project.count({
     where: {
@@ -219,11 +203,7 @@ const Page = async () => {
             </CardDescription>
           </div>
 
-          <AddProjectModal
-            profiles={profiles}
-            users={users ?? []}
-            teams={teams}
-          />
+          <AddProjectModal />
         </div>
       </CardHeader>
 
@@ -262,7 +242,15 @@ const Page = async () => {
         />
       </div>
 
-      <CardContent>Table</CardContent>
+      <div className="px-5 my-5 flex justify-end">
+        <Button variant="outline">
+          <Filter /> Filter
+        </Button>
+      </div>
+
+      <CardContent>
+        <FsdProjectTableContainer />
+      </CardContent>
     </Card>
   );
 };

@@ -1,5 +1,7 @@
 "use client";
 import { createProject } from "@/actions/tools/fsd-projects/create";
+import { editProject } from "@/actions/tools/fsd-projects/edit";
+import { SafeProjectDto } from "@/app/api/tools/fsd-project/route";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -47,20 +49,27 @@ import {
   ProjectCreateSchemaType,
 } from "@/schemas/tools/fsd-projects/project-create-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Prisma, Profile, Team } from "@prisma/client";
+import { Prisma, Profile, ProjectStatus, Team } from "@prisma/client";
+import { Rating } from "@smastrom/react-rating";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Fuse from "fuse.js";
 import {
   Building,
   Calendar,
   Check,
   ChevronsUpDown,
+  CircleStarIcon,
   Loader2,
+  NotebookPen,
   Plus,
   Projector,
 } from "lucide-react";
 import Image from "next/image";
-import { useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
+
+import { Textarea } from "@/components/ui/textarea";
+import "@smastrom/react-rating/style.css";
 import { toast } from "sonner";
 
 type UserTypes = Prisma.UserGetPayload<{
@@ -72,72 +81,196 @@ type UserTypes = Prisma.UserGetPayload<{
 }>;
 
 interface Props {
-  profiles: Profile[];
-  users: UserTypes[];
   onClose?: () => void;
-  teams: Team[];
+  open?: boolean;
+  setOpen?: (p: boolean) => void;
+  initialData?: SafeProjectDto;
 }
-export default function AddProjectModal({ profiles, users, teams }: Props) {
-  const [open, setOpen] = useState(false);
+export default function AddProjectModal({
+  open: defaultOpen,
+  initialData,
+}: Props) {
+  const [open, setOpen] = useState(defaultOpen ?? false);
   const [pending, startTransition] = useTransition();
   const [query, setQuery] = useState("");
 
-  // Initialize Fuse
-  const fuse = new Fuse(users, {
-    keys: ["fullName", "employeeId"],
-    threshold: 0.3, // adjust: lower = stricter, higher = more fuzzy
-  });
-
-  // Get filtered users
-  const filteredUsers = query
-    ? fuse.search(query).map((res) => res.item)
-    : users;
-
   const form = useForm<ProjectCreateSchemaType>({
     resolver: zodResolver(projectCreateSchema),
+    // defaultValues: {
+    //   clientName: initialData?.clientName ?? undefined,
+    //   profileId: initialData?.profile.id ?? undefined,
+    //   orderId: initialData?.orderId ?? undefined,
+    //   salesPersonId: initialData?.salesPerson.id ?? undefined,
+    //   orderDate: initialData?.orderDate ?? undefined,
+    //   deadline: initialData?.deadline ?? undefined,
+    //   shift: initialData?.shift ?? undefined,
+    //   teamId: initialData?.team.id ?? undefined,
+    //   delivered: initialData?.delivered ?? undefined,
+    // },
   });
 
-  function onSubmit(values: ProjectCreateSchemaType) {
-    startTransition(() => {
-      createProject(values).then((res) => {
-        if (!res.success) {
-          toast.error(res.message);
-          return;
-        }
+  // grab profiles
+  const { data: profiles, isError: isProfileError } = useQuery<Profile[]>({
+    queryKey: ["profiles"],
+    queryFn: () => fetch(`/api/profiles`).then((res) => res.json()),
+  });
 
-        toast.success(res.message);
-        form.reset({
-          clientName: "",
-          orderId: "",
-          profileId: "",
-          salesPersonId: "",
-          orderDate: undefined,
-          deadline: undefined,
-          shift: "",
-          teamId: "",
-          value: 0,
-          monetaryValue: 0,
-          instructionSheet: "",
+  // grab teams
+  const { data: teams, isError: isTeamError } = useQuery<Team[]>({
+    queryKey: ["teams"],
+    queryFn: () => fetch(`/api/teams`).then((res) => res.json()),
+  });
+
+  // grab sales man
+  const { data: users, isError: isUserError } = useQuery<UserTypes[]>({
+    queryKey: ["users"],
+    queryFn: () => fetch(`/api/users/salesPerson`).then((res) => res.json()),
+  });
+
+  const queryClient = useQueryClient();
+
+  // Initialize Fuse
+  const fuse = useMemo(() => {
+    if (!users) return null;
+    return new Fuse(users, {
+      keys: ["fullName", "employeeId"],
+      threshold: 0.3,
+    });
+  }, [users]);
+
+  // Get filtered users
+  const filteredUsers = useMemo(() => {
+    if (!fuse || !query) return users;
+    return fuse.search(query).map((r) => r.item);
+  }, [fuse, query, users]);
+
+  function onSubmit(values: ProjectCreateSchemaType) {
+    console.log(values);
+    if (initialData) {
+      // edit project
+      startTransition(() => {
+        editProject(initialData.id, values).then((res) => {
+          if (!res.success) {
+            toast.error(res.message);
+            return;
+          }
+
+          toast.success(res.message);
+          queryClient.invalidateQueries({ queryKey: ["fsd-projects"] });
+
+          form.reset({
+            clientName: "",
+            orderId: "",
+            profileId: "",
+            salesPersonId: "",
+            orderDate: undefined,
+            deadline: undefined,
+            shift: "",
+            teamId: "",
+            value: 0,
+            monetaryValue: 0,
+            instructionSheet: "",
+          });
+          setOpen(false);
         });
       });
+    } else {
+      // create a new project
+      startTransition(() => {
+        createProject(values).then((res) => {
+          if (!res.success) {
+            toast.error(res.message);
+            return;
+          }
+
+          toast.success(res.message);
+          queryClient.invalidateQueries({ queryKey: ["fsd-projects"] });
+          form.reset({
+            clientName: "",
+            orderId: "",
+            profileId: "",
+            salesPersonId: "",
+            orderDate: undefined,
+            deadline: undefined,
+            shift: "",
+            teamId: "",
+            value: 0,
+            monetaryValue: 0,
+            instructionSheet: "",
+          });
+        });
+      });
+    }
+  }
+
+  useEffect(() => {
+    if (defaultOpen !== undefined) {
+      setOpen(defaultOpen);
+    }
+  }, [defaultOpen]);
+
+  useEffect(() => {
+    if (!initialData) return;
+    if (!profiles?.length) return; // 👈 THIS LINE FIXES IT
+
+    form.reset({
+      clientName: initialData.clientName ?? "",
+      orderId: initialData.orderId ?? "",
+      profileId: initialData.profile.id ?? "",
+      salesPersonId: initialData.salesPerson.id ?? "",
+      orderDate: initialData.orderDate
+        ? new Date(initialData.orderDate)
+        : undefined,
+      deadline: initialData.deadline
+        ? new Date(initialData.deadline)
+        : undefined,
+      delivered: initialData.delivered
+        ? new Date(initialData.delivered)
+        : undefined,
+      shift: initialData.shift ?? "",
+      teamId: initialData.team.id ?? "",
+      value: initialData.value ?? undefined,
+      monetaryValue: initialData.monetaryValue ?? undefined,
+      instructionSheet: initialData.instructionSheet ?? "",
+      status: initialData.status ?? undefined,
+      review: initialData.review ?? undefined,
+      quickNoteFromLeader: initialData?.quickNoteFromLeader ?? undefined,
+      remarkFromOperation: initialData?.remarkFromOperation ?? undefined,
     });
+  }, [initialData, form, profiles?.length]);
+
+  if (isProfileError || isTeamError || isUserError) {
+    return (
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetTrigger asChild>
+          <Button>New Project</Button>
+        </SheetTrigger>
+        <SheetContent>
+          <p className="text-sm text-red-500">
+            Failed to load required data. Please refresh or contact support.
+          </p>
+        </SheetContent>
+      </Sheet>
+    );
   }
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <Button
-          variant="default"
-          effect="expandIcon"
-          icon={Plus}
-          iconPlacement="right"
-        >
-          New Project
-        </Button>
-      </SheetTrigger>
+      {!initialData && (
+        <SheetTrigger asChild>
+          <Button
+            variant="default"
+            effect="expandIcon"
+            icon={Plus}
+            iconPlacement="right"
+          >
+            New Project
+          </Button>
+        </SheetTrigger>
+      )}
       <SheetContent className="w-full flex flex-col h-full px-2">
         <SheetHeader>
-          <SheetTitle>New Project</SheetTitle>
+          <SheetTitle>{initialData ? "Edit" : "New"} Project</SheetTitle>
         </SheetHeader>
         <Separator />
         <ScrollArea className="flex-1 pr-4">
@@ -209,10 +342,11 @@ export default function AddProjectModal({ profiles, users, teams }: Props) {
                                   !field.value && "text-muted-foreground",
                                 )}
                               >
-                                {field.value
-                                  ? profiles.find((p) => p.id === field.value)
-                                      ?.name
+                                {field.value && profiles
+                                  ? (profiles.find((p) => p.id === field.value)
+                                      ?.name ?? "Select a profile")
                                   : "Select a profile"}
+
                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                               </Button>
                             </FormControl>
@@ -223,7 +357,7 @@ export default function AddProjectModal({ profiles, users, teams }: Props) {
                               <CommandList>
                                 <CommandEmpty>No profile found.</CommandEmpty>
                                 <CommandGroup>
-                                  {profiles.map((p) => (
+                                  {profiles?.map((p) => (
                                     <CommandItem
                                       key={p.id}
                                       value={p.name} // 👈 use name for search
@@ -270,7 +404,7 @@ export default function AddProjectModal({ profiles, users, teams }: Props) {
                               >
                                 {field.value
                                   ? (() => {
-                                      const selected = users.find(
+                                      const selected = users?.find(
                                         (u) => u.id === field.value,
                                       );
                                       return selected
@@ -297,13 +431,13 @@ export default function AddProjectModal({ profiles, users, teams }: Props) {
                                   onWheel={(e) => e.stopPropagation()}
                                   style={{ WebkitOverflowScrolling: "touch" }}
                                 >
-                                  {filteredUsers.length === 0 && (
+                                  {filteredUsers?.length === 0 && (
                                     <CommandEmpty>
                                       No person found.
                                     </CommandEmpty>
                                   )}
                                   <CommandGroup>
-                                    {filteredUsers.map((user: UserTypes) => (
+                                    {filteredUsers?.map((user: UserTypes) => (
                                       <CommandItem
                                         key={user.id}
                                         value={user.employeeId}
@@ -397,20 +531,95 @@ export default function AddProjectModal({ profiles, users, teams }: Props) {
                     <FormItem>
                       <FormLabel>Team</FormLabel>
                       <Select
-                        value={field.value ?? ""}
+                        value={field.value ?? undefined}
                         onValueChange={field.onChange}
                       >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select Team" />
                         </SelectTrigger>
                         <SelectContent>
-                          {teams.map((item) => (
+                          {teams?.map((item) => (
                             <SelectItem value={item.id} key={item.id}>
                               {item.name}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Status</FormLabel>
+                      <Select
+                        value={field.value ?? undefined}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.keys(ProjectStatus).map((item) => (
+                            <SelectItem value={item} key={item}>
+                              {item}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="delivered"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Delivered At</FormLabel>
+                      <SmartDatePicker
+                        value={field.value} // 👈 same fix
+                        onChange={field.onChange}
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="flex items-center gap-x-3 mt-2 col-span-2">
+                  <Calendar className="size-4 text-primary-yellow" />{" "}
+                  <span className="text-sm">Project Update</span>
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="lastUpdate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Last Update </FormLabel>
+                      <SmartDatePicker
+                        value={field.value} // 👈 same fix
+                        onChange={field.onChange}
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="nextUpdate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Last Update </FormLabel>
+                      <SmartDatePicker
+                        value={field.value} // 👈 same fix
+                        onChange={field.onChange}
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -470,6 +679,32 @@ export default function AddProjectModal({ profiles, users, teams }: Props) {
                 />
               </div>
 
+              {initialData?.status === "Delivered" && (
+                <div className="grid grid-cols-2 gap-3 mt-2">
+                  <div className="flex items-center gap-x-3 mt-2 col-span-2">
+                    <CircleStarIcon className="size-4 text-primary-yellow" />{" "}
+                    <span className="text-sm">Review/Rating</span>
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name="review"
+                    render={({ field }) => (
+                      <FormItem>
+                        <Rating
+                          onChange={field.onChange}
+                          value={field.value ?? 0}
+                          style={{
+                            width: "100px",
+                          }}
+                        />
+
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex items-center gap-x-3 mt-2 col-span-2">
                   <Calendar className="size-4 text-primary-yellow" />{" "}
@@ -504,6 +739,45 @@ export default function AddProjectModal({ profiles, users, teams }: Props) {
                 />
               </div>
 
+              <div className="grid gap-3 mt-2">
+                <div className="flex items-center gap-x-3 mt-2 col-span-2">
+                  <NotebookPen className="size-4 text-primary-yellow" />{" "}
+                  <span className="text-sm">Note/Remarks</span>
+                </div>
+                <FormField
+                  control={form.control}
+                  name="quickNoteFromLeader"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Note (Leader)</FormLabel>
+                      <Textarea
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Quick Note from leader"
+                      />
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="remarkFromOperation"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Note (operation)</FormLabel>
+                      <Textarea
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Note from operation"
+                      />
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
               <div className="flex justify-end gap-x-4">
                 <Button
                   variant="outline"
@@ -518,7 +792,7 @@ export default function AddProjectModal({ profiles, users, teams }: Props) {
                   Cancel
                 </Button>
                 <Button type="submit" disabled={pending}>
-                  Create project
+                  {initialData ? "Save Now" : "Create project"}
                   {pending && <Loader2 className="animate-spin" />}
                 </Button>
               </div>
