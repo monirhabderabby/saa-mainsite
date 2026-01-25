@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Copy, EllipsisVertical, Eye, FileEdit, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import AddProjectModal from "../add-project-modal";
@@ -30,12 +31,6 @@ export default function FsdProjectActions({ project }: Props) {
     toast.success("Copied", {
       description: "Order ID copied to clipboard",
     });
-  };
-
-  const handleView = () => {
-    // router.push(`/projects/${project.id}`);
-    window.open(`/projects/${project.id}`, "_blank");
-    // or open in modal
   };
 
   const handleEdit = () => {
@@ -74,9 +69,12 @@ export default function FsdProjectActions({ project }: Props) {
               Copy Order ID
             </DropdownMenuItem>
 
-            <DropdownMenuItem onClick={handleView} className="cursor-pointer">
-              <Eye className="mr-2 h-4 w-4" />
-              View Details
+            <DropdownMenuItem className="cursor-pointer" asChild>
+              <Link href={`/tools/fsd-projects/view/${project.id}`}>
+                {" "}
+                <Eye className="mr-2 h-4 w-4" />
+                View Details
+              </Link>
             </DropdownMenuItem>
 
             <DropdownMenuItem onClick={handleEdit} className="cursor-pointer">

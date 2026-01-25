@@ -9,7 +9,18 @@ export const dynamic = "force-dynamic";
 export type SafeProjectDto = Prisma.ProjectGetPayload<{
   include: {
     team: true;
-    salesPerson: true;
+    salesPerson: {
+      select: {
+        fullName: true;
+        id: true;
+        image: true;
+        designation: {
+          select: {
+            name: true;
+          };
+        };
+      };
+    };
     phase: true;
     profile: true;
   };

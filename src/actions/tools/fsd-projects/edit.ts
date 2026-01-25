@@ -6,6 +6,7 @@ import {
   ProjectCreateSchemaType,
 } from "@/schemas/tools/fsd-projects/project-create-schema";
 import { Prisma, ProjectStatus } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 type ActionResponse = {
   success: boolean;
@@ -55,6 +56,8 @@ export async function editProject(
         userId: validatedData.userId ?? null,
       },
     });
+
+    revalidatePath(`/tools/fsd-projects/view/${projectId}`);
 
     return {
       success: true,
