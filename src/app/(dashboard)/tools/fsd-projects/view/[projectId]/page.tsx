@@ -71,7 +71,7 @@ const Page = async ({ params }: { params: { projectId: string } }) => {
 
   return (
     <section className="w-full flex gap-x-5">
-      <Card className="flex-1 p-3 shadow-none">
+      <Card className="flex-1 p-3  shadow-none space-y-5">
         <ProjectDetailsHeader data={project} />
         <OverViewContainer data={project} />
       </Card>

@@ -1,8 +1,9 @@
 import { SafeProjectDto } from "@/app/api/tools/fsd-project/route";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import prisma from "@/lib/prisma";
-import { Clock, Info } from "lucide-react";
+import { Clock, Info, MessageCircleMore, MessageSquare } from "lucide-react";
 import moment from "moment";
+import RemarkCard from "../../cards/remark-card";
 import { TeamAssignmentsCard } from "../../cards/team-assigned-card";
 
 interface Props {
@@ -158,7 +159,25 @@ const OverviewTabContainer = async ({ data }: Props) => {
       {nonEmptyTeams.length > 0 && (
         <TeamAssignmentsCard teams={nonEmptyTeams} />
       )}
-      <TeamAssignmentsCard teams={groupedAssignments} />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {data.remarkFromOperation && (
+          <RemarkCard
+            title="Remark From Operation"
+            remark={data.remarkFromOperation}
+            icon={<MessageSquare className="text-[#CA8A04] h-4 w-4" />}
+            containerClassname="bg-[#FEFCE8] p-2 rounded-sm border-[#FEF08A] border-[1px]"
+          />
+        )}
+        {data.quickNoteFromLeader && (
+          <RemarkCard
+            title="Quick Note from Leader"
+            remark={data.quickNoteFromLeader}
+            icon={<MessageCircleMore className="text-blue-500 h-4 w-4" />}
+            containerClassname="bg-[#EFF6FF] p-2 rounded-sm border-blue-400/30 border-[1px]"
+          />
+        )}
+      </div>
     </div>
   );
 };

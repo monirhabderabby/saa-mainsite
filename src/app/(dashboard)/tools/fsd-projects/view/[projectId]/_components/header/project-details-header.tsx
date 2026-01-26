@@ -49,6 +49,13 @@ const ProjectDetailsHeader = ({ data }: Props) => {
           </Button>
         </div>
       </div>
+
+      <div className="space-y-1 px-2 mt-2">
+        <h1 className="text-lg font-bold">E-Commerce Platform Redesign</h1>
+        <p className="text-xs font-normal">
+          Complete UI/UX redesign with frontend and backend integration
+        </p>
+      </div>
       <AddProjectModal initialData={data} open={open} setOpen={setOpen} />
     </div>
   );

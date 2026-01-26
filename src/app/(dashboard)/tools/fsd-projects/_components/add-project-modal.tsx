@@ -308,8 +308,6 @@ export default function AddProjectModal({
     );
   }
 
-  console.log("initialData", initialData);
-
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       {!initialData && (
@@ -671,7 +669,7 @@ export default function AddProjectModal({
                   name="nextUpdate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Last Update </FormLabel>
+                      <FormLabel>Next Update </FormLabel>
                       <SmartDatePicker
                         value={field.value} // 👈 same fix
                         onChange={field.onChange}

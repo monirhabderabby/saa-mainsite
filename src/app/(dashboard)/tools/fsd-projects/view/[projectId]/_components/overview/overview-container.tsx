@@ -10,7 +10,7 @@ const OverViewContainer = ({ data }: Props) => {
   return (
     <div>
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList variant="line">
+        <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="team">Team</TabsTrigger>
         </TabsList>
