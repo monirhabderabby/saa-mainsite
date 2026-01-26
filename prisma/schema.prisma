@@ -518,13 +518,23 @@ model ProjectAssignment {
     @@unique([projectId, userId])
 }
 
+enum ProjectPhaseStatus {
+    Pending
+    Completed
+    Running
+}
+
 model projectPhase {
     id String @id @default(auto()) @map("_id") @db.ObjectId
 
-    title         String
-    willBeDeliver String
-    orderId       String?
-    value         Int
+    title            String
+    willBeDeliver    String
+    orderId          String?
+    value            Int
+    monetaryValue    Int
+    instructionSheet String
+
+    status ProjectPhaseStatus
 
     // ✅ Foreign key to Project
     projectId String  @db.ObjectId

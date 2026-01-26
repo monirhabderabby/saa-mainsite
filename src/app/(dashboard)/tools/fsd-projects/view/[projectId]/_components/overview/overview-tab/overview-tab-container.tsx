@@ -5,6 +5,7 @@ import { Clock, Info, MessageCircleMore, MessageSquare } from "lucide-react";
 import moment from "moment";
 import RemarkCard from "../../cards/remark-card";
 import { TeamAssignmentsCard } from "../../cards/team-assigned-card";
+import ProjectPhaseContainer from "../../sections/project-phase-container";
 
 interface Props {
   data: SafeProjectDto;
@@ -159,6 +160,8 @@ const OverviewTabContainer = async ({ data }: Props) => {
       {nonEmptyTeams.length > 0 && (
         <TeamAssignmentsCard teams={nonEmptyTeams} />
       )}
+
+      <ProjectPhaseContainer projectId={data.id} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {data.remarkFromOperation && (
