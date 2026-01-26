@@ -13,41 +13,47 @@ const OverviewTabContainer = async ({ data }: Props) => {
   const project = await prisma.project.findUnique({
     where: { id: data.id },
     include: {
-      uiuxAssigned: { include: { user: true } },
-      frontendAssigned: { include: { user: true } },
-      backendAssigned: { include: { user: true } },
+      projectAssignments: {
+        include: { user: true },
+      },
     },
   });
+
+  const uiuxMembers =
+    project?.projectAssignments.filter((a) => a.role === "UIUX") ?? [];
+
+  const frontendMembers =
+    project?.projectAssignments.filter((a) => a.role === "FRONTEND") ?? [];
+
+  const backendMembers =
+    project?.projectAssignments.filter((a) => a.role === "BACKEND") ?? [];
 
   const groupedAssignments = [
     {
       role: "UI/UX Designers",
-      members:
-        project?.uiuxAssigned.map((a) => ({
-          id: a.userId,
-          name: a.user.fullName,
-          avatar: a.user.image || "/placeholder.svg",
-        })) || [],
+      members: uiuxMembers.map((a) => ({
+        id: a.userId,
+        name: a.user.fullName,
+        avatar: a.user.image || "/placeholder.svg",
+      })),
       backgroundColor: "bg-pink-100",
     },
     {
       role: "Frontend Devs",
-      members:
-        project?.frontendAssigned.map((a) => ({
-          id: a.userId,
-          name: a.user.fullName,
-          avatar: a.user.image || "/placeholder.svg",
-        })) || [],
+      members: frontendMembers.map((a) => ({
+        id: a.userId,
+        name: a.user.fullName,
+        avatar: a.user.image || "/placeholder.svg",
+      })),
       backgroundColor: "bg-blue-100",
     },
     {
       role: "Backend Devs",
-      members:
-        project?.backendAssigned.map((a) => ({
-          id: a.userId,
-          name: a.user.fullName,
-          avatar: a.user.image || "/placeholder.svg",
-        })) || [],
+      members: backendMembers.map((a) => ({
+        id: a.userId,
+        name: a.user.fullName,
+        avatar: a.user.image || "/placeholder.svg",
+      })),
       backgroundColor: "bg-green-100",
     },
   ];

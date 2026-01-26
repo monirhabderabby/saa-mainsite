@@ -34,6 +34,7 @@ const Page = async ({ params }: { params: { projectId: string } }) => {
         },
       },
       team: true,
+      projectAssignments: true,
       phase: true,
       profile: true, // include profile here to match type
     },

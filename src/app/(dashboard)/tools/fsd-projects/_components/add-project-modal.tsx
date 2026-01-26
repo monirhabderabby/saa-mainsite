@@ -63,11 +63,13 @@ import {
   NotebookPen,
   Plus,
   Projector,
+  Users,
 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 
+import { MultiSelect } from "@/components/ui/multi-select";
 import { Textarea } from "@/components/ui/textarea";
 import "@smastrom/react-rating/style.css";
 import { toast } from "sonner";
@@ -109,6 +111,8 @@ export default function AddProjectModal({
     // },
   });
 
+  // http://localhost:3000/api/users/fsd-members?membersOf=backend
+
   // grab profiles
   const { data: profiles, isError: isProfileError } = useQuery<Profile[]>({
     queryKey: ["profiles"],
@@ -125,6 +129,35 @@ export default function AddProjectModal({
   const { data: users, isError: isUserError } = useQuery<UserTypes[]>({
     queryKey: ["users"],
     queryFn: () => fetch(`/api/users/salesPerson`).then((res) => res.json()),
+  });
+
+  // grab backend engineers
+  const { data: backendEngineers, isError: isBackendUsersError } = useQuery<
+    UserTypes[]
+  >({
+    queryKey: ["backendEngineers"],
+    queryFn: () =>
+      fetch(`/api/users/fsd-members?membersOf=backend`).then((res) =>
+        res.json(),
+      ),
+  });
+  // grab uiux designer
+  const { data: uiuxDesigners, isError: isuiuxDesignerError } = useQuery<
+    UserTypes[]
+  >({
+    queryKey: ["uiuxDesigners"],
+    queryFn: () =>
+      fetch(`/api/users/fsd-members?membersOf=uiux`).then((res) => res.json()),
+  });
+  // grab uiux designer
+  const { data: frontendEngineers, isError: isFrontendUsersError } = useQuery<
+    UserTypes[]
+  >({
+    queryKey: ["frontendEngineers"],
+    queryFn: () =>
+      fetch(`/api/users/fsd-members?membersOf=frontend`).then((res) =>
+        res.json(),
+      ),
   });
 
   const queryClient = useQueryClient();
@@ -145,7 +178,6 @@ export default function AddProjectModal({
   }, [fuse, query, users]);
 
   function onSubmit(values: ProjectCreateSchemaType) {
-    console.log(values);
     if (initialData) {
       // edit project
       startTransition(() => {
@@ -174,6 +206,8 @@ export default function AddProjectModal({
           setOpen(false);
         });
       });
+
+      console.log(values);
     } else {
       // create a new project
       startTransition(() => {
@@ -236,10 +270,30 @@ export default function AddProjectModal({
       review: initialData.review ?? undefined,
       quickNoteFromLeader: initialData?.quickNoteFromLeader ?? undefined,
       remarkFromOperation: initialData?.remarkFromOperation ?? undefined,
+      // ✅ FIXED
+      uiuxAssigned:
+        initialData?.projectAssignments
+          ?.filter((item) => item.role === "UIUX")
+          .map((item) => item.userId) ?? [],
+      backendAssigned:
+        initialData?.projectAssignments
+          ?.filter((item) => item.role === "BACKEND")
+          .map((item) => item.userId) ?? [],
+      frontendAssigned:
+        initialData?.projectAssignments
+          ?.filter((item) => item.role === "FRONTEND")
+          .map((item) => item.userId) ?? [],
     });
   }, [initialData, form, profiles?.length]);
 
-  if (isProfileError || isTeamError || isUserError) {
+  if (
+    isProfileError ||
+    isTeamError ||
+    isUserError ||
+    isBackendUsersError ||
+    isuiuxDesignerError ||
+    isFrontendUsersError
+  ) {
     return (
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
@@ -253,6 +307,8 @@ export default function AddProjectModal({
       </Sheet>
     );
   }
+
+  console.log("initialData", initialData);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -772,6 +828,83 @@ export default function AddProjectModal({
                         placeholder="Note from operation"
                       />
 
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 gap-y-5 mt-2">
+                <div className="flex items-center gap-x-3 mt-2 col-span-2">
+                  <Users className="size-4 text-primary-yellow" />{" "}
+                  <span className="text-sm">Assignment</span>
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="uiuxAssigned"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <Users className="w-4 h-4" /> UI/UX Members
+                      </FormLabel>
+                      <FormControl>
+                        <MultiSelect
+                          options={uiuxDesigners!.map((u) => ({
+                            label: `${u.fullName} (${u.employeeId})`,
+                            value: u.id,
+                          }))}
+                          value={field.value ?? []}
+                          onValueChange={field.onChange}
+                          placeholder="Choose ui/ux members"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="backendAssigned"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <Users className="w-4 h-4" /> Backend Members
+                      </FormLabel>
+                      <FormControl>
+                        <MultiSelect
+                          options={backendEngineers!.map((u) => ({
+                            label: `${u.fullName} (${u.employeeId})`,
+                            value: u.id,
+                          }))}
+                          value={field.value ?? []}
+                          onValueChange={field.onChange}
+                          placeholder="Choose backend members"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="frontendAssigned"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <Users className="w-4 h-4" /> Frontend Members
+                      </FormLabel>
+                      <FormControl>
+                        <MultiSelect
+                          options={frontendEngineers!.map((u) => ({
+                            label: `${u.fullName} (${u.employeeId})`,
+                            value: u.id,
+                          }))}
+                          value={field.value ?? []}
+                          onValueChange={field.onChange}
+                          placeholder="Choose frontend members"
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

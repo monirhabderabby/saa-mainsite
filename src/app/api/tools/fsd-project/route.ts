@@ -23,6 +23,7 @@ export type SafeProjectDto = Prisma.ProjectGetPayload<{
     };
     phase: true;
     profile: true;
+    projectAssignments: true;
   };
 }>;
 
@@ -100,9 +101,6 @@ export async function GET(req: NextRequest) {
     // ─── Assigned to current user ──────────────────────
     if (assignedToMe) {
       where.OR = [
-        { uiuxAssigned: { some: { userId } } },
-        { backendAssigned: { some: { userId } } },
-        { frontendAssigned: { some: { userId } } },
         { userId }, // fallback / legacy field
       ];
     }
@@ -149,14 +147,6 @@ export async function GET(req: NextRequest) {
         },
 
         // Count assignees instead of fetching full list (better performance)
-        _count: {
-          select: {
-            uiuxAssigned: true,
-            backendAssigned: true,
-            frontendAssigned: true,
-            phase: true,
-          },
-        },
 
         // Optional: include phases if list is short
         phase: {
@@ -165,6 +155,15 @@ export async function GET(req: NextRequest) {
 
         // If you really need full assignees (careful with N+1):
         // uiuxAssigned: { select: { user: { select: { id: true, name: true } } } },
+        projectAssignments: {
+          select: {
+            userId: true,
+            role: true,
+            assignedAt: true,
+            id: true,
+            projectId: true,
+          },
+        },
       },
     });
 

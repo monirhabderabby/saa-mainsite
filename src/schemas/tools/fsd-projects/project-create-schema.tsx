@@ -42,6 +42,9 @@ export const projectCreateSchema = z.object({
 
   // Optional assignment of a user at creation
   userId: z.string().optional(),
+  uiuxAssigned: z.array(z.string()).optional(),
+  backendAssigned: z.array(z.string()).optional(),
+  frontendAssigned: z.array(z.string()).optional(),
 });
 
 export type ProjectCreateSchemaType = z.infer<typeof projectCreateSchema>;

@@ -5,7 +5,7 @@ import {
   projectCreateSchema,
   ProjectCreateSchemaType,
 } from "@/schemas/tools/fsd-projects/project-create-schema";
-import { Prisma, ProjectStatus } from "@prisma/client";
+import { AssignmentRole, Prisma, ProjectStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 type ActionResponse = {
@@ -18,43 +18,90 @@ export async function editProject(
   data: ProjectCreateSchemaType,
 ): Promise<ActionResponse> {
   try {
-    // 1) Validate input
+    // 1️⃣ Validate input
     const validatedData = projectCreateSchema.parse(data);
 
-    // 2) Update project
-    await prisma.project.update({
-      where: {
-        id: projectId,
-      },
-      data: {
-        clientName: validatedData.clientName,
-        orderId: validatedData.orderId,
-        profileId: validatedData.profileId,
-        salesPersonId: validatedData.salesPersonId,
-        instructionSheet: validatedData.instructionSheet,
-        orderDate: validatedData.orderDate,
-        deadline: validatedData.deadline,
-        value: validatedData.value,
-        monetaryValue: validatedData.monetaryValue,
-        shift: validatedData.shift,
-        teamId: validatedData.teamId,
-        status: (validatedData.status as ProjectStatus) ?? "NRA",
+    // 2️⃣ Transaction (atomic update)
+    await prisma.$transaction(async (tx) => {
+      // -------------------------
+      // Update project fields
+      // -------------------------
+      await tx.project.update({
+        where: { id: projectId },
+        data: {
+          clientName: validatedData.clientName,
+          orderId: validatedData.orderId,
+          profileId: validatedData.profileId,
+          salesPersonId: validatedData.salesPersonId,
+          instructionSheet: validatedData.instructionSheet,
+          orderDate: validatedData.orderDate,
+          deadline: validatedData.deadline,
+          value: validatedData.value,
+          monetaryValue: validatedData.monetaryValue,
+          shift: validatedData.shift,
+          teamId: validatedData.teamId,
+          status: (validatedData.status as ProjectStatus) ?? "NRA",
 
-        // Optional fields
-        delivered: validatedData.delivered ?? null,
-        lastUpdate: validatedData.lastUpdate ?? null,
-        nextUpdate: validatedData.nextUpdate ?? null,
-        remarkFromOperation: validatedData.remarkFromOperation ?? null,
-        quickNoteFromLeader: validatedData.quickNoteFromLeader ?? null,
-        review: validatedData.review ?? null,
+          delivered: validatedData.delivered ?? null,
+          lastUpdate: validatedData.lastUpdate ?? null,
+          nextUpdate: validatedData.nextUpdate ?? null,
+          remarkFromOperation: validatedData.remarkFromOperation ?? null,
+          quickNoteFromLeader: validatedData.quickNoteFromLeader ?? null,
+          review: validatedData.review ?? null,
 
-        progressSheet: validatedData.progressSheet ?? null,
-        credentialSheet: validatedData.credentialSheet ?? null,
-        websiteIssueTrackerSheet:
-          validatedData.websiteIssueTrackerSheet ?? null,
+          progressSheet: validatedData.progressSheet ?? null,
+          credentialSheet: validatedData.credentialSheet ?? null,
+          websiteIssueTrackerSheet:
+            validatedData.websiteIssueTrackerSheet ?? null,
 
-        userId: validatedData.userId ?? null,
-      },
+          userId: validatedData.userId ?? null,
+        },
+      });
+
+      // -------------------------
+      // Clear old assignments
+      // -------------------------
+      await tx.projectAssignment.deleteMany({
+        where: { projectId },
+      });
+
+      // -------------------------
+      // Prepare new assignments
+      // -------------------------
+      const assignments: Prisma.ProjectAssignmentCreateManyInput[] = [];
+
+      validatedData.uiuxAssigned?.forEach((userId) => {
+        assignments.push({
+          projectId,
+          userId,
+          role: AssignmentRole.UIUX,
+        });
+      });
+
+      validatedData.frontendAssigned?.forEach((userId) => {
+        assignments.push({
+          projectId,
+          userId,
+          role: AssignmentRole.FRONTEND,
+        });
+      });
+
+      validatedData.backendAssigned?.forEach((userId) => {
+        assignments.push({
+          projectId,
+          userId,
+          role: AssignmentRole.BACKEND,
+        });
+      });
+
+      // -------------------------
+      // Create assignments
+      // -------------------------
+      if (assignments.length > 0) {
+        await tx.projectAssignment.createMany({
+          data: assignments,
+        });
+      }
     });
 
     revalidatePath(`/tools/fsd-projects/view/${projectId}`);
@@ -67,7 +114,6 @@ export async function editProject(
   } catch (error: any) {
     // 🔴 Prisma errors
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      // Unique constraint (orderId)
       if (error.code === "P2002") {
         return {
           success: false,
@@ -75,15 +121,13 @@ export async function editProject(
         };
       }
 
-      // Foreign key constraint
       if (error.code === "P2003") {
         return {
           success: false,
-          message: "Invalid profile, team, or salesperson reference.",
+          message: "Invalid reference (profile, team, user, or salesperson).",
         };
       }
 
-      // Record not found
       if (error.code === "P2025") {
         return {
           success: false,
@@ -93,7 +137,7 @@ export async function editProject(
     }
 
     // 🔴 Zod validation error
-    if (error.name === "ZodError") {
+    if (error?.name === "ZodError") {
       return {
         success: false,
         message: "Invalid input data. Please check your form.",
