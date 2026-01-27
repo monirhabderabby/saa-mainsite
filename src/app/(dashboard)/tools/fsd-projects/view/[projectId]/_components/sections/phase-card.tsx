@@ -1,8 +1,11 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
+import { icons } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 import { ProjectPhaseStatus } from "@prisma/client";
 import { Check, Circle, Loader2 } from "lucide-react";
+import Image from "next/image";
 
 export interface PhaseCardProps {
   phaseNumber: number;
@@ -11,6 +14,8 @@ export interface PhaseCardProps {
   points: number;
   status: ProjectPhaseStatus;
   className?: string;
+  instructionSheet?: string;
+  orderId?: string;
 }
 
 const statusConfig = {
@@ -50,6 +55,8 @@ export function PhaseCard({
   points,
   status,
   className,
+  instructionSheet,
+  orderId,
 }: PhaseCardProps) {
   const config =
     statusConfig[status.toLowerCase() as keyof typeof statusConfig];
@@ -82,14 +89,46 @@ export function PhaseCard({
       </div>
 
       {/* Content */}
-      <div className="flex-1 min-w-0">
+      {/* <div className="flex-1 min-w-0">
         <h3 className="font-semibold text-slate-800">
           Phase {phaseNumber}: {title}
         </h3>
         <p className="text-sm text-slate-500 truncate">
           Will deliver: {deliverable}
         </p>
+      </div> */}
+
+      <div className="flex-1 min-w-0">
+        <h3 className="font-semibold text-slate-800">
+          Phase {phaseNumber}: {title}
+        </h3>
+
+        {orderId && (
+          <p className="text-xs text-slate-400">
+            Order ID: <span className="font-mono">{orderId}</span>
+          </p>
+        )}
+
+        <p className="text-sm text-slate-500 truncate">
+          Will deliver: {deliverable}
+        </p>
       </div>
+
+      {instructionSheet && (
+        <div>
+          <a href={instructionSheet} target="_blank">
+            <Badge variant="outline" className="flex gap-x-1">
+              <Image
+                src={icons.Sheet}
+                alt="spreadsheet"
+                width={10}
+                height={10}
+              />
+              Instruction Sheet
+            </Badge>
+          </a>
+        </div>
+      )}
 
       {/* Points & Status */}
       <div className="text-right shrink-0">

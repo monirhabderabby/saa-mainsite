@@ -532,7 +532,7 @@ model projectPhase {
     orderId          String?
     value            Int
     monetaryValue    Int
-    instructionSheet String
+    instructionSheet String?
 
     status ProjectPhaseStatus
 
