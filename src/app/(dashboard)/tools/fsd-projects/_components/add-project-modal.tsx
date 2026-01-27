@@ -42,7 +42,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { icons } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 import {
   projectCreateSchema,
@@ -54,21 +53,29 @@ import { Rating } from "@smastrom/react-rating";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Fuse from "fuse.js";
 import {
-  Building,
-  Calendar,
+  Building2,
+  CalendarRange,
   Check,
   ChevronsUpDown,
-  CircleStarIcon,
+  Clock,
+  DollarSign,
+  LinkIcon,
   Loader2,
   NotebookPen,
   Plus,
-  Projector,
+  SheetIcon,
+  Star,
   Users,
 } from "lucide-react";
-import Image from "next/image";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 
+import { Card } from "@/components/ui/card";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { Textarea } from "@/components/ui/textarea";
 import "@smastrom/react-rating/style.css";
@@ -279,9 +286,15 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
   const value = form.watch("value");
 
   useEffect(() => {
-    // Only update if value exists
-    if (value) {
-      form.setValue("monetaryValue", value * 0.8);
+    if (value == null || value === 0) {
+      form.setValue("monetaryValue", 0);
+      return;
+    }
+
+    const numericValue = Number(value);
+
+    if (!isNaN(numericValue)) {
+      form.setValue("monetaryValue", numericValue * 0.8);
     }
   }, [value, form]);
 
@@ -321,7 +334,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
           </Button>
         </SheetTrigger>
       )}
-      <SheetContent className="w-full flex flex-col h-full px-2">
+      <SheetContent className="w-full bg-[#F9FAFB] flex flex-col h-full px-2">
         <SheetHeader>
           <SheetTitle>{initialData ? "Edit" : "New"} Project</SheetTitle>
         </SheetHeader>
@@ -330,12 +343,23 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-3 px-1"
+              className="space-y-7 px-1"
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="flex items-center gap-x-3 mt-5 col-span-2">
-                  <Building className="size-4 text-primary-yellow" />{" "}
-                  <span className="text-sm">Client Information</span>
+              {/* client information */}
+              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 shadow-none">
+                <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
+                  <div className="bg-[#EFF6FF] p-3 rounded-lg">
+                    <Building2 className="size-4  text-[#2563EB]" />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">
+                      Client Information
+                    </span>
+                    <span className="font-normal text-[10px]">
+                      Basic client and order details
+                    </span>
+                  </div>
                 </div>
                 <FormField
                   control={form.control}
@@ -518,12 +542,21 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                     );
                   }}
                 />
-              </div>
+              </Card>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="flex items-center gap-x-3 mt-2 col-span-2">
-                  <Calendar className="size-4 text-primary-yellow" />{" "}
-                  <span className="text-sm">Timeline</span>
+              {/* timeline */}
+              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 shadow-none">
+                <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
+                  <div className="bg-[#FAF5FF] p-3 rounded-lg">
+                    <CalendarRange className="size-4  text-[#9333EA]" />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">Timeline</span>
+                    <span className="font-normal text-[10px]">
+                      Project schedule and status tracking
+                    </span>
+                  </div>
                 </div>
                 <FormField
                   control={form.control}
@@ -641,12 +674,99 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                     </FormItem>
                   )}
                 />
-              </div>
+              </Card>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="flex items-center gap-x-3 mt-2 col-span-2">
-                  <Calendar className="size-4 text-primary-yellow" />{" "}
-                  <span className="text-sm">Project Update</span>
+              {/* financial information */}
+              <Card className="grid grid-cols-2 gap-3 mt-2 shadow-none p-4">
+                <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
+                  <div className="bg-[#F0FDF4] p-3 rounded-lg">
+                    <DollarSign className="size-4  text-[#16A34A]" />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">
+                      Financial Information
+                    </span>
+                    <span className="font-normal text-[10px]">
+                      Project value and monetary details
+                    </span>
+                  </div>
+                </div>
+                <FormField
+                  control={form.control}
+                  name="value"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Value </FormLabel>
+                      <InputGroup>
+                        <InputGroupInput
+                          type="number"
+                          {...field}
+                          placeholder="eg: 500"
+                          value={field.value ?? ""}
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value === ""
+                                ? undefined
+                                : Number(e.target.value),
+                            )
+                          }
+                        />
+                        <InputGroupAddon>
+                          <DollarSign />
+                        </InputGroupAddon>
+                      </InputGroup>
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="monetaryValue"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Monetary Value </FormLabel>
+                      <InputGroup>
+                        <InputGroupInput
+                          type="number"
+                          disabled
+                          {...field}
+                          placeholder="eg: 400"
+                          value={field.value ?? ""}
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value === ""
+                                ? undefined
+                                : Number(e.target.value),
+                            )
+                          }
+                        />
+                        <InputGroupAddon>
+                          <DollarSign />
+                        </InputGroupAddon>
+                      </InputGroup>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </Card>
+
+              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 shadow-none">
+                <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
+                  <div className="bg-[#FFF7ED] p-3 rounded-lg">
+                    <Clock
+                      strokeWidth={2.75}
+                      className="size-4  text-[#EA580C]"
+                    />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">Project Updates</span>
+                    <span className="font-normal text-[10px]">
+                      Track update schedule
+                    </span>
+                  </div>
                 </div>
 
                 <FormField
@@ -677,93 +797,22 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                     </FormItem>
                   )}
                 />
-              </div>
+              </Card>
 
-              <div className="grid grid-cols-2 gap-3 mt-2">
-                <div className="flex items-center gap-x-3 mt-2 col-span-2">
-                  <Projector className="size-4 text-primary-yellow" />{" "}
-                  <span className="text-sm">Project Information</span>
-                </div>
-                <FormField
-                  control={form.control}
-                  name="value"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Value </FormLabel>
-                      <Input
-                        type="number"
-                        {...field}
-                        placeholder="eg: 500"
-                        value={field.value ?? ""}
-                        onChange={(e) =>
-                          field.onChange(
-                            e.target.value === ""
-                              ? undefined
-                              : Number(e.target.value),
-                          )
-                        }
-                      />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="monetaryValue"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Monetary Value </FormLabel>
-                      <Input
-                        type="number"
-                        disabled
-                        {...field}
-                        placeholder="eg: 500"
-                        value={field.value ?? ""}
-                        onChange={(e) =>
-                          field.onChange(
-                            e.target.value === ""
-                              ? undefined
-                              : Number(e.target.value),
-                          )
-                        }
-                      />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {initialData?.status === "Delivered" && (
-                <div className="grid grid-cols-2 gap-3 mt-2">
-                  <div className="flex items-center gap-x-3 mt-2 col-span-2">
-                    <CircleStarIcon className="size-4 text-primary-yellow" />{" "}
-                    <span className="text-sm">Review/Rating</span>
+              <Card className="grid gap-3 mt-2 shadow-none p-4">
+                <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
+                  <div className="bg-[#FEFCE8] p-3 rounded-lg">
+                    <NotebookPen className="size-4  text-[#CA8A04]" />
                   </div>
-                  <FormField
-                    control={form.control}
-                    name="review"
-                    render={({ field }) => (
-                      <FormItem>
-                        <Rating
-                          onChange={field.onChange}
-                          value={field.value ?? 0}
-                          style={{
-                            width: "100px",
-                          }}
-                        />
 
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">Notes & Remarks</span>
+                    <span className="font-normal text-[10px]">
+                      Additional project information
+                    </span>
+                  </div>
                 </div>
-              )}
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex items-center gap-x-3 mt-2 col-span-2">
-                  <Calendar className="size-4 text-primary-yellow" />{" "}
-                  <span className="text-sm">Additional Information</span>
-                </div>
                 <FormField
                   control={form.control}
                   name="instructionSheet"
@@ -771,39 +820,26 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                     <FormItem className="col-span-2">
                       <FormLabel>Instruction Sheet</FormLabel>
                       <FormControl>
-                        <Input
-                          startNativeIcon={
-                            <Image
-                              src={icons.Sheet}
-                              alt="sheet"
-                              height={15}
-                              width={15}
-                            />
-                          }
-                          className="w-full px-7"
-                          placeholder="e.g https://drive.google.com/drive/folders"
-                          type="text"
-                          {...field}
-                          disabled={pending}
-                        />
+                        <InputGroup>
+                          <InputGroupInput
+                            {...field}
+                            placeholder="e.g https://drive.google.com/drive/folders"
+                          />
+                          <InputGroupAddon>
+                            <SheetIcon className="text-[#00AC47]" />
+                          </InputGroupAddon>
+                        </InputGroup>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              </div>
-
-              <div className="grid gap-3 mt-2">
-                <div className="flex items-center gap-x-3 mt-2 col-span-2">
-                  <NotebookPen className="size-4 text-primary-yellow" />{" "}
-                  <span className="text-sm">Note/Remarks</span>
-                </div>
                 <FormField
                   control={form.control}
                   name="quickNoteFromLeader"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Note (Leader)</FormLabel>
+                      <FormLabel>Quick Note from leader</FormLabel>
                       <Textarea
                         value={field.value}
                         onChange={field.onChange}
@@ -819,7 +855,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                   name="remarkFromOperation"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Note (operation)</FormLabel>
+                      <FormLabel>Remark from Operation</FormLabel>
                       <Textarea
                         value={field.value}
                         onChange={field.onChange}
@@ -830,12 +866,24 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                     </FormItem>
                   )}
                 />
-              </div>
+              </Card>
+              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 gap-y-5 mt-2 shadow-none p-4">
+                <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
+                  <div className="bg-[#EEF2FF] p-3 rounded-lg">
+                    <Users
+                      strokeWidth={2.75}
+                      className="size-4  text-[#4F46E5]"
+                    />
+                  </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 gap-y-5 mt-2">
-                <div className="flex items-center gap-x-3 mt-2 col-span-2">
-                  <Users className="size-4 text-primary-yellow" />{" "}
-                  <span className="text-sm">Assignment</span>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">
+                      Project Assignment
+                    </span>
+                    <span className="font-normal text-[10px]">
+                      Assign team member to roles
+                    </span>
+                  </div>
                 </div>
 
                 <FormField
@@ -844,7 +892,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center gap-2">
-                        <Users className="w-4 h-4" /> UI/UX Members
+                        <Users className="w-3 h-3" /> UI/UX Members
                       </FormLabel>
                       <FormControl>
                         <MultiSelect
@@ -867,7 +915,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center gap-2">
-                        <Users className="w-4 h-4" /> Backend Members
+                        <Users className="w-3 h-3" /> Backend Members
                       </FormLabel>
                       <FormControl>
                         <MultiSelect
@@ -890,7 +938,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center gap-2">
-                        <Users className="w-4 h-4" /> Frontend Members
+                        <Users className="w-3 h-3" /> Frontend Members
                       </FormLabel>
                       <FormControl>
                         <MultiSelect
@@ -907,8 +955,111 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                     </FormItem>
                   )}
                 />
-              </div>
+              </Card>
+              <Card className="grid gap-3 mt-2 shadow-none p-4">
+                <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
+                  <div className="bg-[#F0FDFA] p-3 rounded-lg">
+                    <LinkIcon className="size-4  text-[#1D9B90]" />
+                  </div>
 
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">
+                      Optional Resources
+                    </span>
+                    <span className="font-normal text-[10px]">
+                      External links and tracking sheets
+                    </span>
+                  </div>
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="progressSheet"
+                  render={({ field }) => (
+                    <FormItem className="col-span-2">
+                      <FormLabel>Progress Sheet</FormLabel>
+                      <FormControl>
+                        <InputGroup>
+                          <InputGroupInput {...field} placeholder="https://" />
+                          <InputGroupAddon>
+                            <SheetIcon className="text-[#00AC47]" />
+                          </InputGroupAddon>
+                        </InputGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="credentialSheet"
+                  render={({ field }) => (
+                    <FormItem className="col-span-2">
+                      <FormLabel>Credential Sheet</FormLabel>
+                      <FormControl>
+                        <InputGroup>
+                          <InputGroupInput {...field} placeholder="https://" />
+                          <InputGroupAddon>
+                            <SheetIcon className="text-[#00AC47]" />
+                          </InputGroupAddon>
+                        </InputGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="websiteIssueTrackerSheet"
+                  render={({ field }) => (
+                    <FormItem className="col-span-2">
+                      <FormLabel>Website Issue Tracker Sheet</FormLabel>
+                      <FormControl>
+                        <InputGroup>
+                          <InputGroupInput {...field} placeholder="https://" />
+                          <InputGroupAddon>
+                            <SheetIcon className="text-[#00AC47]" />
+                          </InputGroupAddon>
+                        </InputGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </Card>
+
+              <Card className="grid gap-3 mt-2 shadow-none p-4">
+                <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
+                  <div className="bg-[#FDF2F8] p-3 rounded-lg">
+                    <Star className="size-4 stroke-[#DB2777]  fill-[#DB2777]" />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">Client Rating</span>
+                    <span className="font-normal text-[10px]">
+                      Rate your experience with this client
+                    </span>
+                  </div>
+                </div>
+                <FormField
+                  control={form.control}
+                  name="review"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Rating</FormLabel>
+                      <Rating
+                        onChange={field.onChange}
+                        value={field.value ?? 0}
+                        style={{
+                          width: "100px",
+                        }}
+                      />
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </Card>
               <div className="flex justify-end gap-x-4">
                 <Button
                   variant="outline"
