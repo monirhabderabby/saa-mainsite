@@ -27,15 +27,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 
 import { createPhase, updatePhase } from "@/actions/tools/fsd-projects/phase";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import {
   AddProjectPhaseSchema,
   addProjectPhaseSchema,
 } from "@/schemas/tools/fsd-projects/project-phase-create";
 import { projectPhase } from "@prisma/client";
-import { Layers, Loader, Plus, Save } from "lucide-react";
+import { Layers, Loader, Plus, Save, Sheet } from "lucide-react";
 import { toast } from "sonner";
 
 interface AddProjectPhaseProps {
@@ -62,8 +66,8 @@ export default function AddProjectPhase({
       title: "",
       willBeDeliver: "",
       orderId: "",
-      value: 0,
-      monetaryValue: 0,
+      value: undefined,
+      monetaryValue: undefined,
       instructionSheet: "",
       status: "Pending",
     },
@@ -122,6 +126,22 @@ export default function AddProjectPhase({
       status: initialdata?.status,
     });
   }, [form, initialdata, projectId]);
+
+  // Add this useEffect
+  useEffect(() => {
+    if (!open) {
+      form.reset({
+        projectId,
+        title: initialdata?.title ?? "",
+        willBeDeliver: initialdata?.willBeDeliver ?? "",
+        orderId: initialdata?.orderId ?? "",
+        value: initialdata?.value ?? undefined,
+        monetaryValue: initialdata?.monetaryValue ?? undefined,
+        instructionSheet: initialdata?.instructionSheet ?? "",
+        status: initialdata?.status ?? "Pending",
+      });
+    }
+  }, [open, form, projectId, initialdata]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -272,11 +292,12 @@ export default function AddProjectPhase({
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Textarea
-                      placeholder="Instruction sheet"
-                      rows={4}
-                      {...field}
-                    />
+                    <InputGroup>
+                      <InputGroupInput {...field} />
+                      <InputGroupAddon>
+                        <Sheet className="text-[#00AC47]" />
+                      </InputGroupAddon>
+                    </InputGroup>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

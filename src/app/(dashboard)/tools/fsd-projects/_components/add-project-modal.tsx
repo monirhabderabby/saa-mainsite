@@ -276,6 +276,15 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
     });
   }, [initialData, form, profiles?.length]);
 
+  const value = form.watch("value");
+
+  useEffect(() => {
+    // Only update if value exists
+    if (value) {
+      form.setValue("monetaryValue", value * 0.8);
+    }
+  }, [value, form]);
+
   if (
     isProfileError ||
     isTeamError ||
@@ -706,6 +715,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                       <FormLabel>Monetary Value </FormLabel>
                       <Input
                         type="number"
+                        disabled
                         {...field}
                         placeholder="eg: 500"
                         value={field.value ?? ""}

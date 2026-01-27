@@ -1,7 +1,9 @@
 "use client";
 
+import { deleteProject } from "@/actions/tools/fsd-projects/delete";
 import { SafeProjectDto } from "@/app/api/tools/fsd-project/route";
 import { Button } from "@/components/ui/button";
+import AlertModal from "@/components/ui/custom/alert-modal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,9 +13,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useQueryClient } from "@tanstack/react-query";
 import { Copy, EllipsisVertical, Eye, FileEdit, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import AddProjectModal from "../add-project-modal";
 // import { useRouter } from "next/navigation";             // if needed
@@ -22,8 +25,23 @@ interface Props {
   project: SafeProjectDto;
 }
 
+interface ApiResponse {
+  success: boolean;
+  data: SafeProjectDto[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+}
+
 export default function FsdProjectActions({ project }: Props) {
   const [editable, setEditable] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const copyOrderId = () => {
     navigator.clipboard.writeText(project.orderId || project.id || "—");
@@ -33,13 +51,40 @@ export default function FsdProjectActions({ project }: Props) {
     });
   };
 
+  const queryClient = useQueryClient();
+
   const handleEdit = () => {
     setEditable(true);
   };
 
-  const handleDelete = () => {
-    if (!confirm("Delete this project? This action cannot be undone.")) return;
-    // await deleteProject(project.id);
+  const onDeleteProject = () => {
+    startTransition(() => {
+      deleteProject(project.id).then((res) => {
+        if (!res.success) {
+          toast.error(res.message);
+          return;
+        }
+
+        toast.success(res.message);
+        setDeleteModalOpen(false);
+
+        // --------------------------------------------------------
+        // Update Cache Manually
+        // --------------------------------------------------------
+        queryClient.setQueryData<ApiResponse>(["fsd-projects"], (oldData) => {
+          if (!oldData) return oldData;
+
+          return {
+            ...oldData,
+            data: oldData.data.filter((item) => item.id !== project.id),
+            pagination: {
+              ...oldData.pagination,
+              total: oldData.pagination.total - 1,
+            },
+          };
+        });
+      });
+    });
   };
 
   return (
@@ -87,7 +132,7 @@ export default function FsdProjectActions({ project }: Props) {
 
           <DropdownMenuGroup>
             <DropdownMenuItem
-              onClick={handleDelete}
+              onClick={() => setDeleteModalOpen(true)}
               className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
             >
               <Trash2 className="mr-2 h-4 w-4" />
@@ -107,6 +152,14 @@ export default function FsdProjectActions({ project }: Props) {
         open={editable}
         setOpen={setEditable}
         initialData={project}
+      />
+      <AlertModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={onDeleteProject}
+        loading={isPending}
+        title="Delete this project?"
+        message="Are you sure? This will permanently delete the project, remove all team assignments, and clear associated metadata. This action cannot be undone."
       />
     </>
   );

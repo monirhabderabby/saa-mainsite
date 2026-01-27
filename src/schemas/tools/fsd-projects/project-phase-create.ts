@@ -11,7 +11,7 @@ export const addProjectPhaseSchema = z.object({
   value: z.number().min(0, "Value must be positive"),
   monetaryValue: z.number().min(0, "Monetary value must be positive"),
 
-  instructionSheet: z.string().min(1, "Instruction sheet is required"),
+  instructionSheet: z.string().optional(),
 
   status: z.string().min(1, "Status is required"),
 });
