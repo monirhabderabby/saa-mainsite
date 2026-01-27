@@ -62,6 +62,8 @@ const ProjectPhaseContainer = async ({ projectId }: Props) => {
                 status={phase.status}
                 instructionSheet={phase.instructionSheet!}
                 orderId={phase.orderId!}
+                projectId={projectId}
+                data={phase}
               />
             ))}
           </div>

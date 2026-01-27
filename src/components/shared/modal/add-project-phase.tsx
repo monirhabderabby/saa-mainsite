@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
@@ -29,25 +29,30 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
-import { createPhase } from "@/actions/tools/fsd-projects/phase";
+import { createPhase, updatePhase } from "@/actions/tools/fsd-projects/phase";
 import {
   AddProjectPhaseSchema,
   addProjectPhaseSchema,
 } from "@/schemas/tools/fsd-projects/project-phase-create";
-import { Layers, Loader, Plus } from "lucide-react";
+import { projectPhase } from "@prisma/client";
+import { Layers, Loader, Plus, Save } from "lucide-react";
 import { toast } from "sonner";
 
 interface AddProjectPhaseProps {
   projectId: string;
   trigger?: React.ReactNode;
   onClose?: () => void;
+  defaultOpen?: boolean;
+  initialdata?: projectPhase;
 }
 
 export default function AddProjectPhase({
   projectId,
   trigger,
+  defaultOpen,
+  initialdata,
 }: AddProjectPhaseProps) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen ?? false);
   const [isLoading, startTransition] = useTransition();
 
   const form = useForm<AddProjectPhaseSchema>({
@@ -65,35 +70,77 @@ export default function AddProjectPhase({
   });
 
   const onSubmit = async (values: AddProjectPhaseSchema) => {
-    startTransition(() => {
-      createPhase(values).then((res) => {
-        if (!res.success) {
-          toast.error(res.message);
-          return;
-        }
+    if (initialdata) {
+      // edit server action
+      startTransition(() => {
+        updatePhase(initialdata.id, values).then((res) => {
+          if (!res.success) {
+            toast.error(res.message);
+            return;
+          }
 
-        form.reset();
-        toast.success(res.message);
-        setOpen(false);
+          toast.success(res.message);
+          setOpen(false);
+          form.reset();
+        });
       });
-    });
+    } else {
+      startTransition(() => {
+        createPhase(values).then((res) => {
+          if (!res.success) {
+            toast.error(res.message);
+            return;
+          }
+
+          form.reset();
+          toast.success(res.message);
+          setOpen(false);
+        });
+      });
+    }
   };
+
+  const value = form.watch("value");
+
+  useEffect(() => {
+    if (!value) return;
+
+    form.setValue("monetaryValue", value * 0.8);
+  }, [value, form]);
+
+  useEffect(() => {
+    if (!initialdata) return;
+
+    form.reset({
+      projectId,
+      title: initialdata.title,
+      willBeDeliver: initialdata.willBeDeliver,
+      orderId: initialdata.orderId ?? undefined,
+      value: initialdata.value,
+      monetaryValue: initialdata.monetaryValue,
+      instructionSheet: initialdata.instructionSheet ?? undefined,
+      status: initialdata?.status,
+    });
+  }, [form, initialdata, projectId]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger || (
-          <Button variant="ghost" size="sm">
-            <Layers className="w-4 h-4 mr-2" />
-            Add Phase
-          </Button>
-        )}
-      </DialogTrigger>
+      {!initialdata && (
+        <DialogTrigger asChild>
+          {trigger || (
+            <Button variant="ghost" size="sm">
+              <Layers className="w-4 h-4 mr-2" />
+              Add Phase
+            </Button>
+          )}
+        </DialogTrigger>
+      )}
 
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Layers className="w-5 h-5" /> Add Project Phase
+            <Layers className="w-5 h-5" /> {initialdata ? "Edit" : "Add"}{" "}
+            Project Phase
           </DialogTitle>
         </DialogHeader>
 
@@ -176,6 +223,7 @@ export default function AddProjectPhase({
                     <FormControl>
                       <Input
                         type="number"
+                        disabled
                         {...field}
                         placeholder="Monetary Value eg: 320"
                         value={field.value ?? ""}
@@ -247,8 +295,14 @@ export default function AddProjectPhase({
                 Cancel
               </Button>
               <Button type="submit" disabled={isLoading}>
-                Add Phase{" "}
-                {isLoading ? <Loader className="animate-spin" /> : <Plus />}
+                {initialdata ? "Save Now" : "Add Phase"}
+                {isLoading ? (
+                  <Loader className="ml-2 h-4 w-4 animate-spin" />
+                ) : initialdata ? (
+                  <Save className="ml-2 h-4 w-4" />
+                ) : (
+                  <Plus className="ml-2 h-4 w-4" />
+                )}
               </Button>
             </div>
           </form>

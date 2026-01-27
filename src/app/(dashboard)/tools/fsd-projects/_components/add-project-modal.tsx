@@ -88,11 +88,7 @@ interface Props {
   setOpen?: (p: boolean) => void;
   initialData?: SafeProjectDto;
 }
-export default function AddProjectModal({
-  open: defaultOpen,
-  initialData,
-}: Props) {
-  const [open, setOpen] = useState(defaultOpen ?? false);
+export default function AddProjectModal({ open, initialData, setOpen }: Props) {
   const [pending, startTransition] = useTransition();
   const [query, setQuery] = useState("");
 
@@ -203,7 +199,7 @@ export default function AddProjectModal({
             monetaryValue: 0,
             instructionSheet: "",
           });
-          setOpen(false);
+          setOpen?.(false);
         });
       });
 
@@ -236,12 +232,6 @@ export default function AddProjectModal({
       });
     }
   }
-
-  useEffect(() => {
-    if (defaultOpen !== undefined) {
-      setOpen(defaultOpen);
-    }
-  }, [defaultOpen]);
 
   useEffect(() => {
     if (!initialData) return;
@@ -915,7 +905,7 @@ export default function AddProjectModal({
                   className="text-primary hover:text-primary/80"
                   onClick={() => {
                     form.reset();
-                    setOpen(false);
+                    setOpen?.(false);
                   }}
                   type="button"
                   disabled={pending}
