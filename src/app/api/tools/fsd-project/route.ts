@@ -30,12 +30,12 @@ export type SafeProjectDto = Prisma.ProjectGetPayload<{
 export async function GET(req: NextRequest) {
   const session = await auth();
 
-  //   if (!session?.user?.id) {
-  //     return NextResponse.json(
-  //       { success: false, message: "Unauthorized" },
-  //       { status: 401 },
-  //     );
-  //   }
+  if (!session?.user?.id) {
+    return NextResponse.json(
+      { success: false, message: "Unauthorized" },
+      { status: 401 },
+    );
+  }
 
   const userId = session?.user.id;
   const searchParams = req.nextUrl.searchParams;
@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
   const skip = (page - 1) * limit;
 
   // ─── Filters ───────────────────────────────────
-  const teamId = searchParams.get("teamId") ?? undefined;
+  const teamIdsParam = searchParams.getAll("teamIds");
   const status = searchParams.get("status") ?? undefined;
   const assignedToMe = searchParams.get("assignedToMe") === "true";
   const search = searchParams.get("search")?.trim() || undefined;
@@ -58,6 +58,11 @@ export async function GET(req: NextRequest) {
   const fromDate = searchParams.get("fromDate"); // YYYY-MM-DD
   const toDate = searchParams.get("toDate"); // YYYY-MM-DD
 
+  const teamIds = teamIdsParam
+    .flatMap((id) => id.split(",")) // split comma-separated values
+    .map((id) => id.trim())
+    .filter(Boolean);
+
   try {
     // Build where clause
     const where: Prisma.ProjectWhereInput = {};
@@ -65,8 +70,10 @@ export async function GET(req: NextRequest) {
     // Optional: only allow users to see projects in their team (uncomment/adjust logic)
     // where.teamId = teamIdFromUserSession ?? undefined;
 
-    if (teamId) {
-      where.teamId = teamId;
+    if (teamIds && teamIds.length > 0) {
+      where.teamId = {
+        in: teamIds,
+      };
     }
 
     if (status) {
@@ -79,7 +86,10 @@ export async function GET(req: NextRequest) {
     }
 
     if (orderId) {
-      where.orderId = { contains: orderId, mode: "insensitive" };
+      where.OR = [
+        { orderId: { contains: orderId, mode: "insensitive" } },
+        { phase: { some: { orderId: orderId } } },
+      ];
     }
 
     if (search) {

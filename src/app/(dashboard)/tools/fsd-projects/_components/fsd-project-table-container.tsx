@@ -5,6 +5,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { Skeleton } from "@/components/ui/skeleton";
 import SkeletonWrapper from "@/components/ui/skeleton-wrapper";
+import { useFsdProjectFilterState } from "@/zustand/tools/fsd-project";
 import { useQuery } from "@tanstack/react-query";
 import {
   ColumnDef,
@@ -30,9 +31,17 @@ interface ApiResponse {
 }
 
 const FsdProjectTableContainer = () => {
+  let { clientName, orderId, teamId } = useFsdProjectFilterState();
+  clientName = clientName ?? "";
+  orderId = orderId ?? "";
+  let preparedTeamids = teamId ? teamId?.join(",") : "";
+
   const { data, isError, error, isLoading } = useQuery<ApiResponse>({
-    queryKey: ["fsd-projects"],
-    queryFn: () => fetch(`/api/tools/fsd-project`).then((res) => res.json()),
+    queryKey: ["fsd-projects", clientName, orderId, preparedTeamids],
+    queryFn: () =>
+      fetch(
+        `/api/tools/fsd-project?clientName=${clientName}&orderId=${orderId}&teamIds=${preparedTeamids}`,
+      ).then((res) => res.json()),
   });
 
   if (isError) {

@@ -9,6 +9,7 @@ import {
 import prisma from "@/lib/prisma";
 import { Filter } from "lucide-react";
 import dynamic from "next/dynamic";
+import AddFilterFsdProject from "./_components/filter/add-filter-fsd-project";
 import FsdProjectTableContainer from "./_components/fsd-project-table-container";
 const ProjectStatsCard = dynamic(
   () => import("./_components/project-stats-card"),
@@ -192,6 +193,15 @@ const Page = async () => {
 
   const totalRevenueChange = calculateChange(currentRevenue, lastRevenue);
 
+  const profiles = await prisma.profile.findMany();
+  const teams = await prisma.team.findMany({
+    where: {
+      service: {
+        name: "FSD",
+      },
+    },
+  });
+
   return (
     <Card>
       <CardHeader className=" w-full">
@@ -243,9 +253,15 @@ const Page = async () => {
       </div>
 
       <div className="px-5 my-5 flex justify-end">
-        <Button variant="outline">
-          <Filter /> Filter
-        </Button>
+        <AddFilterFsdProject
+          trigger={
+            <Button variant="outline">
+              <Filter /> Filter
+            </Button>
+          }
+          profiles={profiles}
+          teams={teams}
+        />
       </div>
 
       <CardContent>

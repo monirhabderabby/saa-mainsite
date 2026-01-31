@@ -12,7 +12,6 @@ import { Toaster } from "sonner";
 import "./globals.css";
 
 import "@/lib/cron/station";
-import prisma from "@/lib/prisma";
 
 const raleway = Raleway({
   subsets: ["latin"],
@@ -41,18 +40,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
-
-  const userTeams = await prisma.userTeam.findMany({
-    where: {
-      team: {
-        serviceId: "68db8a01d46e9cd778a33acc",
-      },
-    },
-    include: {
-      team: true,
-    },
-  });
-  console.log("UserTeams blocking delete:", userTeams);
 
   return (
     <html lang="en">
