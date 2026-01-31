@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import CommandPaletteContainer from "@/components/command-palette/command-palette-container";
 import { MobileFeatureUnlock } from "@/components/popup-notifications/mobile-feature-unlock";
 import prisma from "@/lib/prisma";
 import dynamic from "next/dynamic";
@@ -48,6 +49,8 @@ const SiteLayout = async ({ children }: Props) => {
       </div>
       {/* <NewYearCelebration employeeId={user.employeeId} /> */}
       <MobileFeatureUnlock employeeId={user.employeeId} />
+
+      <CommandPaletteContainer />
     </>
   );
 };
