@@ -31,16 +31,29 @@ interface ApiResponse {
 }
 
 const FsdProjectTableContainer = () => {
-  let { clientName, orderId, teamId } = useFsdProjectFilterState();
-  clientName = clientName ?? "";
-  orderId = orderId ?? "";
-  let preparedTeamids = teamId ? teamId?.join(",") : "";
+  const { clientName, orderId, teamId, profileId, status, shift } =
+    useFsdProjectFilterState();
+  const preparedClientName = clientName ?? "";
+  const preparedOrderId = orderId ?? "";
+  const preparedTeamids = teamId ? teamId?.join(",") : "";
+  const preparedProfileIds = profileId === "All" ? "" : (profileId ?? "");
+
+  const preparedStatus = status ? status.join(",") : "";
+  const preparedShift = shift === "All" ? "" : (shift ?? "");
 
   const { data, isError, error, isLoading } = useQuery<ApiResponse>({
-    queryKey: ["fsd-projects", clientName, orderId, preparedTeamids],
+    queryKey: [
+      "fsd-projects",
+      preparedClientName,
+      preparedOrderId,
+      preparedTeamids,
+      preparedProfileIds,
+      preparedStatus,
+      preparedShift,
+    ],
     queryFn: () =>
       fetch(
-        `/api/tools/fsd-project?clientName=${clientName}&orderId=${orderId}&teamIds=${preparedTeamids}`,
+        `/api/tools/fsd-project?clientName=${preparedClientName}&orderId=${preparedOrderId}&teamIds=${preparedTeamids}&profileId=${preparedProfileIds}&statuses=${preparedStatus}&shift=${preparedShift}`,
       ).then((res) => res.json()),
   });
 

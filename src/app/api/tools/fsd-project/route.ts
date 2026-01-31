@@ -1,7 +1,7 @@
 // app/api/projects/route.ts
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma, ProjectStatus } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -50,15 +50,22 @@ export async function GET(req: NextRequest) {
 
   // ─── Filters ───────────────────────────────────
   const teamIdsParam = searchParams.getAll("teamIds");
-  const status = searchParams.get("status") ?? undefined;
+  const statuses = searchParams.getAll("statuses");
   const assignedToMe = searchParams.get("assignedToMe") === "true";
   const search = searchParams.get("search")?.trim() || undefined;
   const clientName = searchParams.get("clientName")?.trim() || undefined;
   const orderId = searchParams.get("orderId")?.trim() || undefined;
-  const fromDate = searchParams.get("fromDate"); // YYYY-MM-DD
-  const toDate = searchParams.get("toDate"); // YYYY-MM-DD
+  const fromDate = searchParams.get("fromDate");
+  const toDate = searchParams.get("toDate");
+  const profileId = searchParams.get("profileId");
+  const shift = searchParams.get("shift");
 
   const teamIds = teamIdsParam
+    .flatMap((id) => id.split(",")) // split comma-separated values
+    .map((id) => id.trim())
+    .filter(Boolean);
+
+  const preparedStatuses = statuses
     .flatMap((id) => id.split(",")) // split comma-separated values
     .map((id) => id.trim())
     .filter(Boolean);
@@ -76,9 +83,18 @@ export async function GET(req: NextRequest) {
       };
     }
 
-    if (status) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      where.status = status as any; // assumes ProjectStatus is enum in prisma
+    if (profileId) {
+      where.profileId = profileId;
+    }
+
+    if (shift) {
+      where.shift = shift;
+    }
+
+    if (preparedStatuses && preparedStatuses.length > 0) {
+      where.status = {
+        in: preparedStatuses as ProjectStatus[],
+      };
     }
 
     if (clientName) {

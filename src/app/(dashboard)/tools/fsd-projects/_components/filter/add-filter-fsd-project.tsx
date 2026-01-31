@@ -227,6 +227,7 @@ export default function AddFilterFsdProject({
                       options={projectStatusOptions}
                       value={field.value ?? []}
                       onValueChange={field.onChange}
+                      placeholder="Select Statuses"
                     />
                   </FormItem>
                 )}
@@ -239,7 +240,22 @@ export default function AddFilterFsdProject({
                   <FormItem>
                     <FormLabel>Shift</FormLabel>
                     <FormControl>
-                      <Input {...field} value={field.value ?? ""} />
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Shift" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectItem value="All">All</SelectItem>
+                            <SelectItem value="morning">Morning</SelectItem>
+                            <SelectItem value="evening">Evening</SelectItem>
+                            <SelectItem value="night">Night</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                   </FormItem>
                 )}
