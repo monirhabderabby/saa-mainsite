@@ -36,7 +36,7 @@ const OverviewTabContainer = async ({ data }: Props) => {
       members: uiuxMembers.map((a) => ({
         id: a.userId,
         name: a.user.fullName,
-        avatar: a.user.image || "/placeholder.svg",
+        avatar: a.user.image || "",
       })),
       backgroundColor: "bg-pink-100",
     },
@@ -45,7 +45,7 @@ const OverviewTabContainer = async ({ data }: Props) => {
       members: frontendMembers.map((a) => ({
         id: a.userId,
         name: a.user.fullName,
-        avatar: a.user.image || "/placeholder.svg",
+        avatar: a.user.image || "",
       })),
       backgroundColor: "bg-blue-100",
     },
@@ -54,7 +54,7 @@ const OverviewTabContainer = async ({ data }: Props) => {
       members: backendMembers.map((a) => ({
         id: a.userId,
         name: a.user.fullName,
-        avatar: a.user.image || "/placeholder.svg",
+        avatar: a.user.image || "",
       })),
       backgroundColor: "bg-green-100",
     },

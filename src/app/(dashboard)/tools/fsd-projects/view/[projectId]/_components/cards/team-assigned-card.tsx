@@ -1,6 +1,12 @@
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarGroup,
+  AvatarImage,
+} from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { placeholderImage } from "@/constants/assets";
 import { Users } from "lucide-react";
-import Image from "next/image";
 
 export interface TeamMember {
   id: string;
@@ -39,7 +45,7 @@ export function TeamAssignmentsCard({ teams }: TeamAssignmentsCardProps) {
               className={`flex flex-1 flex-col gap-3 rounded-lg p-4 ${team.backgroundColor || "bg-gray-100"}`}
             >
               <div className="flex items-center justify-between">
-                <span className="font-medium text-[14px] text-gray-900">
+                <span className="text-[14px] font-medium text-gray-900">
                   {team.role}
                 </span>
                 <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-300 text-xs font-semibold text-gray-700">
@@ -48,27 +54,24 @@ export function TeamAssignmentsCard({ teams }: TeamAssignmentsCardProps) {
               </div>
 
               {/* Team Members */}
-              <div className="flex items-center gap-2 relative">
-                {team.members.map((member, index) => (
-                  <div
-                    key={member.id}
-                    className="relative group"
-                    style={{ marginLeft: index > 0 ? "-8px" : "0" }}
-                  >
-                    <Image
-                      src={member.avatar || "/placeholder.svg"}
-                      alt={member.name}
-                      className="h-8 w-8 rounded-full border-2 border-white object-cover cursor-pointer"
-                      height={40}
-                      width={40}
-                    />
-                    {/* Tooltip */}
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10">
+              <AvatarGroup>
+                {team.members.map((member) => (
+                  <div className="relative group" key={member.id}>
+                    <Avatar className="cursor-pointer border-2 border-white ">
+                      <AvatarImage
+                        src={member.avatar ?? placeholderImage}
+                        alt={member.name}
+                      />
+                      <AvatarFallback className="capitalize">
+                        {member.name.slice(0, 2)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-10 delay-1000">
                       {member.name}
                     </div>
                   </div>
                 ))}
-              </div>
+              </AvatarGroup>
             </div>
           ))}
         </div>
