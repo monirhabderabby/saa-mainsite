@@ -14,9 +14,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-function formatDate(date: Date | undefined) {
+function formatDate(date: Date | string | undefined) {
   if (!date) return "";
-  return date.toLocaleDateString("en-US", {
+
+  const parsedDate = date instanceof Date ? date : new Date(date);
+
+  if (isNaN(parsedDate.getTime())) return "";
+
+  return parsedDate.toLocaleDateString("en-US", {
     day: "2-digit",
     month: "long",
     year: "numeric",
@@ -38,7 +43,7 @@ export default function SmartDatePicker({
 
   // Local input state for free typing
   const [inputValue, setInputValue] = React.useState(
-    value ? formatDate(value) : ""
+    value ? formatDate(value) : "",
   );
 
   const [month, setMonth] = React.useState<Date | undefined>(value);

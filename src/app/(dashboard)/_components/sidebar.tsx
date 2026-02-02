@@ -163,7 +163,7 @@ const Sidebar = ({ cu, onNavigationLink }: Props) => {
 
   // inside Sidebar component, before return
   const accessibleRoutes = routes.filter((route) =>
-    route.access.includes(cu.role)
+    route.access.includes(cu.role),
   );
 
   return (
