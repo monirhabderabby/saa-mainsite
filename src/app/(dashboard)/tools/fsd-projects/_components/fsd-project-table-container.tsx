@@ -52,6 +52,7 @@ const FsdProjectTableContainer = () => {
     deadlineTo,
     lastUpdateTo,
     nextUpdateTo,
+    page,
   } = useFsdProjectFilterState();
   const preparedClientName = clientName ?? "";
   const preparedOrderId = orderId ?? "";
@@ -85,10 +86,11 @@ const FsdProjectTableContainer = () => {
       preparedDeadlineTo,
       preparedLastUpdate,
       preparedNextUpdate,
+      page,
     ],
     queryFn: () =>
       fetch(
-        `/api/tools/fsd-project?clientName=${preparedClientName}&orderId=${preparedOrderId}&teamIds=${preparedTeamids}&profileId=${preparedProfileIds}&statuses=${preparedStatus}&shift=${preparedShift}&deadlineFrom=${preparedDeadlineFrom}&deadlineTo=${preparedDeadlineTo}&lastUpdate=${preparedLastUpdate}&nextUpdate=${preparedNextUpdate}`,
+        `/api/tools/fsd-project?clientName=${preparedClientName}&orderId=${preparedOrderId}&teamIds=${preparedTeamids}&profileId=${preparedProfileIds}&statuses=${preparedStatus}&shift=${preparedShift}&deadlineFrom=${preparedDeadlineFrom}&deadlineTo=${preparedDeadlineTo}&lastUpdate=${preparedLastUpdate}&nextUpdate=${preparedNextUpdate}&limit=10&page=${page}`,
       ).then((res) => res.json()),
   });
 
@@ -154,24 +156,36 @@ const Table = ({ data, columns, totalPages }: TableProps) => {
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
+
+  const { setPage, page } = useFsdProjectFilterState();
+
+  const totalWorkload = data.reduce(
+    (acc, project) => acc + project.monetaryValue,
+    0,
+  );
   return (
     <>
       <div className="bg-background ">
         <DataTable table={table} columns={columns} />
       </div>
-      {totalPages > 1 && (
-        <div className="mt-4 w-full  flex justify-end">
+
+      <div className="mt-4 w-full  flex justify-between items-center">
+        <div>
+          <p className="text-xs text-foreground">
+            Total : <span className="font-semibold">${totalWorkload}</span>
+          </p>
+        </div>
+
+        {totalPages > 1 && (
           <div>
             <PaginationControls
-              currentPage={1}
-              onPageChange={(page) => {
-                console.log(page);
-              }}
+              currentPage={page}
+              onPageChange={setPage}
               totalPages={totalPages}
             />
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </>
   );
 };

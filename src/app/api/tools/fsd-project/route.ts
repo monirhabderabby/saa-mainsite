@@ -45,8 +45,9 @@ export async function GET(req: NextRequest) {
   const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
   const limit = Math.min(
     50,
-    Math.max(5, parseInt(searchParams.get("limit") || "10", 10)),
+    Math.max(1, Number(searchParams.get("limit") ?? 1)),
   );
+
   const skip = (page - 1) * limit;
 
   // ─── Filters ───────────────────────────────────

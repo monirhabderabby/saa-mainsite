@@ -89,7 +89,6 @@ export default function AddFilterFsdProject({
   });
 
   function onSubmit(values: FsdProjectFilterForm) {
-    console.log(values);
     setAllValues({
       ...values,
       deadlineFrom: values.deadlineFrom?.toISOString(),
@@ -114,9 +113,7 @@ export default function AddFilterFsdProject({
       review: 0,
       deadlineFrom: undefined,
       deadlineTo: undefined,
-      lastUpdateFrom: undefined,
       lastUpdateTo: undefined,
-      nextUpdateFrom: undefined,
       nextUpdateTo: undefined,
     });
     clearFilters();

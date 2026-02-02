@@ -9,8 +9,22 @@ import {
 import prisma from "@/lib/prisma";
 import { Filter } from "lucide-react";
 import dynamic from "next/dynamic";
-import AddFilterFsdProject from "./_components/filter/add-filter-fsd-project";
-import FsdProjectTableContainer from "./_components/fsd-project-table-container";
+const BackToPrevPage = dynamic(() => import("./_components/BackToPrevPage"), {
+  ssr: false,
+});
+
+const AddFilterFsdProject = dynamic(
+  () => import("./_components/filter/add-filter-fsd-project"),
+  {
+    ssr: false,
+  },
+);
+const FsdProjectTableContainer = dynamic(
+  () => import("./_components/fsd-project-table-container"),
+  {
+    ssr: false,
+  },
+);
 const ProjectStatsCard = dynamic(
   () => import("./_components/project-stats-card"),
   {
@@ -207,10 +221,15 @@ const Page = async () => {
       <CardHeader className=" w-full">
         <div className="flex items-center justify-between w-full">
           <div>
-            <CardTitle>FSD Projects</CardTitle>
-            <CardDescription className="mt-2">
-              Manage and track all your fsd projects
-            </CardDescription>
+            <div className="flex items-center gap-x-3">
+              <BackToPrevPage />
+              <div>
+                <CardTitle>FSD Projects</CardTitle>
+                <CardDescription className="mt-2">
+                  Manage and track all your fsd projects
+                </CardDescription>
+              </div>
+            </div>
           </div>
 
           <AddProjectModal />
