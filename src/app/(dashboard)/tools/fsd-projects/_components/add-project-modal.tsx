@@ -209,8 +209,6 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
           setOpen?.(false);
         });
       });
-
-      console.log(values);
     } else {
       // create a new project
       startTransition(() => {
@@ -267,6 +265,8 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
       review: initialData.review ?? undefined,
       quickNoteFromLeader: initialData?.quickNoteFromLeader ?? undefined,
       remarkFromOperation: initialData?.remarkFromOperation ?? undefined,
+      lastUpdate: initialData?.lastUpdate ?? undefined,
+      nextUpdate: initialData?.nextUpdate ?? undefined,
       // ✅ FIXED
       uiuxAssigned:
         initialData?.projectAssignments

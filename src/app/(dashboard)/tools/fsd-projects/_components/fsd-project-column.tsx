@@ -25,8 +25,6 @@ export const getFSDProjectsColumn = (): ColumnDef<SafeProjectDto>[] => [
     cell: ({ row }) => {
       const sheetLink = row.original.instructionSheet;
 
-      console.log(sheetLink);
-
       return (
         <a
           href={sheetLink}

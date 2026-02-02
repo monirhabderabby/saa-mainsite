@@ -1,5 +1,6 @@
 // app/api/projects/route.ts
 import { auth } from "@/auth";
+import { getDayRange } from "@/lib/date";
 import prisma from "@/lib/prisma";
 import { Prisma, ProjectStatus } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
@@ -57,8 +58,12 @@ export async function GET(req: NextRequest) {
   const orderId = searchParams.get("orderId")?.trim() || undefined;
   const fromDate = searchParams.get("fromDate");
   const toDate = searchParams.get("toDate");
+  const deadlineFrom = searchParams.get("deadlineFrom");
+  const deadlineTo = searchParams.get("deadlineTo");
   const profileId = searchParams.get("profileId");
   const shift = searchParams.get("shift");
+  const nextUpdate = searchParams.get("nextUpdate");
+  const lastUpdate = searchParams.get("lastUpdate");
 
   const teamIds = teamIdsParam
     .flatMap((id) => id.split(",")) // split comma-separated values
@@ -117,11 +122,60 @@ export async function GET(req: NextRequest) {
       ];
     }
 
+    if (nextUpdate) {
+      const { start, end } = getDayRange(nextUpdate);
+
+      where.nextUpdate = {
+        gte: start,
+        lte: end,
+      };
+    }
+
+    if (lastUpdate) {
+      const { start, end } = getDayRange(lastUpdate);
+
+      where.lastUpdate = {
+        gte: start,
+        lte: end,
+      };
+    }
+
     // Date range filter (example: orderDate)
     if (fromDate || toDate) {
       where.orderDate = {};
       if (fromDate) where.orderDate.gte = new Date(fromDate);
       if (toDate) where.orderDate.lte = new Date(`${toDate}T23:59:59.999Z`);
+    }
+
+    // Date range filter (example: deadline)
+
+    if (deadlineFrom && deadlineFrom !== "All") {
+      const { start } = getDayRange(deadlineFrom);
+
+      let end: Date;
+      if (deadlineTo && deadlineTo !== "All") {
+        end = getDayRange(deadlineTo).end;
+      } else {
+        end = getDayRange(deadlineFrom).end;
+      }
+
+      where.deadline = {
+        gte: start,
+        lte: end,
+      };
+    } else if (
+      deadlineFrom &&
+      deadlineFrom !== "All" &&
+      (!deadlineTo || deadlineTo === "All")
+    ) {
+      const { start, end } = getDayRange(deadlineFrom);
+      where.deadline = { gte: start, lte: end };
+    } else if (
+      (!deadlineFrom || deadlineFrom === "All") &&
+      deadlineTo &&
+      deadlineTo !== "All"
+    ) {
+      where.deadline = { lte: new Date(deadlineTo) };
     }
 
     // ─── Assigned to current user ──────────────────────

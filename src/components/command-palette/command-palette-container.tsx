@@ -87,7 +87,12 @@ export default function CommandPaletteContainer() {
       </p>
       <Button onClick={() => setOpen(true)}>Open Command Palette</Button> */}
 
-      <CommandPalette open={open} onOpenChange={setOpen} groups={groups} />
+      <CommandPalette
+        open={open}
+        onOpenChange={setOpen}
+        groups={groups}
+        showRecent={false}
+      />
     </div>
   );
 }

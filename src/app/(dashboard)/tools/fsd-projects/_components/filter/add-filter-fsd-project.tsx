@@ -89,6 +89,7 @@ export default function AddFilterFsdProject({
   });
 
   function onSubmit(values: FsdProjectFilterForm) {
+    console.log(values);
     setAllValues({
       ...values,
       deadlineFrom: values.deadlineFrom?.toISOString(),
@@ -135,7 +136,7 @@ export default function AddFilterFsdProject({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             {/* Client & Order */}
-            <div className="grid grid-cols-2 gap-5">
+            <div className="grid grid-cols-3 gap-5">
               <FormField
                 control={form.control}
                 name="clientName"
@@ -169,10 +170,26 @@ export default function AddFilterFsdProject({
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="teamId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Team</FormLabel>
+
+                    <MultiSelect
+                      options={teamsOptions}
+                      value={field.value ?? []}
+                      onValueChange={field.onChange}
+                    />
+                  </FormItem>
+                )}
+              />
             </div>
 
             {/* Profile & Team */}
-            <div className="grid grid-cols-2 gap-5">
+            <div className="grid grid-cols-3 gap-5">
               <FormField
                 control={form.control}
                 name="profileId"
@@ -198,25 +215,6 @@ export default function AddFilterFsdProject({
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="teamId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Team</FormLabel>
-
-                    <MultiSelect
-                      options={teamsOptions}
-                      value={field.value ?? []}
-                      onValueChange={field.onChange}
-                    />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Status & Shift */}
-            <div className="grid grid-cols-2 gap-5">
               <FormField
                 control={form.control}
                 name="status"
@@ -257,6 +255,36 @@ export default function AddFilterFsdProject({
                         </SelectContent>
                       </Select>
                     </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* last update next update */}
+            <div className="grid grid-cols-3 gap-5">
+              <FormField
+                control={form.control}
+                name="lastUpdateTo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Last Update</FormLabel>
+                    <SmartDatePicker
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="nextUpdateTo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Next Update</FormLabel>
+                    <SmartDatePicker
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
                   </FormItem>
                 )}
               />

@@ -30,9 +30,29 @@ interface ApiResponse {
   };
 }
 
+function toYMD(date?: Date | null) {
+  if (!date || isNaN(date.getTime())) return "";
+
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+
+  return `${y}-${m}-${d}`;
+}
+
 const FsdProjectTableContainer = () => {
-  const { clientName, orderId, teamId, profileId, status, shift } =
-    useFsdProjectFilterState();
+  const {
+    clientName,
+    orderId,
+    teamId,
+    profileId,
+    status,
+    shift,
+    deadlineFrom,
+    deadlineTo,
+    lastUpdateTo,
+    nextUpdateTo,
+  } = useFsdProjectFilterState();
   const preparedClientName = clientName ?? "";
   const preparedOrderId = orderId ?? "";
   const preparedTeamids = teamId ? teamId?.join(",") : "";
@@ -40,6 +60,17 @@ const FsdProjectTableContainer = () => {
 
   const preparedStatus = status ? status.join(",") : "";
   const preparedShift = shift === "All" ? "" : (shift ?? "");
+
+  // Deadlines filter
+  const preparedDeadlineFrom = deadlineFrom
+    ? new Date(deadlineFrom).toISOString().split("T")[0]
+    : "";
+  const preparedDeadlineTo = deadlineTo
+    ? new Date(deadlineTo).toISOString().split("T")[0]
+    : "";
+
+  const preparedLastUpdate = toYMD(new Date(lastUpdateTo!));
+  const preparedNextUpdate = toYMD(new Date(nextUpdateTo!));
 
   const { data, isError, error, isLoading } = useQuery<ApiResponse>({
     queryKey: [
@@ -50,10 +81,14 @@ const FsdProjectTableContainer = () => {
       preparedProfileIds,
       preparedStatus,
       preparedShift,
+      preparedDeadlineFrom,
+      preparedDeadlineTo,
+      preparedLastUpdate,
+      preparedNextUpdate,
     ],
     queryFn: () =>
       fetch(
-        `/api/tools/fsd-project?clientName=${preparedClientName}&orderId=${preparedOrderId}&teamIds=${preparedTeamids}&profileId=${preparedProfileIds}&statuses=${preparedStatus}&shift=${preparedShift}`,
+        `/api/tools/fsd-project?clientName=${preparedClientName}&orderId=${preparedOrderId}&teamIds=${preparedTeamids}&profileId=${preparedProfileIds}&statuses=${preparedStatus}&shift=${preparedShift}&deadlineFrom=${preparedDeadlineFrom}&deadlineTo=${preparedDeadlineTo}&lastUpdate=${preparedLastUpdate}&nextUpdate=${preparedNextUpdate}`,
       ).then((res) => res.json()),
   });
 

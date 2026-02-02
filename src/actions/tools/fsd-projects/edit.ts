@@ -21,6 +21,12 @@ export async function editProject(
     // 1️⃣ Validate input
     const validatedData = projectCreateSchema.parse(data);
 
+    const lastUpdate = new Date(validatedData.lastUpdate!)
+      .toLocaleDateString("en-BN")
+      .split("T")[0];
+
+    console.log("lastUpdate", lastUpdate);
+
     // 2️⃣ Transaction (atomic update)
     await prisma.$transaction(async (tx) => {
       // -------------------------
