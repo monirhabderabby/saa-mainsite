@@ -71,6 +71,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 
 import { Card } from "@/components/ui/card";
+import InfoToolTip from "@/components/ui/custom/info-tooltip";
 import {
   InputGroup,
   InputGroupAddon,
@@ -255,6 +256,9 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
         : undefined,
       delivered: initialData.delivered
         ? new Date(initialData.delivered)
+        : undefined,
+      probablyWillBeDeliver: initialData.probablyWillBeDeliver
+        ? new Date(initialData.probablyWillBeDeliver)
         : undefined,
       shift: initialData.shift ?? "",
       teamId: initialData.team.id ?? "",
@@ -665,7 +669,28 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                   name="delivered"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Delivered At</FormLabel>
+                      <div className="flex items-center gap-x-1">
+                        <FormLabel>Delivered At</FormLabel>
+                        <InfoToolTip
+                          animation="fade"
+                          placement="top"
+                          content="Used for delivery tracking and reporting. Select when the project was officially delivered."
+                        />
+                      </div>
+                      <SmartDatePicker
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="probablyWillBeDeliver"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Probably Will Be Delivered At</FormLabel>
                       <SmartDatePicker
                         value={field.value} // 👈 same fix
                         onChange={field.onChange}

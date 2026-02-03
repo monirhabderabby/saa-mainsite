@@ -59,6 +59,7 @@ export async function createProject(
 
           // Optional fields
           delivered: validatedData.delivered ?? null,
+          probablyWillBeDeliver: validatedData.probablyWillBeDeliver ?? null,
           lastUpdate: validatedData.lastUpdate ?? null,
           nextUpdate: validatedData.nextUpdate ?? nextUpdate,
           remarkFromOperation: validatedData.remarkFromOperation ?? null,

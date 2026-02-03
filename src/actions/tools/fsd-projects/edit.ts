@@ -49,6 +49,7 @@ export async function editProject(
           status: (validatedData.status as ProjectStatus) ?? "NRA",
 
           delivered: validatedData.delivered ?? null,
+          probablyWillBeDeliver: validatedData.probablyWillBeDeliver ?? null,
           lastUpdate: validatedData.lastUpdate ?? null,
           nextUpdate: validatedData.nextUpdate ?? null,
           remarkFromOperation: validatedData.remarkFromOperation ?? null,

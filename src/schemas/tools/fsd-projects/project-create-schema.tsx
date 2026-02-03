@@ -25,6 +25,7 @@ export const projectCreateSchema = z.object({
 
   // Optional fields at creation
   delivered: z.date().optional(),
+  probablyWillBeDeliver: z.date().optional(),
   lastUpdate: z.date().optional(),
   nextUpdate: z.date().optional(),
 

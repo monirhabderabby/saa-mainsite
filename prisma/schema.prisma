@@ -469,7 +469,8 @@ model Project {
     teamId String @db.ObjectId
     team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
-    delivered DateTime?
+    delivered             DateTime?
+    probablyWillBeDeliver DateTime?
 
     lastUpdate DateTime?
     nextUpdate DateTime?

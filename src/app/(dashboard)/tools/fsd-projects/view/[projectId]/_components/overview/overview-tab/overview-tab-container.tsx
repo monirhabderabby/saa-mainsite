@@ -132,7 +132,7 @@ const OverviewTabContainer = async ({ data }: Props) => {
               <div className="px-3 py-2 border-b border-border flex justify-between text-[13px]">
                 <p>Last Update</p>
                 <p className="font-medium">
-                  {moment(data.lastUpdate).format("MMM DD, YYYY HH:mm")}
+                  {moment(data.lastUpdate).format("MMM DD, YYYY ")}
                 </p>
               </div>
             )}
@@ -140,7 +140,15 @@ const OverviewTabContainer = async ({ data }: Props) => {
               <div className="px-3 py-2 border-b border-border flex justify-between text-[13px]">
                 <p>Next Update</p>
                 <p className="font-medium">
-                  {moment(data.nextUpdate).format("MMM DD, YYYY HH:mm")}
+                  {moment(data.nextUpdate).format("MMM DD, YYYY")}
+                </p>
+              </div>
+            )}
+            {data.probablyWillBeDeliver && (
+              <div className="px-3 py-2 border-b border-border flex justify-between text-[13px]">
+                <p>Probably Will Be Deliver</p>
+                <p className="font-medium">
+                  {moment(data.probablyWillBeDeliver).format("MMM D, YYYY")}
                 </p>
               </div>
             )}
