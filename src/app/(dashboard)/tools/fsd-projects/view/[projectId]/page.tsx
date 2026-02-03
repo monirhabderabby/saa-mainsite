@@ -11,7 +11,13 @@ import SalesPersonCard from "./_components/cards/sales-person-card";
 import ProjectDetailsHeader from "./_components/header/project-details-header";
 import OverViewContainer from "./_components/overview/overview-container";
 
-const Page = async ({ params }: { params: { projectId: string } }) => {
+const Page = async ({
+  params,
+  searchParams,
+}: {
+  params: { projectId: string };
+  searchParams: { tab?: string };
+}) => {
   const { projectId } = params;
 
   if (!projectId) notFound();
@@ -36,7 +42,7 @@ const Page = async ({ params }: { params: { projectId: string } }) => {
       team: true,
       projectAssignments: true,
       phase: true,
-      profile: true, // include profile here to match type
+      profile: true,
     },
   });
 
@@ -67,13 +73,16 @@ const Page = async ({ params }: { params: { projectId: string } }) => {
       icon: <Bug className="h-4 w-4 text-primary-yellow" />,
       url: project.websiteIssueTrackerSheet,
     },
-  ].filter(Boolean); // 🔥 removes undefined
+  ].filter(Boolean);
+
+  // Get the tab from searchParams, default to "overview"
+  const currentTab = searchParams.tab || "overview";
 
   return (
     <section className="w-full flex gap-x-5">
-      <Card className="flex-1 p-3  shadow-none space-y-5">
+      <Card className="flex-1 p-3 shadow-none space-y-5">
         <ProjectDetailsHeader data={project} />
-        <OverViewContainer data={project} />
+        <OverViewContainer data={project} tab={currentTab} />
       </Card>
 
       <div className="w-[240px] space-y-3">

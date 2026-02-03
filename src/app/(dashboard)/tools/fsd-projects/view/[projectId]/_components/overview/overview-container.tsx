@@ -1,26 +1,32 @@
 import { SafeProjectDto } from "@/app/api/tools/fsd-project/route";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import { ProjectNavigation } from "../project-navigation";
 import OverviewTabContainer from "./overview-tab/overview-tab-container";
 
 interface Props {
   data: SafeProjectDto;
+  tab?: string;
 }
 
-const OverViewContainer = ({ data }: Props) => {
-  return (
-    <div>
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="team">Team</TabsTrigger>
-        </TabsList>
-        <TabsContent value="overview">
-          <OverviewTabContainer data={data} />
-        </TabsContent>
-        <TabsContent value="team">Change your password here.</TabsContent>
-      </Tabs>
-    </div>
-  );
+const OverViewContainer = ({ data, tab = "overview" }: Props) => {
+  const renderTabContent = () => {
+    switch (tab) {
+      case "overview":
+        return <OverviewTabContainer data={data} />;
+      case "team":
+        return <div>Team content here</div>;
+      case "phases":
+        return <div>Phases content here</div>;
+      case "documents":
+        return <div>Documents content here</div>;
+      case "timeline":
+        return <div>Timeline content here</div>;
+      default:
+        return <OverviewTabContainer data={data} />;
+    }
+  };
+
+  return <ProjectNavigation>{renderTabContent()}</ProjectNavigation>;
 };
 
 export default OverViewContainer;
