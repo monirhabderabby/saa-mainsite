@@ -200,6 +200,8 @@ export async function GET(req: NextRequest) {
       ],
       select: {
         id: true,
+        title: true,
+        shortDescription: true,
         clientName: true,
         orderId: true,
         orderDate: true,

@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,6 +10,9 @@ import {
 import prisma from "@/lib/prisma";
 import { Filter } from "lucide-react";
 import dynamic from "next/dynamic";
+import { redirect } from "next/navigation";
+import TodayNeedToUpdate from "./_components/features/today-need-to-update";
+import UpcomingDeadlines from "./_components/features/upcoming-deadlines";
 const BackToPrevPage = dynamic(() => import("./_components/BackToPrevPage"), {
   ssr: false,
 });
@@ -89,6 +93,9 @@ function calculateChange(current: number, previous: number) {
 }
 
 const Page = async () => {
+  const session = await auth();
+
+  if (!session || !session.user || !session.user.id) redirect("/login");
   // total projects
   const currentTotalProjects = await prisma.project.count({
     where: {
@@ -217,76 +224,98 @@ const Page = async () => {
   });
 
   return (
-    <Card>
-      <CardHeader className=" w-full">
-        <div className="flex items-center justify-between w-full">
-          <div>
-            <div className="flex items-center gap-x-3">
-              <BackToPrevPage />
-              <div>
-                <CardTitle>FSD Projects</CardTitle>
-                <CardDescription className="mt-2">
-                  Manage and track all your fsd projects
-                </CardDescription>
+    <div className="space-y-5">
+      <Card className="shadow-none">
+        <CardHeader className=" w-full">
+          <div className="flex items-center justify-between w-full">
+            <div>
+              <div className="flex items-center gap-x-3">
+                <BackToPrevPage />
+                <div>
+                  <CardTitle>FSD Projects</CardTitle>
+                  <CardDescription className="mt-2">
+                    Manage and track all your fsd projects
+                  </CardDescription>
+                </div>
               </div>
             </div>
+
+            <AddProjectModal />
           </div>
+        </CardHeader>
 
-          <AddProjectModal />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 px-5 pb-5">
+          <ProjectStatsCard
+            title="Total Projects"
+            value={currentTotalProjects.toString()}
+            change={totalProjectChange.change}
+            changeType={totalProjectChange.type as "positive" | "negative"}
+            icon="folder"
+          />
+          <ProjectStatsCard
+            title="Active Projects"
+            value={currentTotalActiveProjects.toString()}
+            change={totalActiveProjectChange.change}
+            changeType={
+              totalActiveProjectChange.type as "positive" | "negative"
+            }
+            icon="activity"
+          />
+
+          <ProjectStatsCard
+            title="Completed"
+            value={currentMonthTotalDeliveredProjects.toString()}
+            change={totalDeliveredProjectChange.change}
+            changeType={
+              totalDeliveredProjectChange.type as "positive" | "negative"
+            }
+            icon="checkCircle"
+          />
+
+          <ProjectStatsCard
+            title="Revenue"
+            value={`$${currentRevenue}`}
+            change={totalRevenueChange.change}
+            changeType={totalRevenueChange.type as "positive" | "negative"}
+            icon="doller"
+          />
         </div>
-      </CardHeader>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 px-5">
-        <ProjectStatsCard
-          title="Total Projects"
-          value={currentTotalProjects}
-          change={totalProjectChange.change}
-          changeType={totalProjectChange.type as "positive" | "negative"}
-          icon="folder"
-        />
-        <ProjectStatsCard
-          title="Active Projects"
-          value={currentTotalActiveProjects}
-          change={totalActiveProjectChange.change}
-          changeType={totalActiveProjectChange.type as "positive" | "negative"}
-          icon="activity"
-        />
+        <div className="grid grid-cols-12 gap-5 px-5 pb-5">
+          <div className="col-span-7 ">
+            <UpcomingDeadlines loggedinUserId={session.user.id} />
+          </div>
+          <div className="col-span-5">
+            <TodayNeedToUpdate loggedinUserId={session.user.id} />
+          </div>
+        </div>
+      </Card>
 
-        <ProjectStatsCard
-          title="Completed"
-          value={currentMonthTotalDeliveredProjects}
-          change={totalDeliveredProjectChange.change}
-          changeType={
-            totalDeliveredProjectChange.type as "positive" | "negative"
-          }
-          icon="checkCircle"
-        />
-
-        <ProjectStatsCard
-          title="Revenue"
-          value={currentRevenue}
-          change={totalRevenueChange.change}
-          changeType={totalRevenueChange.type as "positive" | "negative"}
-          icon="doller"
-        />
-      </div>
-
-      <div className="px-5 my-5 flex justify-end">
-        <AddFilterFsdProject
-          trigger={
-            <Button variant="outline">
-              <Filter /> Filter
-            </Button>
-          }
-          profiles={profiles}
-          teams={teams}
-        />
-      </div>
-
-      <CardContent>
-        <FsdProjectTableContainer />
-      </CardContent>
-    </Card>
+      <Card className="shadow-none">
+        <CardHeader>
+          <div className="  flex justify-between">
+            <div>
+              <h1 className="font-medium">All Projects</h1>
+              <p className="text-sm text-muted-foreground">
+                Manage and track all your projects
+              </p>
+            </div>
+            <AddFilterFsdProject
+              trigger={
+                <Button variant="outline">
+                  <Filter /> Filter
+                </Button>
+              }
+              profiles={profiles}
+              teams={teams}
+            />
+          </div>
+        </CardHeader>
+        <CardContent>
+          <FsdProjectTableContainer />
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

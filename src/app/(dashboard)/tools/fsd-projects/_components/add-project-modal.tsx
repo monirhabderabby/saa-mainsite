@@ -267,8 +267,14 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
       review: initialData.review ?? undefined,
       quickNoteFromLeader: initialData?.quickNoteFromLeader ?? undefined,
       remarkFromOperation: initialData?.remarkFromOperation ?? undefined,
-      lastUpdate: initialData?.lastUpdate ?? undefined,
-      nextUpdate: initialData?.nextUpdate ?? undefined,
+      lastUpdate: initialData?.lastUpdate
+        ? new Date(initialData.lastUpdate)
+        : undefined,
+
+      nextUpdate: initialData?.nextUpdate
+        ? new Date(initialData.nextUpdate)
+        : undefined,
+
       supportPeriodStart: initialData?.supportPeriodStart ?? undefined,
       supportPeriodEnd: initialData?.supportPeriodEnd ?? undefined,
       // ✅ FIXED

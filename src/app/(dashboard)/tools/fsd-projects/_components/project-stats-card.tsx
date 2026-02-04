@@ -13,7 +13,7 @@ type IconKey = keyof typeof iconMap;
 
 interface Props {
   title: string;
-  value: number;
+  value: string;
   change: string;
   changeType: "positive" | "negative";
   icon: IconKey;
