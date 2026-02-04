@@ -59,6 +59,7 @@ import {
   ChevronsUpDown,
   Clock,
   DollarSign,
+  FileText,
   LinkIcon,
   Loader2,
   NotebookPen,
@@ -102,20 +103,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
 
   const form = useForm<ProjectCreateSchemaType>({
     resolver: zodResolver(projectCreateSchema),
-    // defaultValues: {
-    //   clientName: initialData?.clientName ?? undefined,
-    //   profileId: initialData?.profile.id ?? undefined,
-    //   orderId: initialData?.orderId ?? undefined,
-    //   salesPersonId: initialData?.salesPerson.id ?? undefined,
-    //   orderDate: initialData?.orderDate ?? undefined,
-    //   deadline: initialData?.deadline ?? undefined,
-    //   shift: initialData?.shift ?? undefined,
-    //   teamId: initialData?.team.id ?? undefined,
-    //   delivered: initialData?.delivered ?? undefined,
-    // },
   });
-
-  // http://localhost:3000/api/users/fsd-members?membersOf=backend
 
   // grab profiles
   const { data: profiles, isError: isProfileError } = useQuery<Profile[]>({
@@ -194,19 +182,8 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
           toast.success(res.message);
           queryClient.invalidateQueries({ queryKey: ["fsd-projects"] });
 
-          form.reset({
-            clientName: "",
-            orderId: "",
-            profileId: "",
-            salesPersonId: "",
-            orderDate: undefined,
-            deadline: undefined,
-            shift: "",
-            teamId: "",
-            value: 0,
-            monetaryValue: 0,
-            instructionSheet: "",
-          });
+          // reset the form
+          formReset();
           setOpen?.(false);
         });
       });
@@ -221,29 +198,50 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
 
           toast.success(res.message);
           queryClient.invalidateQueries({ queryKey: ["fsd-projects"] });
-          form.reset({
-            clientName: "",
-            orderId: "",
-            profileId: "",
-            salesPersonId: "",
-            orderDate: undefined,
-            deadline: undefined,
-            shift: "",
-            teamId: "",
-            value: 0,
-            monetaryValue: 0,
-            instructionSheet: "",
-          });
+
+          // reset the form
+          formReset();
         });
       });
     }
   }
+
+  const formReset = () => {
+    form.reset({
+      title: "",
+      shortDescription: "",
+      clientName: "",
+      orderId: "",
+      profileId: "",
+      salesPersonId: "",
+      orderDate: undefined,
+      deadline: undefined,
+      shift: "",
+      teamId: "",
+      status: undefined,
+      delivered: undefined,
+      probablyWillBeDeliver: undefined,
+      review: undefined,
+      quickNoteFromLeader: undefined,
+      remarkFromOperation: undefined,
+      lastUpdate: undefined,
+      nextUpdate: undefined,
+      uiuxAssigned: undefined,
+      frontendAssigned: undefined,
+      backendAssigned: undefined,
+      value: 0,
+      monetaryValue: 0,
+      instructionSheet: "",
+    });
+  };
 
   useEffect(() => {
     if (!initialData) return;
     if (!profiles?.length) return; // 👈 THIS LINE FIXES IT
 
     form.reset({
+      title: initialData.title ?? "",
+      shortDescription: initialData.shortDescription ?? "",
       clientName: initialData.clientName ?? "",
       orderId: initialData.orderId ?? "",
       profileId: initialData.profile.id ?? "",
@@ -351,6 +349,62 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
               onSubmit={form.handleSubmit(onSubmit)}
               className="space-y-7 px-1"
             >
+              {/* basic information */}
+              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 shadow-none">
+                <div className="flex items-center gap-x-2 mt-2 col-span-2">
+                  <div className="bg-[#FFFBEB] p-3 rounded-lg">
+                    <FileText className="size-4 text-[#D97706]" />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">
+                      Basic Information
+                    </span>
+                    <span className="font-normal text-[10px] text-muted-foreground">
+                      Supplementary project details
+                    </span>
+                  </div>
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Project Title</FormLabel>
+                      <FormControl>
+                        <Input
+                          className="w-full"
+                          placeholder="e.g: Biblioteca Legal"
+                          type="text"
+                          {...field}
+                          disabled={pending}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="shortDescription"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Short Description</FormLabel>
+                      <FormControl>
+                        <Input
+                          className="w-full"
+                          placeholder="e.g: Complete UI/UX redesign with frontend and backend integration"
+                          type="text"
+                          {...field}
+                          disabled={pending}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </Card>
               {/* client information */}
               <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 shadow-none">
                 <div className="flex items-center gap-x-2 mt-2 col-span-2 ">

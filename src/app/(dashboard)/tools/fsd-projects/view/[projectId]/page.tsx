@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import prisma from "@/lib/prisma";
-import { BarChart3, Bug, FileText, Shield } from "lucide-react";
+import { Bug, ChartSpline, FileText, KeyRound } from "lucide-react";
 import { notFound } from "next/navigation";
 import AssignedTeamCard from "./_components/cards/assigned-team-card";
 import ClientReviewCard from "./_components/cards/client-review-card";
@@ -52,25 +52,26 @@ const Page = async ({
     project.instructionSheet && {
       key: "instruction",
       label: "Instruction Sheet",
-      icon: <FileText className="h-4 w-4 text-primary-yellow" />,
+      icon: <FileText className="h-4 w-4 text-[#2563EB]" />,
       url: project.instructionSheet,
+      iconBgColor: "",
     },
     project.progressSheet && {
       key: "progress",
       label: "Progress Sheet",
-      icon: <BarChart3 className="h-4 w-4 text-primary-yellow" />,
+      icon: <ChartSpline className="h-4 w-4 text-[#16A34A]" />,
       url: project.progressSheet,
     },
     project.credentialSheet && {
       key: "credential",
       label: "Credential Sheet",
-      icon: <Shield className="h-4 w-4 text-primary-yellow" />,
+      icon: <KeyRound className="h-4 w-4 text-[#9333EA]" />,
       url: project.credentialSheet,
     },
     project.websiteIssueTrackerSheet && {
       key: "issue",
       label: "Issue Tracker",
-      icon: <Bug className="h-4 w-4 text-primary-yellow" />,
+      icon: <Bug className="h-4 w-4 text-[#DC2626]" />,
       url: project.websiteIssueTrackerSheet,
     },
   ].filter(Boolean);

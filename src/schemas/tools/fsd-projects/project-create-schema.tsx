@@ -1,6 +1,8 @@
 import * as z from "zod";
 
 export const projectCreateSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  shortDescription: z.string().min(1, "Short description is required"),
   clientName: z.string().min(1, "Client name is required"),
 
   orderId: z.string().min(1, "Order ID is required"),

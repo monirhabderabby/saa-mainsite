@@ -450,7 +450,11 @@ enum ProjectStatus {
 }
 
 model Project {
-    id         String @id @default(auto()) @map("_id") @db.ObjectId
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    title            String @default("E-Commerce Platform")
+    shortDescription String @default("Complete UI/UX redesign with frontend and backend integration")
+
     clientName String
     orderId    String @unique
 

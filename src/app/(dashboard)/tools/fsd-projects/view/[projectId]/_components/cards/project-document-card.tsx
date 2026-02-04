@@ -2,6 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import { ChevronRight } from "lucide-react";
 import { ReactNode } from "react";
 import MotionCard from "./motion-card";
@@ -11,6 +12,7 @@ export interface DocumentItem {
   label: string;
   icon: ReactNode;
   url?: string | null;
+  iconBgColor: string;
 }
 
 interface Props {
@@ -36,7 +38,12 @@ export default function ProjectDocumentsCard({ documents }: Props) {
                   className="group flex items-center justify-between rounded-lg px-2 py-2 transition-colors hover:bg-muted/60"
                 >
                   <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary-yellow/20">
+                    <div
+                      className={cn(
+                        "flex h-8 w-8 items-center justify-center rounded-md ",
+                        doc.iconBgColor,
+                      )}
+                    >
                       {doc.icon}
                     </div>
 
