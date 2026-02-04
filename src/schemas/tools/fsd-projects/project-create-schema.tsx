@@ -28,6 +28,8 @@ export const projectCreateSchema = z.object({
   probablyWillBeDeliver: z.date().optional(),
   lastUpdate: z.date().optional(),
   nextUpdate: z.date().optional(),
+  supportPeriodStart: z.date().optional(),
+  supportPeriodEnd: z.date().optional(),
 
   remarkFromOperation: z.string().optional(),
   quickNoteFromLeader: z.string().optional(),

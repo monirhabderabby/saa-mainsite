@@ -160,6 +160,22 @@ const OverviewTabContainer = async ({ data }: Props) => {
                 </p>
               </div>
             )}
+            {data.supportPeriodStart && (
+              <div className="px-3 py-2 border-b border-border flex justify-between text-[13px]">
+                <p>Support Period Start</p>
+                <p className="font-medium">
+                  {moment(data.supportPeriodStart).format("MMM DD, YYYY")}
+                </p>
+              </div>
+            )}
+            {data.supportPeriodEnd && (
+              <div className="px-3 py-2 border-b border-border flex justify-between text-[13px]">
+                <p>Support Period End</p>
+                <p className="font-medium">
+                  {moment(data.supportPeriodEnd).format("MMM DD, YYYY")}
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

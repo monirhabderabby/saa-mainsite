@@ -271,6 +271,8 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
       remarkFromOperation: initialData?.remarkFromOperation ?? undefined,
       lastUpdate: initialData?.lastUpdate ?? undefined,
       nextUpdate: initialData?.nextUpdate ?? undefined,
+      supportPeriodStart: initialData?.supportPeriodStart ?? undefined,
+      supportPeriodEnd: initialData?.supportPeriodEnd ?? undefined,
       // ✅ FIXED
       uiuxAssigned:
         initialData?.projectAssignments
@@ -685,6 +687,40 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                     </FormItem>
                   )}
                 />
+
+                {initialData?.status === "Delivered" && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="supportPeriodStart"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Support Period Start</FormLabel>
+                          <SmartDatePicker
+                            value={field.value} // 👈 same fix
+                            onChange={field.onChange}
+                          />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="supportPeriodEnd"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Support Period End</FormLabel>
+                          <SmartDatePicker
+                            value={field.value} // 👈 same fix
+                            onChange={field.onChange}
+                          />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
+
                 <FormField
                   control={form.control}
                   name="probablyWillBeDeliver"

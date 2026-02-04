@@ -52,6 +52,8 @@ export async function editProject(
           probablyWillBeDeliver: validatedData.probablyWillBeDeliver ?? null,
           lastUpdate: validatedData.lastUpdate ?? null,
           nextUpdate: validatedData.nextUpdate ?? null,
+          supportPeriodStart: validatedData.supportPeriodStart ?? null,
+          supportPeriodEnd: validatedData.supportPeriodEnd ?? null,
           remarkFromOperation: validatedData.remarkFromOperation ?? null,
           quickNoteFromLeader: validatedData.quickNoteFromLeader ?? null,
           review: validatedData.review ?? null,

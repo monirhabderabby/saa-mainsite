@@ -473,6 +473,9 @@ model Project {
     delivered             DateTime?
     probablyWillBeDeliver DateTime?
 
+    supportPeriodStart DateTime?
+    supportPeriodEnd   DateTime?
+
     lastUpdate DateTime?
     nextUpdate DateTime?
 
