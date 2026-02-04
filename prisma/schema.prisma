@@ -75,7 +75,8 @@ model User {
     projectAssignments ProjectAssignment[]
 
     projects      Project[]
-    salesProjects Project[] @relation("SalesPersonProjects")
+    salesProjects Project[]    @relation("SalesPersonProjects")
+    projectQnas   ProjectQna[]
 }
 
 model UserVerification {
@@ -493,8 +494,9 @@ model Project {
     user   User?   @relation(fields: [userId], references: [id])
     userId String? @db.ObjectId
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    createdAt   DateTime     @default(now())
+    updatedAt   DateTime     @updatedAt
+    projectQnas ProjectQna[]
 }
 
 enum AssignmentRole {
@@ -540,4 +542,20 @@ model projectPhase {
     // ✅ Foreign key to Project
     projectId String  @db.ObjectId
     project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ProjectQna {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    question String
+    answer   String
+
+    projectId String  @db.ObjectId
+    project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+    creatorId String @db.ObjectId
+    creator   User   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }

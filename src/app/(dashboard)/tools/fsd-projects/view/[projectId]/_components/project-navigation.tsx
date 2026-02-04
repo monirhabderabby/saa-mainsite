@@ -14,6 +14,7 @@ export function ProjectNavigation({ children }: { children: React.ReactNode }) {
     { label: "Phases", href: "#phases" },
     { label: "Documents", href: "#documents" },
     { label: "Timeline", href: "#timeline" },
+    { label: "Q&A", href: "#qna" },
   ];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
