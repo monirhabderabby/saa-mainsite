@@ -135,6 +135,21 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
   const preparedLastUpdate = toYMD(new Date(lastUpdateTo!));
   const preparedNextUpdate = toYMD(new Date(nextUpdateTo!));
 
+  const FSDProjectTableQueryKey = [
+    "fsd-projects",
+    preparedClientName,
+    preparedOrderId,
+    preparedTeamids,
+    preparedProfileIds,
+    preparedStatus,
+    preparedShift,
+    preparedDeadlineFrom,
+    preparedDeadlineTo,
+    preparedLastUpdate,
+    preparedNextUpdate,
+    page,
+  ];
+
   const form = useForm<ProjectCreateSchemaType>({
     resolver: zodResolver(projectCreateSchema),
   });
@@ -234,20 +249,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
           const returnedata = res.data as SafeProjectDto;
 
           queryClient.setQueryData<FSDProjectApiProps>(
-            [
-              "fsd-projects",
-              preparedClientName,
-              preparedOrderId,
-              preparedTeamids,
-              preparedProfileIds,
-              preparedStatus,
-              preparedShift,
-              preparedDeadlineFrom,
-              preparedDeadlineTo,
-              preparedLastUpdate,
-              preparedNextUpdate,
-              page,
-            ],
+            FSDProjectTableQueryKey,
             (oldData) => {
               if (!oldData) return oldData;
 
