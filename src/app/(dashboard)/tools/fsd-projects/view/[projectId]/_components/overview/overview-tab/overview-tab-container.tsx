@@ -38,7 +38,7 @@ const OverviewTabContainer = async ({ data }: Props) => {
         name: a.user.fullName,
         avatar: a.user.image || "",
       })),
-      backgroundColor: "bg-pink-100",
+      bgClass: "bg-pink-100 dark:bg-pink-900/30",
     },
     {
       role: "Frontend Devs",
@@ -47,7 +47,7 @@ const OverviewTabContainer = async ({ data }: Props) => {
         name: a.user.fullName,
         avatar: a.user.image || "",
       })),
-      backgroundColor: "bg-blue-100",
+      bgClass: "bg-blue-100 dark:bg-blue-900/30",
     },
     {
       role: "Backend Devs",
@@ -56,7 +56,7 @@ const OverviewTabContainer = async ({ data }: Props) => {
         name: a.user.fullName,
         avatar: a.user.image || "",
       })),
-      backgroundColor: "bg-green-100",
+      bgClass: "bg-green-100 dark:bg-green-900/30",
     },
   ];
 

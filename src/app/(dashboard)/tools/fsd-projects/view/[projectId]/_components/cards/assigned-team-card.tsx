@@ -9,7 +9,7 @@ interface AssignedTeamCardProps {
 export default function AssignedTeamCard({ teamName }: AssignedTeamCardProps) {
   return (
     <MotionCard delay={0.1}>
-      <Card className="shadow-none">
+      <Card className="shadow-none dark:bg-white/5">
         <CardContent className="pt-3 px-3 space-y-2">
           <Label>Assigned Team</Label>
           <div className="bg-primary-yellow/20 text-sm font-medium p-3 rounded-lg">

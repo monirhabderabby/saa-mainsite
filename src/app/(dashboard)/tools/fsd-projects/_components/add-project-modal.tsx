@@ -423,7 +423,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
           </Button>
         </SheetTrigger>
       )}
-      <SheetContent className="w-full bg-[#F9FAFB] flex flex-col h-full px-2">
+      <SheetContent className="w-full bg-[#F9FAFB] dark:bg-black flex flex-col h-full px-2">
         <SheetHeader>
           <SheetTitle>{initialData ? "Edit" : "New"} Project</SheetTitle>
         </SheetHeader>
@@ -435,7 +435,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
               className="space-y-7 px-1"
             >
               {/* basic information */}
-              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 shadow-none">
+              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 shadow-none dark:bg-white/10">
                 <div className="flex items-center gap-x-2 mt-2 col-span-2">
                   <div className="bg-[#FFFBEB] p-3 rounded-lg">
                     <FileText className="size-4 text-[#D97706]" />
@@ -491,7 +491,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                 />
               </Card>
               {/* client information */}
-              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 shadow-none">
+              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 shadow-none dark:bg-white/10">
                 <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
                   <div className="bg-[#EFF6FF] p-3 rounded-lg">
                     <Building2 className="size-4  text-[#2563EB]" />
@@ -690,7 +690,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
               </Card>
 
               {/* timeline */}
-              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 shadow-none">
+              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 shadow-none dark:bg-white/10">
                 <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
                   <div className="bg-[#FAF5FF] p-3 rounded-lg">
                     <CalendarRange className="size-4  text-[#9333EA]" />
@@ -877,7 +877,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
               </Card>
 
               {/* financial information */}
-              <Card className="grid grid-cols-2 gap-3 mt-2 shadow-none p-4">
+              <Card className="grid grid-cols-2 gap-3 mt-2 shadow-none p-4 dark:bg-white/10">
                 <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
                   <div className="bg-[#F0FDF4] p-3 rounded-lg">
                     <DollarSign className="size-4  text-[#16A34A]" />
@@ -952,7 +952,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                 />
               </Card>
 
-              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 shadow-none">
+              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 shadow-none dark:bg-white/10">
                 <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
                   <div className="bg-[#FFF7ED] p-3 rounded-lg">
                     <Clock
@@ -999,7 +999,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                 />
               </Card>
 
-              <Card className="grid gap-3 mt-2 shadow-none p-4">
+              <Card className="grid gap-3 mt-2 shadow-none p-4 dark:bg-white/10">
                 <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
                   <div className="bg-[#FEFCE8] p-3 rounded-lg">
                     <NotebookPen className="size-4  text-[#CA8A04]" />
@@ -1067,7 +1067,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                   )}
                 />
               </Card>
-              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 gap-y-5 mt-2 shadow-none p-4">
+              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 gap-y-5 mt-2 shadow-none p-4 dark:bg-white/10">
                 <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
                   <div className="bg-[#EEF2FF] p-3 rounded-lg">
                     <Users
@@ -1156,7 +1156,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                   )}
                 />
               </Card>
-              <Card className="grid gap-3 mt-2 shadow-none p-4">
+              <Card className="grid gap-3 mt-2 shadow-none p-4 dark:bg-white/10">
                 <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
                   <div className="bg-[#F0FDFA] p-3 rounded-lg">
                     <LinkIcon className="size-4  text-[#1D9B90]" />
@@ -1228,7 +1228,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                 />
               </Card>
 
-              <Card className="grid gap-3 mt-2 shadow-none p-4">
+              <Card className="grid gap-3 mt-2 shadow-none p-4 dark:bg-white/10">
                 <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
                   <div className="bg-[#FDF2F8] p-3 rounded-lg">
                     <Star className="size-4 stroke-[#DB2777]  fill-[#DB2777]" />
