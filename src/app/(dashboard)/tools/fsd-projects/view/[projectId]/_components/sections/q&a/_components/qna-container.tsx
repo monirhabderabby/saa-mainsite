@@ -221,40 +221,64 @@ export default function QNAContainer({ projectId }: Props) {
       <div>
         {/* Add New */}
         {isAdding ? (
-          <div className="rounded-md bg-[#F7F6F3] p-3">
+          <div className="rounded-md bg-[#F7F6F3] p-3 dark:bg-[#2A2A2A]">
             <input
               type="text"
               value={newForm.question}
               onChange={(e) =>
                 setNewForm({ ...newForm, question: e.target.value })
               }
-              className="mb-2 w-full bg-transparent text-[15px] font-medium text-[#37352F] outline-none placeholder:text-[#9B9A97]"
+              className="
+          mb-2 w-full bg-transparent
+          text-[15px] font-medium
+          text-[#37352F] dark:text-[#EDEDED]
+          outline-none
+          placeholder:text-[#9B9A97] dark:placeholder:text-[#A1A1A1]
+        "
               placeholder="Question"
               autoFocus
             />
+
             <textarea
               value={newForm.answer}
               onChange={(e) =>
                 setNewForm({ ...newForm, answer: e.target.value })
               }
-              className="w-full resize-none bg-transparent text-[14px] text-[#6B6B6B] outline-none placeholder:text-[#9B9A97]"
+              className="
+          w-full resize-none bg-transparent
+          text-[14px]
+          text-[#6B6B6B] dark:text-[#CFCFCF]
+          outline-none
+          placeholder:text-[#9B9A97] dark:placeholder:text-[#A1A1A1]
+        "
               placeholder="Answer (optional)"
               rows={2}
             />
+
             <div className="mt-2 flex gap-2">
               <button
                 onClick={handleAddNew}
-                className="rounded px-2 py-1 text-xs font-medium text-[#37352F] hover:bg-[#EDECE9]"
                 disabled={pending}
+                className="
+            rounded px-2 py-1 text-xs font-medium
+            text-[#37352F] dark:text-[#EDEDED]
+            hover:bg-[#EDECE9] dark:hover:bg-[#3A3A3A]
+            disabled:opacity-50
+          "
               >
                 Save
               </button>
+
               <button
                 onClick={() => {
                   setIsAdding(false);
                   setNewForm({ question: "", answer: "" });
                 }}
-                className="rounded px-2 py-1 text-xs text-[#9B9A97] hover:bg-[#EDECE9]"
+                className="
+            rounded px-2 py-1 text-xs
+            text-[#9B9A97] dark:text-[#A1A1A1]
+            hover:bg-[#EDECE9] dark:hover:bg-[#3A3A3A]
+          "
               >
                 Cancel
               </button>
@@ -271,14 +295,20 @@ export default function QNAContainer({ projectId }: Props) {
         {apiData.data.map((item) => (
           <div key={item.id} className="group">
             {editingId === item.id ? (
-              <div className="rounded-md bg-[#F7F6F3] p-3">
+              <div className="rounded-md bg-[#F7F6F3] p-3 dark:bg-[#2A2A2A]">
                 <input
                   type="text"
                   value={editForm.question}
                   onChange={(e) =>
                     setEditForm({ ...editForm, question: e.target.value })
                   }
-                  className="mb-2 w-full bg-transparent text-[15px] font-medium text-[#37352F] outline-none placeholder:text-[#9B9A97]"
+                  className="
+              mb-2 w-full bg-transparent
+              text-[15px] font-medium
+              text-[#37352F] dark:text-[#EDEDED]
+              outline-none
+              placeholder:text-[#9B9A97] dark:placeholder:text-[#A1A1A1]
+            "
                   placeholder="Question"
                   autoFocus
                 />
@@ -287,52 +317,78 @@ export default function QNAContainer({ projectId }: Props) {
                   onChange={(e) =>
                     setEditForm({ ...editForm, answer: e.target.value })
                   }
-                  className="w-full resize-none bg-transparent text-[14px] text-[#6B6B6B] outline-none placeholder:text-[#9B9A97]"
+                  className="
+              w-full resize-none bg-transparent
+              text-[14px]
+              text-[#6B6B6B] dark:text-[#CFCFCF]
+              outline-none
+              placeholder:text-[#9B9A97] dark:placeholder:text-[#A1A1A1]
+            "
                   placeholder="Answer (optional)"
                   rows={2}
                 />
                 <div className="mt-2 flex gap-2">
                   <button
                     onClick={() => handleSaveEdit(item.id)}
-                    className="rounded px-2 py-1 text-xs font-medium text-[#37352F] hover:bg-[#EDECE9]"
+                    className="
+                rounded px-2 py-1 text-xs font-medium
+                text-[#37352F] dark:text-[#EDEDED]
+                hover:bg-[#EDECE9] dark:hover:bg-[#3A3A3A]
+              "
                   >
                     Save
                   </button>
                   <button
                     onClick={handleCancelEdit}
-                    className="rounded px-2 py-1 text-xs text-[#9B9A97] hover:bg-[#EDECE9]"
+                    className="
+                rounded px-2 py-1 text-xs
+                text-[#9B9A97] dark:text-[#A1A1A1]
+                hover:bg-[#EDECE9] dark:hover:bg-[#3A3A3A]
+              "
                   >
                     Cancel
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="flex items-start gap-1 rounded-md px-1 py-2 transition-colors hover:bg-[#F7F6F3]">
+              <div className="flex items-start gap-1 rounded-md px-1 py-2 transition-colors hover:bg-[#F7F6F3] dark:hover:bg-[#2A2A2A]">
                 <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                  <button className="p-0.5 text-[#C4C4C4] hover:text-[#9B9A97]">
+                  <button className="p-0.5 text-[#C4C4C4] hover:text-[#9B9A97] dark:text-[#6F6F6F] dark:hover:text-[#A1A1A1]">
                     <GripVertical className="h-4 w-4" />
                   </button>
                 </div>
+
                 <div className="min-w-0 flex-1">
-                  <p className="text-[15px] font-medium text-[#37352F]">
+                  <p className="text-[15px] font-medium text-[#37352F] dark:text-[#EDEDED]">
                     {item.question}
                   </p>
                   {item.answer && (
-                    <p className="mt-0.5 text-[14px] text-[#6B6B6B]">
+                    <p className="mt-0.5 text-[14px] text-[#6B6B6B] dark:text-[#CFCFCF]">
                       {item.answer}
                     </p>
                   )}
                 </div>
+
                 <div className="flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
                   <button
                     onClick={() => handleEdit(item)}
-                    className="rounded p-1.5 text-[#9B9A97] hover:bg-[#EDECE9] hover:text-[#37352F]"
+                    className="
+                rounded p-1.5
+                text-[#9B9A97] dark:text-[#A1A1A1]
+                hover:bg-[#EDECE9] dark:hover:bg-[#3A3A3A]
+                hover:text-[#37352F] dark:hover:text-[#EDEDED]
+              "
                   >
                     <Pencil className="h-3.5 w-3.5" />
                   </button>
                   <button
                     onClick={() => handleDelete(item.id)}
-                    className="rounded p-1.5 text-[#9B9A97] hover:bg-[#EDECE9] hover:text-[#EB5757]"
+                    className="
+                rounded p-1.5
+                text-[#9B9A97] dark:text-[#A1A1A1]
+                hover:bg-[#EDECE9] dark:hover:bg-[#3A3A3A]
+                hover:text-[#EB5757]
+              "
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -344,14 +400,20 @@ export default function QNAContainer({ projectId }: Props) {
 
         {/* Add New */}
         {isAdding ? (
-          <div className="rounded-md bg-[#F7F6F3] p-3">
+          <div className="rounded-md bg-[#F7F6F3] p-3 dark:bg-[#2A2A2A]">
             <input
               type="text"
               value={newForm.question}
               onChange={(e) =>
                 setNewForm({ ...newForm, question: e.target.value })
               }
-              className="mb-2 w-full bg-transparent text-[15px] font-medium text-[#37352F] outline-none placeholder:text-[#9B9A97]"
+              className="
+          mb-2 w-full bg-transparent
+          text-[15px] font-medium
+          text-[#37352F] dark:text-[#EDEDED]
+          outline-none
+          placeholder:text-[#9B9A97] dark:placeholder:text-[#A1A1A1]
+        "
               placeholder="Question"
               autoFocus
             />
@@ -360,15 +422,26 @@ export default function QNAContainer({ projectId }: Props) {
               onChange={(e) =>
                 setNewForm({ ...newForm, answer: e.target.value })
               }
-              className="w-full resize-none bg-transparent text-[14px] text-[#6B6B6B] outline-none placeholder:text-[#9B9A97]"
+              className="
+          w-full resize-none bg-transparent
+          text-[14px]
+          text-[#6B6B6B] dark:text-[#CFCFCF]
+          outline-none
+          placeholder:text-[#9B9A97] dark:placeholder:text-[#A1A1A1]
+        "
               placeholder="Answer (optional)"
               rows={2}
             />
             <div className="mt-2 flex gap-2">
               <button
                 onClick={handleAddNew}
-                className="rounded px-2 py-1 text-xs font-medium text-[#37352F] hover:bg-[#EDECE9]"
                 disabled={pending}
+                className="
+            rounded px-2 py-1 text-xs font-medium
+            text-[#37352F] dark:text-[#EDEDED]
+            hover:bg-[#EDECE9] dark:hover:bg-[#3A3A3A]
+            disabled:opacity-50
+          "
               >
                 Save
               </button>
@@ -377,7 +450,11 @@ export default function QNAContainer({ projectId }: Props) {
                   setIsAdding(false);
                   setNewForm({ question: "", answer: "" });
                 }}
-                className="rounded px-2 py-1 text-xs text-[#9B9A97] hover:bg-[#EDECE9]"
+                className="
+            rounded px-2 py-1 text-xs
+            text-[#9B9A97] dark:text-[#A1A1A1]
+            hover:bg-[#EDECE9] dark:hover:bg-[#3A3A3A]
+          "
               >
                 Cancel
               </button>
@@ -386,7 +463,14 @@ export default function QNAContainer({ projectId }: Props) {
         ) : (
           <button
             onClick={() => setIsAdding(true)}
-            className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-[14px] text-[#9B9A97] transition-colors hover:bg-[#F7F6F3] hover:text-[#37352F]"
+            className="
+        flex w-full items-center gap-2 rounded-md px-2 py-2
+        text-[14px]
+        text-[#9B9A97] dark:text-[#A1A1A1]
+        transition-colors
+        hover:bg-[#F7F6F3] dark:hover:bg-[#2A2A2A]
+        hover:text-[#37352F] dark:hover:text-[#EDEDED]
+      "
           >
             <Plus className="h-4 w-4" />
             <span>Add a question</span>
@@ -397,14 +481,14 @@ export default function QNAContainer({ projectId }: Props) {
   }
 
   return (
-    <div className=" bg-[#FBFBFA]">
+    <div className="bg-[#FBFBFA] dark:bg-[#1E1E1E]">
       <div className="mx-auto px-8 py-5">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-xl font-bold text-[#37352F]">
+          <h1 className="text-xl font-bold text-[#37352F] dark:text-[#EDEDED]">
             Q&A - Common Information
           </h1>
-          <p className="mt-1 text-sm text-[#9B9A97]">
+          <p className="mt-1 text-sm text-[#9B9A97] dark:text-[#A1A1A1]">
             Store and manage all your project related questions and answers in
             one place.
           </p>
@@ -427,18 +511,30 @@ function ErrorState({
 }) {
   return (
     <div className="flex flex-col items-center py-16">
-      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#FDEBEB]">
+      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#FDEBEB] dark:bg-[#EB5757]/10">
         <AlertCircle className="h-6 w-6 text-[#EB5757]" />
       </div>
-      <p className="mb-1 text-[15px] font-medium text-[#37352F]">
+
+      <p className="mb-1 text-[15px] font-medium text-[#37352F] dark:text-[#EDEDED]">
         Something went wrong
       </p>
-      <p className="mb-4 text-center text-[14px] text-[#9B9A97]">
+
+      <p className="mb-4 text-center text-[14px] text-[#9B9A97] dark:text-[#A1A1A1]">
         We couldn&apos;t load your questions. Please try again.
       </p>
+
       <button
         onClick={onRetry}
-        className="flex items-center gap-2 rounded-md bg-[#37352F] px-3 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-[#2F2F2F]"
+        className="
+          flex items-center gap-2 rounded-md
+          bg-[#37352F] px-3 py-1.5
+          text-[13px] font-medium text-white
+          transition-colors
+          hover:bg-[#2F2F2F]
+          dark:bg-[#EDEDED]
+          dark:text-[#1E1E1E]
+          dark:hover:bg-[#DADADA]
+        "
       >
         <RefreshCw
           className={cn(isRefetching && "animate-spin", "h-3.5 w-3.5")}
@@ -477,13 +573,13 @@ function LoadingState() {
 function EmptyState({ onAddNew }: { onAddNew: () => void }) {
   return (
     <div className="flex flex-col items-center py-16">
-      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#F7F6F3]">
+      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#F7F6F3] dark:bg-[#FFFFFF]/5">
         <svg
           width="24"
           height="24"
           viewBox="0 0 24 24"
           fill="none"
-          className="text-[#9B9A97]"
+          className="text-[#9B9A97] dark:text-[#A1A1A1]"
         >
           <path
             d="M9 9h6m-6 4h6m-6 4h4M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"
@@ -494,15 +590,27 @@ function EmptyState({ onAddNew }: { onAddNew: () => void }) {
           />
         </svg>
       </div>
-      <p className="mb-1 text-[15px] font-medium text-[#37352F]">
+
+      <p className="mb-1 text-[15px] font-medium text-[#37352F] dark:text-[#EDEDED]">
         No questions yet
       </p>
-      <p className="mb-4 text-center text-[14px] text-[#9B9A97]">
+
+      <p className="mb-4 text-center text-[14px] text-[#9B9A97] dark:text-[#A1A1A1]">
         Add your first question to get started.
       </p>
+
       <button
         onClick={onAddNew}
-        className="flex items-center gap-2 rounded-md bg-[#37352F] px-3 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-[#2F2F2F]"
+        className="
+          flex items-center gap-2 rounded-md
+          bg-[#37352F] px-3 py-1.5
+          text-[13px] font-medium text-white
+          transition-colors
+          hover:bg-[#2F2F2F]
+          dark:bg-[#EDEDED]
+          dark:text-[#1E1E1E]
+          dark:hover:bg-[#DADADA]
+        "
       >
         <Plus className="h-3.5 w-3.5" />
         Add question
