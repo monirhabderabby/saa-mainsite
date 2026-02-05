@@ -3,7 +3,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import prisma from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 import { ProjectStatus } from "@prisma/client";
-import { Building2 } from "lucide-react";
+import { Building2, CalendarCheck2 } from "lucide-react";
 
 interface Props {
   loggedinUserId: string;
@@ -95,10 +95,20 @@ const UpcomingDeadlines = async ({ loggedinUserId }: Props) => {
       </div>
 
       <ScrollArea className="h-full w-full min-h-0">
-        <div className="space-y-2 pr-2">
+        <div className="space-y-2 pr-2 ">
           {sortedProjects.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              No upcoming deadlines in the next 7 days
+            <div className="text-center py-8 text-muted-foreground flex items-center flex-col justify-center h-[300px]">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-sky-50 text-sky-700">
+                <CalendarCheck2 className="h-6 w-6" />
+              </div>
+
+              <h3 className="text-sm font-semibold text-foreground">
+                You’re all caught up
+              </h3>
+
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                No deadlines are coming up in the next 7 days.
+              </p>
             </div>
           ) : (
             sortedProjects.map((project) => {

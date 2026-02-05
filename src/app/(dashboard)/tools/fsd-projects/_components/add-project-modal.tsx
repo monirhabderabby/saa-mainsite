@@ -80,8 +80,10 @@ import {
 } from "@/components/ui/input-group";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { Textarea } from "@/components/ui/textarea";
+import { useFsdProjectFilterState } from "@/zustand/tools/fsd-project";
 import "@smastrom/react-rating/style.css";
 import { toast } from "sonner";
+import { FSDProjectApiProps, toYMD } from "./fsd-project-table-container";
 
 type UserTypes = Prisma.UserGetPayload<{
   select: {
@@ -100,6 +102,38 @@ interface Props {
 export default function AddProjectModal({ open, initialData, setOpen }: Props) {
   const [pending, startTransition] = useTransition();
   const [query, setQuery] = useState("");
+
+  const {
+    clientName,
+    orderId,
+    teamId,
+    profileId,
+    status,
+    shift,
+    deadlineFrom,
+    deadlineTo,
+    lastUpdateTo,
+    nextUpdateTo,
+    page,
+  } = useFsdProjectFilterState();
+  const preparedClientName = clientName ?? "";
+  const preparedOrderId = orderId ?? "";
+  const preparedTeamids = teamId ? teamId?.join(",") : "";
+  const preparedProfileIds = profileId === "All" ? "" : (profileId ?? "");
+
+  const preparedStatus = status ? status.join(",") : "";
+  const preparedShift = shift === "All" ? "" : (shift ?? "");
+
+  // Deadlines filter
+  const preparedDeadlineFrom = deadlineFrom
+    ? new Date(deadlineFrom).toISOString().split("T")[0]
+    : "";
+  const preparedDeadlineTo = deadlineTo
+    ? new Date(deadlineTo).toISOString().split("T")[0]
+    : "";
+
+  const preparedLastUpdate = toYMD(new Date(lastUpdateTo!));
+  const preparedNextUpdate = toYMD(new Date(nextUpdateTo!));
 
   const form = useForm<ProjectCreateSchemaType>({
     resolver: zodResolver(projectCreateSchema),
@@ -197,7 +231,33 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
           }
 
           toast.success(res.message);
-          queryClient.invalidateQueries({ queryKey: ["fsd-projects"] });
+          const returnedata = res.data as SafeProjectDto;
+
+          queryClient.setQueryData<FSDProjectApiProps>(
+            [
+              "fsd-projects",
+              preparedClientName,
+              preparedOrderId,
+              preparedTeamids,
+              preparedProfileIds,
+              preparedStatus,
+              preparedShift,
+              preparedDeadlineFrom,
+              preparedDeadlineTo,
+              preparedLastUpdate,
+              preparedNextUpdate,
+              page,
+            ],
+            (oldData) => {
+              if (!oldData) return oldData;
+
+              return {
+                success: true,
+                pagination: oldData.pagination,
+                data: [returnedata, ...oldData.data],
+              };
+            },
+          );
 
           // reset the form
           formReset();
