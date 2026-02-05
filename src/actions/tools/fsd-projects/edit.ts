@@ -1,5 +1,6 @@
 "use server";
 
+import { SafeProjectDto } from "@/app/api/tools/fsd-project/route";
 import prisma from "@/lib/prisma";
 import {
   projectCreateSchema,
@@ -11,6 +12,7 @@ import { revalidatePath } from "next/cache";
 type ActionResponse = {
   success: boolean;
   message: string;
+  data?: SafeProjectDto;
 };
 
 export async function editProject(
@@ -21,18 +23,12 @@ export async function editProject(
     // 1️⃣ Validate input
     const validatedData = projectCreateSchema.parse(data);
 
-    const lastUpdate = new Date(validatedData.lastUpdate!)
-      .toLocaleDateString("en-BN")
-      .split("T")[0];
-
-    console.log("lastUpdate", lastUpdate);
-
     // 2️⃣ Transaction (atomic update)
-    await prisma.$transaction(async (tx) => {
+    const returnedData = await prisma.$transaction(async (tx) => {
       // -------------------------
       // Update project fields
       // -------------------------
-      await tx.project.update({
+      const project = await tx.project.update({
         where: { id: projectId },
         data: {
           clientName: validatedData.clientName,
@@ -111,6 +107,27 @@ export async function editProject(
           data: assignments,
         });
       }
+
+      // ✅ fetch the final shape you want to return
+      const full = await tx.project.findUnique({
+        where: { id: project.id },
+        include: {
+          team: true,
+          salesPerson: {
+            select: {
+              fullName: true,
+              id: true,
+              image: true,
+              designation: { select: { name: true } },
+            },
+          },
+          phase: true,
+          profile: true,
+          projectAssignments: true,
+        },
+      });
+
+      return full!; // safe right after create
     });
 
     revalidatePath(`/tools/fsd-projects/view/${projectId}`);
@@ -118,6 +135,7 @@ export async function editProject(
     return {
       success: true,
       message: "Project updated successfully ✅",
+      data: returnedData,
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {

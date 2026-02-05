@@ -229,7 +229,24 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
           }
 
           toast.success(res.message);
-          queryClient.invalidateQueries({ queryKey: ["fsd-projects"] });
+          queryClient.setQueryData<FSDProjectApiProps>(
+            FSDProjectTableQueryKey,
+            (oldData) => {
+              if (!oldData) return oldData;
+
+              const updatedData = oldData.data.map((project) => {
+                if (project.id === initialData.id) {
+                  return res.data as SafeProjectDto;
+                }
+                return project;
+              });
+
+              return {
+                ...oldData,
+                data: updatedData,
+              };
+            },
+          );
 
           // reset the form
           formReset();
