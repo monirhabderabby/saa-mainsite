@@ -1,6 +1,6 @@
 import { SafeProjectDto } from "@/app/api/tools/fsd-project/route";
 
-import ActivityTimeline from "../activity-timeline";
+import ActivityTimeline from "../activity-timeline/activity-timeline";
 import { ProjectNavigation } from "../project-navigation";
 import QNAContainer from "../sections/q&a/_components/qna-container";
 import OverviewTabContainer from "./overview-tab/overview-tab-container";

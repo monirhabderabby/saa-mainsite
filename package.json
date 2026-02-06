@@ -65,6 +65,7 @@
     "html-to-text": "^9.0.5",
     "isomorphic-dompurify": "^2.28.0",
     "js-cookie": "^3.0.5",
+    "jsondiffpatch": "^0.7.3",
     "jszip": "^3.10.1",
     "lucide-react": "^0.542.0",
     "moment": "^2.30.1",

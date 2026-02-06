@@ -219,10 +219,20 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
   }, [fuse, query, users]);
 
   async function onSubmit(values: ProjectCreateSchemaType) {
+    const userAgent = window.navigator.userAgent;
+
     if (initialData) {
       // edit project
-      startTransition(() => {
-        editProject(initialData.id, values).then((res) => {
+      startTransition(async () => {
+        const ip = await fetch("https://api.ipify.org?format=json")
+          .then((res) => res.json())
+          .then((data) => data.ip)
+          .catch(() => "unknown");
+
+        editProject(initialData.id, values, {
+          userAgent: userAgent,
+          ip: ip,
+        }).then((res) => {
           if (!res.success) {
             toast.error(res.message);
             return;
@@ -254,13 +264,12 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
         });
       });
     } else {
-      const ip = await fetch("https://api.ipify.org?format=json")
-        .then((res) => res.json())
-        .then((data) => data.ip)
-        .catch(() => "unknown");
-      const userAgent = window.navigator.userAgent;
       // create a new project
-      startTransition(() => {
+      startTransition(async () => {
+        const ip = await fetch("https://api.ipify.org?format=json")
+          .then((res) => res.json())
+          .then((data) => data.ip)
+          .catch(() => "unknown");
         createProject(values, {
           userAgent: userAgent,
           ip: ip,
