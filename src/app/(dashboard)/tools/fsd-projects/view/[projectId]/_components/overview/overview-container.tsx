@@ -1,5 +1,6 @@
 import { SafeProjectDto } from "@/app/api/tools/fsd-project/route";
 
+import ActivityTimeline from "../activity-timeline";
 import { ProjectNavigation } from "../project-navigation";
 import QNAContainer from "../sections/q&a/_components/qna-container";
 import OverviewTabContainer from "./overview-tab/overview-tab-container";
@@ -14,16 +15,10 @@ const OverViewContainer = ({ data, tab = "overview" }: Props) => {
     switch (tab) {
       case "overview":
         return <OverviewTabContainer data={data} />;
-      case "team":
-        return <div>Team content here</div>;
-      case "phases":
-        return <div>Phases content here</div>;
-      case "documents":
-        return <div>Documents content here</div>;
-      case "timeline":
-        return <div>Timeline content here</div>;
       case "qna":
         return <QNAContainer projectId={data.id} />;
+      case "activity":
+        return <ActivityTimeline projectId={data.id} />;
       default:
         return <OverviewTabContainer data={data} />;
     }

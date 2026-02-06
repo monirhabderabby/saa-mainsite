@@ -10,11 +10,8 @@ export function ProjectNavigation({ children }: { children: React.ReactNode }) {
 
   const navItems = [
     { label: "Overview", href: "#overview" },
-    { label: "Team", href: "#team" },
-    { label: "Phases", href: "#phases" },
-    { label: "Documents", href: "#documents" },
-    { label: "Timeline", href: "#timeline" },
     { label: "Q&A", href: "#qna" },
+    { label: "Activity", href: "#activity" },
   ];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

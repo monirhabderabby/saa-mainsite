@@ -77,6 +77,7 @@ model User {
     projects      Project[]
     salesProjects Project[]    @relation("SalesPersonProjects")
     projectQnas   ProjectQna[]
+    auditLogs     AuditLog[]
 }
 
 model UserVerification {
@@ -565,4 +566,41 @@ model ProjectQna {
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+}
+
+enum Entity {
+    project
+    updateSheet
+    issueSheet
+}
+
+enum AuditAction {
+    CREATE
+    UPDATE
+    DELETE
+    STATUS_CHANGE
+    DELIVERY_SENT
+    UPDATE_SENT
+    COMMENT_ADDED
+}
+
+model AuditLog {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    entity   Entity
+    entityId String @db.ObjectId
+
+    action  AuditAction
+    actorId String?     @db.ObjectId
+    actor   User?       @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+    changes Json?
+    meta    Json?
+
+    createdAt DateTime @default(now())
+
+    @@index([entity, entityId])
+    @@index([actorId])
+    @@index([action])
+    @@index([createdAt])
 }

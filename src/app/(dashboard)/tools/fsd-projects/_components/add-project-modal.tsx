@@ -218,7 +218,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
     return fuse.search(query).map((r) => r.item);
   }, [fuse, query, users]);
 
-  function onSubmit(values: ProjectCreateSchemaType) {
+  async function onSubmit(values: ProjectCreateSchemaType) {
     if (initialData) {
       // edit project
       startTransition(() => {
@@ -254,9 +254,17 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
         });
       });
     } else {
+      const ip = await fetch("https://api.ipify.org?format=json")
+        .then((res) => res.json())
+        .then((data) => data.ip)
+        .catch(() => "unknown");
+      const userAgent = window.navigator.userAgent;
       // create a new project
       startTransition(() => {
-        createProject(values).then((res) => {
+        createProject(values, {
+          userAgent: userAgent,
+          ip: ip,
+        }).then((res) => {
           if (!res.success) {
             toast.error(res.message);
             return;

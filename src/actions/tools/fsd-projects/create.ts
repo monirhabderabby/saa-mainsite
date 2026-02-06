@@ -1,5 +1,6 @@
 "use server";
 
+import { createProjectLog } from "@/actions/audit-log/project";
 import { SafeProjectDto } from "@/app/api/tools/fsd-project/route";
 import { auth } from "@/auth"; // adjust if you use next-auth or custom auth
 import prisma from "@/lib/prisma";
@@ -17,6 +18,10 @@ type ActionResponse = {
 
 export async function createProject(
   data: ProjectCreateSchemaType,
+  meta?: {
+    userAgent: string;
+    ip: string;
+  },
 ): Promise<ActionResponse> {
   try {
     // ----------------------------------
@@ -140,8 +145,10 @@ export async function createProject(
     });
 
     // ----------------------------------
-    // 6. Cache revalidation
+    // 6. Audit log
     // ----------------------------------
+
+    await createProjectLog({ project: returnedData, meta });
 
     return {
       success: true,
