@@ -9,6 +9,7 @@ import { AuditAction } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
+  ArrowRightLeft,
   Briefcase,
   Calendar,
   DollarSign,
@@ -269,17 +270,21 @@ function TeamChange({ from, to }: { from: string; to: string }) {
 
 function ClientChange({ from, to }: { from: string; to: string }) {
   return (
-    <div className="mt-2 space-y-1.5 flex items-center gap-2">
-      <p className="text-[11px] text-muted-foreground">
+    <div className="mt-2 space-y-1.5">
+      <p className="text-sm text-muted-foreground">
         Updated client name from{" "}
+        <span className="font-medium text-foreground">{from}</span> to{" "}
+        <span className="font-medium text-foreground">{to}</span>
       </p>
-      <div className="flex items-start gap-2 flex-wrap">
-        <div className="flex-1 min-w-0 flex gap-2">
-          <div className="text-[11px] text-muted-foreground line-through mb-1">
-            {from}
-          </div>
-          <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
-          <div className="text-[11px] text-foreground font-medium">{to}</div>
+      <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-1.5 rounded-md bg-purple-50 px-2 py-1 border border-purple-200">
+          <Users className="h-2.5 w-2.5 text-purple-500" />
+          <span className="text-[8px] font-medium text-purple-700">{from}</span>
+        </div>
+        <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+        <div className="flex items-center gap-1.5 rounded-md bg-purple-100 px-2 py-1 border border-purple-300">
+          <Users className="h-2.5 w-2.5 text-purple-700" />
+          <span className="text-[8px] font-medium text-purple-800">{to}</span>
         </div>
       </div>
     </div>
@@ -416,9 +421,9 @@ function TextChange({
   to: string;
 }) {
   const fieldLabels: Record<string, string> = {
-    title: "Project title",
+    title: "title",
     shortDescription: "description",
-    instructionSheet: "instruction sheet live link",
+    instructionSheet: "instruction sheet",
     shift: "shift",
     remarkFromOperation: "operation remark",
     quickNoteFromLeader: "leader note",
@@ -430,14 +435,13 @@ function TextChange({
   const label = fieldLabels[field] || formatFieldName(field);
 
   return (
-    <div className="mt-2 space-y-1.5 flex items-center gap-2">
-      <p className="text-[11px] text-muted-foreground">Changed {label}</p>
+    <div className="mt-2 space-y-1.5">
+      <p className="text-sm text-muted-foreground">Updated {label}</p>
       <div className="flex items-start gap-2 flex-wrap">
-        <div className="flex-1 min-w-0 flex gap-2">
+        <div className="flex-1 min-w-0">
           <div className="text-[11px] text-muted-foreground line-through mb-1">
             {from}
           </div>
-          <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
           <div className="text-[11px] text-foreground font-medium">{to}</div>
         </div>
       </div>
@@ -488,6 +492,91 @@ function ProfileChange({ from, to }: { from: string; to: string }) {
           <Briefcase className="h-2.5 w-2.5 text-indigo-700" />
           <span className="text-[8px] font-medium text-indigo-800">{to}</span>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function AssignmentChange({
+  role,
+  from,
+  to,
+}: {
+  role: string;
+  from: string[];
+  to: string[];
+}) {
+  const roleLabels: Record<string, string> = {
+    UIUX: "UI/UX Designer",
+    FRONTEND: "Frontend Developer",
+    BACKEND: "Backend Developer",
+    QA: "QA Engineer",
+    PM: "Project Manager",
+  };
+
+  const roleLabel = roleLabels[role] || role;
+
+  // Determine what changed
+  const added = to.filter((userName) => !from.includes(userName));
+  const removed = from.filter((userName) => !to.includes(userName));
+  const unchanged = from.filter((userName) => to.includes(userName));
+
+  let actionText = "";
+  if (added.length > 0 && removed.length === 0 && unchanged.length === 0) {
+    // Pure addition (no one was there before)
+    actionText = `Assigned ${roleLabel}${added.length > 1 ? "s" : ""}`;
+  } else if (removed.length > 0 && added.length === 0) {
+    // Pure removal (no one added)
+    actionText = `Unassigned ${roleLabel}${removed.length > 1 ? "s" : ""}`;
+  } else {
+    // Mixed: some added, some removed, or some unchanged
+    actionText = `Updated ${roleLabel} assignments`;
+  }
+
+  return (
+    <div className="mt-2 space-y-1.5">
+      <p className="text-sm text-muted-foreground">{actionText}</p>
+      <div className="flex flex-wrap gap-1">
+        {/* Show removed users with strikethrough */}
+        {removed.map((userName, idx) => (
+          <div
+            key={`removed-${userName}-${idx}`}
+            className="flex items-center gap-1.5 rounded-md px-2 py-1 border text-[8px] font-medium bg-red-50 border-red-200 text-red-700 line-through opacity-60"
+          >
+            <User className="h-2.5 w-2.5" />
+            <span>{userName}</span>
+          </div>
+        ))}
+
+        {/* Show arrow if there are changes */}
+        {removed.length > 0 && (added.length > 0 || unchanged.length > 0) && (
+          <ArrowRight className="h-3.5 w-3.5 text-muted-foreground self-center" />
+        )}
+
+        {/* Show unchanged users (neutral) */}
+        {unchanged.map((userName, idx) => (
+          <div
+            key={`unchanged-${userName}-${idx}`}
+            className="flex items-center gap-1.5 rounded-md px-2 py-1 border text-[8px] font-medium bg-cyan-50 border-cyan-200 text-cyan-700"
+          >
+            <User className="h-2.5 w-2.5" />
+            <span>{userName}</span>
+          </div>
+        ))}
+        {added.length > 0 && unchanged.length > 0 && (
+          <ArrowRightLeft className="h-3.5 w-3.5 text-muted-foreground self-center" />
+        )}
+
+        {/* Show added users with green highlight */}
+        {added.map((userName, idx) => (
+          <div
+            key={`added-${userName}-${idx}`}
+            className="flex items-center gap-1.5 rounded-md px-2 py-1 border text-[8px] font-medium bg-emerald-50 border-emerald-200 text-emerald-700 ring-2 ring-emerald-200"
+          >
+            <User className="h-2.5 w-2.5" />
+            <span>{userName}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -585,6 +674,36 @@ function renderSingleChange(change: ParsedChange) {
 
   // Generic fallback
   return <GenericChange field={field} from={from} to={to} />;
+}
+
+function renderAssignmentChanges(
+  assignments: Record<string, [string[], string[]]>,
+) {
+  const roles = Object.keys(assignments);
+
+  if (roles.length === 1) {
+    // Single role assignment change
+    const role = roles[0];
+    const [from, to] = assignments[role];
+    return <AssignmentChange role={role} from={from} to={to} />;
+  }
+
+  // Multiple role assignment changes
+  return (
+    <div className="mt-2 space-y-2 p-3 bg-muted/30 rounded-lg border border-border/50">
+      <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-1">
+        {roles.length} Assignment Changes
+      </div>
+      {roles.map((role) => {
+        const [from, to] = assignments[role];
+        return (
+          <div key={role}>
+            <AssignmentChange role={role} from={from} to={to} />
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 function MultipleChanges({ changes }: { changes: ParsedChange[] }) {
@@ -805,7 +924,7 @@ function CommentDetail({ comment }: { comment: string }) {
   return (
     <div className="mt-2 p-3 bg-blue-50/50 dark:bg-blue-950/20 border-l-2 border-blue-400 rounded-r">
       <p className="text-sm text-muted-foreground leading-relaxed italic">
-        &quot;{comment}&quot;
+        &#34;{comment}&#34;
       </p>
     </div>
   );
@@ -835,7 +954,18 @@ function ActivityItem({ log }: { log: AuditLogWithActor }) {
   const orderId = meta.orderId ?? null;
   const profile = meta.profile ?? null;
 
-  const changes = parseChanges(log.changes as Record<string, unknown> | null);
+  const logChanges = (log.changes as Record<string, unknown> | null) ?? {};
+
+  // Extract assignment changes separately
+  const assignmentChanges = logChanges.assignments as
+    | Record<string, [string[], string[]]>
+    | undefined;
+
+  // Parse regular changes (excluding assignments)
+  const regularChangesObj = { ...logChanges };
+  delete regularChangesObj.assignments;
+
+  const changes = parseChanges(regularChangesObj);
   const hasMultipleChanges = changes.length > 1;
   const singleChange = changes.length === 1 ? changes[0] : null;
 
@@ -861,7 +991,12 @@ function ActivityItem({ log }: { log: AuditLogWithActor }) {
           />
         )}
 
-        {/* Multiple changes */}
+        {/* Assignment changes */}
+        {log.action === "UPDATE" &&
+          assignmentChanges &&
+          renderAssignmentChanges(assignmentChanges)}
+
+        {/* Multiple regular changes */}
         {log.action === "UPDATE" && hasMultipleChanges && (
           <MultipleChanges changes={changes} />
         )}

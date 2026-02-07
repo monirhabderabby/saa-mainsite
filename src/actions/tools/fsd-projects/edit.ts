@@ -36,7 +36,18 @@ export async function editProject(
         where: { id: projectId },
         include: {
           profile: true,
-          projectAssignments: true,
+          team: true,
+          salesPerson: true,
+          projectAssignments: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  fullName: true,
+                },
+              },
+            },
+          },
         },
       });
 
@@ -147,7 +158,16 @@ export async function editProject(
           },
           phase: true,
           profile: true,
-          projectAssignments: true,
+          projectAssignments: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  fullName: true,
+                },
+              },
+            },
+          },
         },
       });
 
@@ -177,7 +197,6 @@ export async function editProject(
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    // ... your existing error handling unchanged
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
         return {
@@ -241,7 +260,9 @@ function normalizeProjectSnapshot(project: any) {
     clientName: project.clientName,
     orderId: project.orderId,
     profileId: project.profileId,
+    profile: project.profile?.name,
     salesPersonId: project.salesPersonId,
+    salesPerson: project.salesPerson?.fullName,
 
     instructionSheet: project.instructionSheet,
     orderDate: project.orderDate,
@@ -251,6 +272,7 @@ function normalizeProjectSnapshot(project: any) {
     monetaryValue: project.monetaryValue,
     shift: project.shift,
     teamId: project.teamId,
+    team: project.team?.name,
     status: project.status,
 
     delivered: project.delivered,
@@ -272,13 +294,16 @@ function normalizeProjectSnapshot(project: any) {
 
     userId: project.userId,
 
-    // Normalize assignments as role -> sorted userIds
+    // Normalize assignments as role -> sorted user names (not IDs)
     assignments: (() => {
       const map: Record<string, string[]> = {};
       for (const a of project.projectAssignments ?? []) {
         if (!map[a.role]) map[a.role] = [];
-        map[a.role].push(a.userId);
+        // Store user's full name instead of ID for readable logs
+        const userName = a.user?.fullName || a.userId;
+        map[a.role].push(userName);
       }
+      // Sort for consistent comparison
       for (const k of Object.keys(map)) map[k] = map[k].sort();
       return map;
     })(),
@@ -299,14 +324,98 @@ interface LoggerProps {
   };
 }
 
+/**
+ * Normalizes assignment changes from jsondiffpatch format
+ * to simple [from, to] array format
+ */
+function normalizeAssignmentChanges(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  assignmentDiff: Record<string, any>,
+  beforeAssignments: Record<string, string[]>,
+  afterAssignments: Record<string, string[]>,
+): Record<string, [string[], string[]]> | null {
+  const normalized: Record<string, [string[], string[]]> = {};
+
+  // Get all unique roles from both before and after
+  const allRoles = new Set([
+    ...Object.keys(beforeAssignments),
+    ...Object.keys(afterAssignments),
+  ]);
+
+  // Check each role for actual changes
+  for (const role of Array.from(allRoles)) {
+    const beforeList = (beforeAssignments[role] || []).sort();
+    const afterList = (afterAssignments[role] || []).sort();
+
+    // Only include if there's an actual difference
+    const beforeStr = JSON.stringify(beforeList);
+    const afterStr = JSON.stringify(afterList);
+
+    if (beforeStr !== afterStr) {
+      normalized[role] = [beforeList, afterList];
+    }
+  }
+
+  return Object.keys(normalized).length > 0 ? normalized : null;
+}
+
+/**
+ * Main normalize function for all changes
+ */
+async function normalizeChanges(
+  changes: Record<string, unknown>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  beforeSnap: any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  afterSnap: any,
+): Promise<Record<string, unknown>> {
+  const normalized = { ...changes };
+
+  // Handle assignment changes specially
+  if (normalized.assignments && typeof normalized.assignments === "object") {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const assignmentDiff = normalized.assignments as Record<string, any>;
+
+    // Get before and after assignment states from snapshots
+    const beforeAssignments = beforeSnap.assignments || {};
+    const afterAssignments = afterSnap.assignments || {};
+
+    // Normalize the assignment changes
+    const normalizedAssignments = normalizeAssignmentChanges(
+      assignmentDiff,
+      beforeAssignments,
+      afterAssignments,
+    );
+
+    if (normalizedAssignments) {
+      normalized.assignments = normalizedAssignments;
+    } else {
+      delete normalized.assignments;
+    }
+  }
+
+  // Handle other field resolvers (team, profile, salesPerson)
+  for (const [field, resolver] of Object.entries(FIELD_RESOLVERS)) {
+    if (field in normalized) {
+      const resolved = await resolver(normalized[field]);
+      if (resolved) {
+        delete normalized[field];
+        normalized[resolved.field] = resolved.value;
+      }
+    }
+  }
+
+  return normalized;
+}
+
 type ResolverResult = {
-  field: string; // new field name to store in audit log
-  value: unknown; // usually [from, to]
+  field: string;
+  value: unknown;
 };
 
 type FieldResolver = (tuple: unknown) => Promise<ResolverResult | null>;
 
-// Put all “foreign key → human readable” mappings here
+// Put all "foreign key → human readable" mappings here
 const FIELD_RESOLVERS: Record<string, FieldResolver> = {
   teamId: async (tuple: unknown) => {
     if (!Array.isArray(tuple) || tuple.length < 2) return null;
@@ -385,34 +494,6 @@ const FIELD_RESOLVERS: Record<string, FieldResolver> = {
   },
 };
 
-// Converts raw jsonDiff output into readable audit-log changes
-async function normalizeChanges(
-  changes: Record<string, unknown>,
-): Promise<Record<string, unknown>> {
-  const normalized: Record<string, unknown> = {};
-
-  // 1) start with original keys
-  for (const [key, value] of Object.entries(changes)) {
-    normalized[key] = value;
-  }
-
-  // 2) apply resolvers (replace *Id fields with readable fields)
-  for (const [key, value] of Object.entries(changes)) {
-    const resolver = FIELD_RESOLVERS[key];
-    if (!resolver) continue;
-
-    const resolved = await resolver(value);
-    if (!resolved) continue;
-
-    // add the readable field
-    normalized[resolved.field] = resolved.value;
-    // remove the raw id diff
-    delete normalized[key];
-  }
-
-  return normalized;
-}
-
 export async function logger({
   beforeSnap,
   afterSnap,
@@ -425,7 +506,25 @@ export async function logger({
   > | null;
 
   if (logChanges) {
-    logChanges = await normalizeChanges(logChanges);
+    logChanges = await normalizeChanges(logChanges, beforeSnap, afterSnap);
+  }
+
+  // Debug logging
+  if (logChanges?.assignments) {
+    console.log("=== ASSIGNMENT DEBUG ===");
+    console.log(
+      "Before assignments:",
+      JSON.stringify(beforeSnap.assignments, null, 2),
+    );
+    console.log(
+      "After assignments:",
+      JSON.stringify(afterSnap.assignments, null, 2),
+    );
+    console.log(
+      "Normalized assignments:",
+      JSON.stringify(logChanges.assignments, null, 2),
+    );
+    console.log("=======================");
   }
 
   await updateProjectLog({

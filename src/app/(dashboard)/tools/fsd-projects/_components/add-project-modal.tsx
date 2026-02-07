@@ -373,6 +373,12 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
 
       supportPeriodStart: initialData?.supportPeriodStart ?? undefined,
       supportPeriodEnd: initialData?.supportPeriodEnd ?? undefined,
+
+      // sheets
+      progressSheet: initialData?.progressSheet ?? undefined,
+      credentialSheet: initialData?.credentialSheet ?? undefined,
+      websiteIssueTrackerSheet:
+        initialData?.websiteIssueTrackerSheet ?? undefined,
       // ✅ FIXED
       uiuxAssigned:
         initialData?.projectAssignments
