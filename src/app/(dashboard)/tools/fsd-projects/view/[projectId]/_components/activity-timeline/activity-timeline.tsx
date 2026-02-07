@@ -5,13 +5,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
   ArrowRightLeft,
   Briefcase,
   Calendar,
   DollarSign,
+  Loader2,
   Star,
   User,
   Users,
@@ -680,13 +681,41 @@ function EmptyState({ message }: { message: string }) {
 // MAIN COMPONENT
 // ============================================================================
 
+const PAGE_SIZE = 5;
+
+type AuditLogApiResponse = {
+  data: AuditLogWithActor[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
+};
+
 const ActivityTimeline = ({ projectId }: Props) => {
-  const { data, isLoading, isError } = useQuery<AuditLogWithActor[]>({
+  const {
+    data: response,
+    isLoading,
+    isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery<AuditLogApiResponse>({
     queryKey: ["auditLog", "project", projectId],
-    queryFn: () =>
-      fetch(`/api/auditLog?entity=project&entityId=${projectId}`).then((res) =>
-        res.json(),
-      ),
+    queryFn: ({ pageParam = 1 }) =>
+      fetch(
+        `/api/auditLog?entity=project&entityId=${projectId}&page=${pageParam}&limit=${PAGE_SIZE}`,
+      ).then((res) => res.json()),
+    getNextPageParam: (lastPage) => {
+      if (lastPage?.pagination?.hasNextPage) {
+        return lastPage.pagination.page + 1;
+      }
+      return undefined;
+    },
+    initialPageParam: 1,
   });
 
   if (isLoading) {
@@ -697,19 +726,55 @@ const ActivityTimeline = ({ projectId }: Props) => {
     return <EmptyState message="Failed to load activity. Please try again." />;
   }
 
-  if (!data || data.length === 0) {
+  const logs = response?.pages?.flatMap((p) => p.data) ?? [];
+
+  if (logs.length === 0) {
     return <EmptyState message="No activity found for this project." />;
   }
 
   return (
     <div className="relative" role="feed" aria-label="Activity timeline">
-      {data.map((log, index) => (
+      {logs.map((log, index) => (
         <TimelineItem
           key={log.id}
           log={log}
-          isLast={index === data.length - 1}
+          isLast={index === logs.length - 1}
         />
       ))}
+
+      {hasNextPage && (
+        <div className="flex items-center justify-center py-4">
+          <button
+            type="button"
+            onClick={() => fetchNextPage()}
+            className="flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isFetchingNextPage || !hasNextPage}
+          >
+            {isFetchingNextPage ? (
+              <>
+                <Loader2 className="h-3 w-3 animate-spin" />
+                <span>Loading...</span>
+              </>
+            ) : (
+              <>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  className="h-3 w-3"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span>{!hasNextPage ? "End" : "Load More"}</span>
+              </>
+            )}
+          </button>
+        </div>
+      )}
     </div>
   );
 };
