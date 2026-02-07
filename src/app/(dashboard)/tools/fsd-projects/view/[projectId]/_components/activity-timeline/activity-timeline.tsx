@@ -5,7 +5,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { AuditAction } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
@@ -13,19 +12,18 @@ import {
   Briefcase,
   Calendar,
   DollarSign,
-  Mail,
-  MessageSquare,
-  Pencil,
-  Plus,
-  RefreshCw,
-  Send,
   Star,
-  Trash2,
   User,
   Users,
 } from "lucide-react";
 import moment from "moment";
-import React from "react";
+import { ACTION_CONFIG, STATUS_CONFIG, StatusKey } from "./lib/constants";
+import {
+  formatFieldName,
+  getInitials,
+  parseChanges,
+  ParsedChange,
+} from "./lib/utils";
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -33,130 +31,6 @@ import React from "react";
 
 interface Props {
   projectId: string;
-}
-
-interface ActionConfig {
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-  dotColor: string;
-}
-
-interface ParsedChange {
-  field: string;
-  from: unknown;
-  to: unknown;
-}
-
-type StatusKey = "NRA" | "WIP" | "Delivered" | "Revision" | "Cancelled";
-
-// ============================================================================
-// CONFIGURATION
-// ============================================================================
-
-const STATUS_CONFIG: Record<StatusKey, { label: string; color: string }> = {
-  NRA: {
-    label: "Not Ready",
-    color: "bg-slate-100 text-slate-700 border-slate-200",
-  },
-  WIP: {
-    label: "In Progress",
-    color: "bg-blue-100 text-blue-700 border-blue-200",
-  },
-  Delivered: {
-    label: "Delivered",
-    color: "bg-emerald-100 text-emerald-700 border-emerald-200",
-  },
-  Revision: {
-    label: "Revision",
-    color: "bg-amber-100 text-amber-700 border-amber-200",
-  },
-  Cancelled: {
-    label: "Cancelled",
-    color: "bg-red-100 text-red-700 border-red-200",
-  },
-};
-
-const ACTION_CONFIG: Record<AuditAction, ActionConfig> = {
-  CREATE: {
-    label: "created a new project",
-    icon: Plus,
-    dotColor: "bg-emerald-500",
-  },
-  UPDATE: {
-    label: "updated",
-    icon: Pencil,
-    dotColor: "bg-amber-500",
-  },
-  DELETE: {
-    label: "deleted",
-    icon: Trash2,
-    dotColor: "bg-red-500",
-  },
-  STATUS_CHANGE: {
-    label: "updated status in",
-    icon: RefreshCw,
-    dotColor: "bg-blue-500",
-  },
-  DELIVERY_SENT: {
-    label: "sent a delivery for",
-    icon: Send,
-    dotColor: "bg-violet-500",
-  },
-  UPDATE_SENT: {
-    label: "sent an update for",
-    icon: Mail,
-    dotColor: "bg-teal-500",
-  },
-  COMMENT_ADDED: {
-    label: "added a comment on",
-    icon: MessageSquare,
-    dotColor: "bg-emerald-500",
-  },
-};
-
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
-
-function parseChanges(changes: Record<string, unknown> | null): ParsedChange[] {
-  if (!changes) return [];
-
-  return Object.entries(changes)
-    .map(([field, value]) => {
-      // Handle array format: ["oldValue", "newValue"]
-      if (Array.isArray(value) && value.length >= 2) {
-        return { field, from: value[0], to: value[1] };
-      }
-
-      // Handle object format: { from: "oldValue", to: "newValue" }
-      if (value && typeof value === "object") {
-        const v = value as Record<string, unknown>;
-        if ("from" in v || "to" in v) {
-          return { field, from: v.from, to: v.to };
-        }
-      }
-
-      return null;
-    })
-    .filter((change): change is ParsedChange => change !== null);
-}
-
-function formatFieldName(field: string): string {
-  return field
-    .replace(/([A-Z])/g, " $1")
-    .trim()
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
 }
 
 // ============================================================================
