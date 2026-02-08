@@ -60,6 +60,7 @@ import {
   Clock,
   DollarSign,
   FileText,
+  HandHeart,
   LinkIcon,
   Loader2,
   NotebookPen,
@@ -850,39 +851,6 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                   )}
                 />
 
-                {initialData?.status === "Delivered" && (
-                  <>
-                    <FormField
-                      control={form.control}
-                      name="supportPeriodStart"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Support Period Start</FormLabel>
-                          <SmartDatePicker
-                            value={field.value} // 👈 same fix
-                            onChange={field.onChange}
-                          />
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="supportPeriodEnd"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Support Period End</FormLabel>
-                          <SmartDatePicker
-                            value={field.value} // 👈 same fix
-                            onChange={field.onChange}
-                          />
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </>
-                )}
-
                 <FormField
                   control={form.control}
                   name="probablyWillBeDeliver"
@@ -898,6 +866,55 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                   )}
                 />
               </Card>
+
+              {/* support period */}
+              {initialData?.status === "Delivered" && (
+                <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 shadow-none dark:bg-white/10">
+                  <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
+                    <div className="bg-rose-50 p-3 rounded-lg">
+                      <HandHeart className="size-4 text-rose-600" />
+                    </div>
+
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium">
+                        Support period
+                      </span>
+                      <span className="font-normal text-[10px]">
+                        Used for Support period tracking and reporting. Select
+                        when the project was officially delivered.
+                      </span>
+                    </div>
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name="supportPeriodStart"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Support Period Start</FormLabel>
+                        <SmartDatePicker
+                          value={field.value} // 👈 same fix
+                          onChange={field.onChange}
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="supportPeriodEnd"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Support Period End</FormLabel>
+                        <SmartDatePicker
+                          value={field.value} // 👈 same fix
+                          onChange={field.onChange}
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </Card>
+              )}
 
               {/* financial information */}
               <Card className="grid grid-cols-2 gap-3 mt-2 shadow-none p-4 dark:bg-white/10">
@@ -1283,6 +1300,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                   )}
                 />
               </Card>
+
               <div className="flex justify-end gap-x-4">
                 <Button
                   variant="outline"
