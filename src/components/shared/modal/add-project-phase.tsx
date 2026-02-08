@@ -293,7 +293,10 @@ export default function AddProjectPhase({
                 <FormItem>
                   <FormControl>
                     <InputGroup>
-                      <InputGroupInput {...field} />
+                      <InputGroupInput
+                        {...field}
+                        placeholder="eg: https://docs.google.com/spreadsheets/d"
+                      />
                       <InputGroupAddon>
                         <Sheet className="text-[#00AC47]" />
                       </InputGroupAddon>

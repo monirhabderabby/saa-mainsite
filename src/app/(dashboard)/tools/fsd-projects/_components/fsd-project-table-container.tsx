@@ -17,7 +17,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
 import { getFSDProjectsColumn } from "./fsd-project-column";
 
-interface ApiResponse {
+export interface FSDProjectApiProps {
   success: boolean;
   data: SafeProjectDto[];
   pagination: {
@@ -30,7 +30,7 @@ interface ApiResponse {
   };
 }
 
-function toYMD(date?: Date | null) {
+export function toYMD(date?: Date | null) {
   if (!date || isNaN(date.getTime())) return "";
 
   const y = date.getFullYear();
@@ -73,7 +73,7 @@ const FsdProjectTableContainer = () => {
   const preparedLastUpdate = toYMD(new Date(lastUpdateTo!));
   const preparedNextUpdate = toYMD(new Date(nextUpdateTo!));
 
-  const { data, isError, error, isLoading } = useQuery<ApiResponse>({
+  const { data, isError, error, isLoading } = useQuery<FSDProjectApiProps>({
     queryKey: [
       "fsd-projects",
       preparedClientName,

@@ -13,12 +13,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useFsdProjectFilterState } from "@/zustand/tools/fsd-project";
 import { useQueryClient } from "@tanstack/react-query";
 import { Copy, EllipsisVertical, Eye, FileEdit, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import AddProjectModal from "../add-project-modal";
+import { toYMD } from "../fsd-project-table-container";
 // import { useRouter } from "next/navigation";             // if needed
 
 interface Props {
@@ -42,6 +44,53 @@ export default function FsdProjectActions({ project }: Props) {
   const [editable, setEditable] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  const {
+    clientName,
+    orderId,
+    teamId,
+    profileId,
+    status,
+    shift,
+    deadlineFrom,
+    deadlineTo,
+    lastUpdateTo,
+    nextUpdateTo,
+    page,
+  } = useFsdProjectFilterState();
+  const preparedClientName = clientName ?? "";
+  const preparedOrderId = orderId ?? "";
+  const preparedTeamids = teamId ? teamId?.join(",") : "";
+  const preparedProfileIds = profileId === "All" ? "" : (profileId ?? "");
+
+  const preparedStatus = status ? status.join(",") : "";
+  const preparedShift = shift === "All" ? "" : (shift ?? "");
+
+  // Deadlines filter
+  const preparedDeadlineFrom = deadlineFrom
+    ? new Date(deadlineFrom).toISOString().split("T")[0]
+    : "";
+  const preparedDeadlineTo = deadlineTo
+    ? new Date(deadlineTo).toISOString().split("T")[0]
+    : "";
+
+  const preparedLastUpdate = toYMD(new Date(lastUpdateTo!));
+  const preparedNextUpdate = toYMD(new Date(nextUpdateTo!));
+
+  const FSDProjectTableQueryKey = [
+    "fsd-projects",
+    preparedClientName,
+    preparedOrderId,
+    preparedTeamids,
+    preparedProfileIds,
+    preparedStatus,
+    preparedShift,
+    preparedDeadlineFrom,
+    preparedDeadlineTo,
+    preparedLastUpdate,
+    preparedNextUpdate,
+    page,
+  ];
 
   const copyOrderId = () => {
     navigator.clipboard.writeText(project.orderId || project.id || "—");
@@ -71,18 +120,21 @@ export default function FsdProjectActions({ project }: Props) {
         // --------------------------------------------------------
         // Update Cache Manually
         // --------------------------------------------------------
-        queryClient.setQueryData<ApiResponse>(["fsd-projects"], (oldData) => {
-          if (!oldData) return oldData;
+        queryClient.setQueryData<ApiResponse>(
+          FSDProjectTableQueryKey,
+          (oldData) => {
+            if (!oldData) return oldData;
 
-          return {
-            ...oldData,
-            data: oldData.data.filter((item) => item.id !== project.id),
-            pagination: {
-              ...oldData.pagination,
-              total: oldData.pagination.total - 1,
-            },
-          };
-        });
+            return {
+              ...oldData,
+              data: oldData.data.filter((item) => item.id !== project.id),
+              pagination: {
+                ...oldData.pagination,
+                total: oldData.pagination.total - 1,
+              },
+            };
+          },
+        );
       });
     });
   };
