@@ -22,7 +22,7 @@ export default function SalesPersonCard({
 
           <div className="flex items-center gap-3">
             <Image
-              src={image || "/avatar-placeholder.png"}
+              src={image || "/placeholder.png"}
               alt={fullName}
               height={40}
               width={40}

@@ -5,9 +5,15 @@ import { Button } from "@/components/ui/button";
 import { getStatusBadgeProps } from "@/lib/tools/project-status-style";
 import { ProjectStatus } from "@prisma/client";
 import { Pencil } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useState } from "react";
 import { toast } from "sonner";
-import AddProjectModal from "../../../../_components/add-project-modal";
+const AddProjectModal = dynamic(
+  () => import("../../../../_components/add-project-modal"),
+  {
+    ssr: false,
+  },
+);
 
 interface Props {
   data: SafeProjectDto;
@@ -44,7 +50,7 @@ const ProjectDetailsHeader = ({ data }: Props) => {
           </p>
         </div>
         <div>
-          <Button variant="outline" onClick={() => setOpen(true)}>
+          <Button variant="outline" onClick={() => setOpen(true)} size="sm">
             <Pencil /> Edit
           </Button>
         </div>

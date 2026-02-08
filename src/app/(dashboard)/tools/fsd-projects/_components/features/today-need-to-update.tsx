@@ -180,7 +180,7 @@ const TodayNeedToUpdate = async ({ loggedinUserId }: Props) => {
       </div>
 
       {/* Scrollable List */}
-      <ScrollArea className="flex-1 min-h-0 w-full ">
+      <ScrollArea className="flex-1 min-h-0 w-full">
         <div className="space-y-2 pr-2">
           {allProjects.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -208,7 +208,7 @@ const TodayNeedToUpdate = async ({ loggedinUserId }: Props) => {
                     "hover:shadow-md hover:border-primary/20 hover:-translate-y-0.5",
                     "bg-card",
                     isOverdue
-                      ? "border-red-200 bg-red-50/50"
+                      ? "border-destructive/50 bg-destructive/5 dark:bg-destructive/10"
                       : "border-border hover:bg-accent/30",
                   )}
                 >
@@ -217,7 +217,7 @@ const TodayNeedToUpdate = async ({ loggedinUserId }: Props) => {
                     className={cn(
                       "absolute left-0 top-0 bottom-0 w-1 transition-all",
                       isOverdue
-                        ? "bg-red-500"
+                        ? "bg-destructive"
                         : "bg-gradient-to-b from-primary to-primary/60",
                     )}
                   />
@@ -237,8 +237,8 @@ const TodayNeedToUpdate = async ({ loggedinUserId }: Props) => {
                           className={cn(
                             "shrink-0 px-2 py-0.5 rounded-md font-medium text-[11px]",
                             isOverdue
-                              ? "bg-red-100 text-red-700"
-                              : "bg-primary/10 text-primary",
+                              ? "bg-destructive/20 text-destructive-foreground dark:bg-destructive/30 dark:text-destructive"
+                              : "bg-primary/10 text-primary dark:bg-primary/20",
                           )}
                         >
                           {project.nextUpdate

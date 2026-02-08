@@ -1293,6 +1293,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                         style={{
                           width: "100px",
                         }}
+                        className=""
                       />
 
                       <FormMessage />
