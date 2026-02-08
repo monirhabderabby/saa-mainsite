@@ -301,8 +301,21 @@ async function main() {
   console.log("✅ Database seeded successfully with departments!");
 }
 
+async function migrate() {
+  console.log("called");
+  const result = await prisma.updateSheet.updateMany({
+    where: {},
+    data: {
+      teamId: "68d546d5244216e75fe20df6",
+      serviceId: "68d5314a907cefb68d8ce382",
+    },
+  });
+
+  console.log(result);
+}
+
 /** Entrypoint */
-main()
+migrate()
   .catch((err) => {
     console.error("❌ Seed failed:", err);
     process.exit(1);

@@ -14,7 +14,7 @@ export const updateToSchema = z
 
 // src/schemas/update-sheet/filter.ts
 export const updateSheetFilter = z.object({
-  profileId: z.array(z.string()).optional(), // ✅ array of strings
+  profileId: z.array(z.string()).optional(),
   updateTo: z.string().optional(),
   tl: z.string().optional(),
   done: z.string().optional(),
@@ -27,6 +27,9 @@ export const updateSheetFilter = z.object({
   createdTo: z.string().optional(),
   clientName: z.string().optional(),
   orderId: z.string().optional(),
+
+  // ✅ Added serviceId
+  serviceId: z.string().optional(),
 });
 
 export type UpdateSheetFilter = z.infer<typeof updateSheetFilter>;

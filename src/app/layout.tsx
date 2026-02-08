@@ -3,12 +3,15 @@ import { EdgeStoreProvider } from "@/lib/edgestore";
 import { cn } from "@/lib/utils";
 import TanstackProvider from "@/providers/tanstack/tanstack-provider";
 import { ThemeProvider } from "@/providers/theme/theme-provider";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 import { Raleway } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
 import { Toaster } from "sonner";
 import "./globals.css";
+
+import "@/lib/cron/station";
 
 const raleway = Raleway({
   subsets: ["latin"],
@@ -52,13 +55,14 @@ export default async function RootLayout({
           >
             <TanstackProvider>
               <EdgeStoreProvider>{children}</EdgeStoreProvider>
-              <p className="absolute bottom-2 right-7 text-[12px]">
-                Beta v1.0.6
+              <p className="absolute bottom-1 right-7 text-[12px]">
+                Beta v1.0.8
               </p>
             </TanstackProvider>
           </ThemeProvider>{" "}
           <Toaster richColors />
           <NextTopLoader showSpinner={false} color="#FFC300" />
+          <GoogleAnalytics gaId={process.env.GOOGLE_ANALYTICS_ID!} />
         </SessionProvider>
       </body>
     </html>

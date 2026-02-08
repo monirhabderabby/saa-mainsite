@@ -1,7 +1,6 @@
 "use client";
 
 import { DataTable } from "@/components/ui/data-table";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import SkeletonWrapper from "@/components/ui/skeleton-wrapper";
 import {
   GetUpdateSheetsReturn,
@@ -35,6 +34,12 @@ interface Props {
   currentUserTeam?: CurrentUserTeam | null;
 }
 
+const hideServicelineDefaultFilters = [
+  "ADMIN",
+  "SUPER_ADMIN",
+  "SALES_MEMBER",
+] as Role[];
+
 const TableContainer = ({
   currentUserRole,
   currentUserId,
@@ -51,6 +56,7 @@ const TableContainer = ({
     done: rawDone,
     createdFrom: rawCreatedFrom,
     sendFrom: rawSendFrom,
+    serviceId: rawServiceId,
   } = useUpdateSheetFilterState();
 
   const updateTo = rawUpdateTo ?? "All";
@@ -66,6 +72,10 @@ const TableContainer = ({
     : "All";
 
   const profileIds = profileId?.join(",") ?? "All";
+
+  const serviceId = hideServicelineDefaultFilters.includes(currentUserRole)
+    ? "All"
+    : (rawServiceId ?? "All");
 
   const {
     data,
@@ -86,11 +96,12 @@ const TableContainer = ({
       done,
       createdFrom,
       sendFrom,
+      serviceId,
     ],
     initialPageParam: 1,
     queryFn: ({ pageParam = 1, signal }) =>
       fetch(
-        `/api/update-entries?profileId=${profileIds}&updateTo=${updateTo}&clientName=${clientName}&orderId=${orderId}&page=${pageParam}&limit=25&tl=${tl}&done=${done}&createdFrom=${createdFrom}&sendFroms=${sendFrom}`,
+        `/api/update-entries?profileId=${profileIds}&updateTo=${updateTo}&clientName=${clientName}&orderId=${orderId}&page=${pageParam}&limit=25&tl=${tl}&done=${done}&createdFrom=${createdFrom}&sendFroms=${sendFrom}&serviceId=${serviceId}`,
         {
           signal,
         }
@@ -208,14 +219,11 @@ const Table = ({
 
   return (
     <div className="bg-background">
-      <ScrollArea className="h-[75vh] w-full" ref={scrollRef}>
-        <DataTable table={table} columns={columns} />
-        {/* Invisible div at bottom to trigger next page */}
-        <div ref={observerRef} className="h-4" />
-        {isFetchingNextPage && (
-          <p className="text-center py-2 text-gray-500">Loading more...</p>
-        )}
-      </ScrollArea>
+      <DataTable table={table} columns={columns} />
+      <div ref={observerRef} className="h-4" />
+      {isFetchingNextPage && (
+        <p className="text-center py-2 text-gray-500">Loading more...</p>
+      )}
     </div>
   );
 };

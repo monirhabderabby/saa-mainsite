@@ -47,7 +47,7 @@ model User {
     designation   Designations @relation(fields: [designationId], references: [id], onDelete: Cascade)
 
     serviceId String?   @db.ObjectId
-    service   Services? @relation(fields: [serviceId], references: [id])
+    service   Services? @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
     departmentId String?     @db.ObjectId
     department   Department? @relation(fields: [departmentId], references: [id], onDelete: Cascade)
@@ -61,7 +61,8 @@ model User {
     tlCheckEntries      UpdateSheet[]   @relation("TLChecks")
     doneByEntries       UpdateSheet[]   @relation("DoneByChecks")
 
-    // 👇 Add relation to services managed by this user
+    assignments StationAssignment[]
+
     managedServices Services[] @relation("ServiceManager")
 
     issueSheets         IssueSheet[]
@@ -69,6 +70,14 @@ model User {
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
+    tasksId            String?             @db.ObjectId
+    projectAssignments ProjectAssignment[]
+
+    projects      Project[]
+    salesProjects Project[]    @relation("SalesPersonProjects")
+    projectQnas   ProjectQna[]
+    auditLogs     AuditLog[]
 }
 
 model UserVerification {
@@ -110,8 +119,9 @@ model Services {
     departmentId String?     @db.ObjectId
     department   Department? @relation(fields: [departmentId], references: [id], onDelete: Cascade)
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    createdAt    DateTime      @default(now())
+    updatedAt    DateTime      @updatedAt
+    updateSheets UpdateSheet[]
 
     @@unique([name, departmentId])
 }
@@ -155,14 +165,15 @@ model Profile {
     id   String @id @default(auto()) @map("_id") @db.ObjectId
     name String @unique
 
-    // ref
+    assignments StationAssignmentProfile[]
+
     updateSheets UpdateSheet[]
+    issueSheets  IssueSheet[]
 
-    // 
-    issueSheets IssueSheet[]
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    createdAt          DateTime            @default(now())
+    updatedAt          DateTime            @updatedAt
+    stationAssignments StationAssignment[]
+    projects           Project[]
 }
 
 model Team {
@@ -173,13 +184,16 @@ model Team {
     serviceId String?      @db.ObjectId
     userTeams UserTeam[]
     issues    IssueSheet[]
-    service   Services?    @relation(fields: [serviceId], references: [id])
+    service   Services?    @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
     departmentId String?     @db.ObjectId
     department   Department? @relation(fields: [departmentId], references: [id], onDelete: Cascade)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
+    updateSheets UpdateSheet[]
+    projects     Project[]
 }
 
 model Permissions {
@@ -269,7 +283,7 @@ enum TeamResponsibility {
 
 model UserTeam {
     id     String @id @default(auto()) @map("_id") @db.ObjectId
-    userId String @unique @db.ObjectId
+    userId String @db.ObjectId
     teamId String @db.ObjectId
 
     responsibility TeamResponsibility @default(Member)
@@ -314,6 +328,12 @@ model UpdateSheet {
 
     profileId String  @db.ObjectId
     profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+    teamId String? @db.ObjectId
+    team   Team?   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+    serviceId String?   @db.ObjectId
+    service   Services? @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
     createdAt DateTime @default(now())
 }
@@ -372,4 +392,215 @@ model Settings {
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+}
+
+model StationUpdate {
+    id    String @id @default(auto()) @map("_id") @db.ObjectId
+    shift String
+    title String
+
+    assignments StationAssignment[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model StationAssignment {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    stationId String        @db.ObjectId
+    station   StationUpdate @relation(fields: [stationId], references: [id], onDelete: Cascade)
+
+    userId String @db.ObjectId
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    profiles StationAssignmentProfile[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    profile   Profile? @relation(fields: [profileId], references: [id])
+    profileId String?  @db.ObjectId
+
+    @@unique([stationId, userId])
+    @@index([stationId])
+    @@index([userId])
+}
+
+model StationAssignmentProfile {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    assignmentId String            @db.ObjectId
+    assignment   StationAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+
+    profileId String  @db.ObjectId
+    profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+    @@unique([assignmentId, profileId])
+    @@index([assignmentId])
+    @@index([profileId])
+}
+
+// project
+
+enum ProjectStatus {
+    NRA
+    WIP
+    Delivered
+    Revision
+    Cancelled
+}
+
+model Project {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    title            String @default("E-Commerce Platform")
+    shortDescription String @default("Complete UI/UX redesign with frontend and backend integration")
+
+    clientName String
+    orderId    String @unique
+
+    profileId String  @db.ObjectId
+    profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+    salesPersonId String @db.ObjectId
+    salesPerson   User   @relation("SalesPersonProjects", fields: [salesPersonId], references: [id], onDelete: Cascade)
+
+    instructionSheet String
+    orderDate        DateTime
+    deadline         DateTime
+    value            Int
+    monetaryValue    Int
+    shift            String
+
+    teamId String @db.ObjectId
+    team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+    delivered             DateTime?
+    probablyWillBeDeliver DateTime?
+
+    supportPeriodStart DateTime?
+    supportPeriodEnd   DateTime?
+
+    lastUpdate DateTime?
+    nextUpdate DateTime?
+
+    remarkFromOperation String?
+    quickNoteFromLeader String?
+
+    review Int?
+    status ProjectStatus @default(NRA)
+
+    // 👇 Named relations
+    projectAssignments ProjectAssignment[]
+
+    progressSheet            String?
+    credentialSheet          String?
+    websiteIssueTrackerSheet String?
+
+    phase projectPhase[]
+
+    user   User?   @relation(fields: [userId], references: [id])
+    userId String? @db.ObjectId
+
+    createdAt   DateTime     @default(now())
+    updatedAt   DateTime     @updatedAt
+    projectQnas ProjectQna[]
+}
+
+enum AssignmentRole {
+    UIUX
+    FRONTEND
+    BACKEND
+}
+
+model ProjectAssignment {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    projectId String @db.ObjectId
+
+    role AssignmentRole
+
+    userId String @db.ObjectId
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    assignedAt DateTime @default(now())
+    project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+    @@unique([projectId, userId])
+}
+
+enum ProjectPhaseStatus {
+    Pending
+    Completed
+    Running
+}
+
+model projectPhase {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    title            String
+    willBeDeliver    String
+    orderId          String?
+    value            Int
+    monetaryValue    Int
+    instructionSheet String?
+
+    status ProjectPhaseStatus
+
+    // ✅ Foreign key to Project
+    projectId String  @db.ObjectId
+    project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ProjectQna {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    question String
+    answer   String
+
+    projectId String  @db.ObjectId
+    project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+    creatorId String @db.ObjectId
+    creator   User   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+enum Entity {
+    project
+    updateSheet
+    issueSheet
+}
+
+enum AuditAction {
+    CREATE
+    UPDATE
+    DELETE
+    STATUS_CHANGE
+    DELIVERY_SENT
+    UPDATE_SENT
+    COMMENT_ADDED
+}
+
+model AuditLog {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    entity   Entity
+    entityId String @db.ObjectId
+
+    action  AuditAction
+    actorId String?     @db.ObjectId
+    actor   User?       @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+    changes Json?
+    meta    Json?
+
+    createdAt DateTime @default(now())
+
+    @@index([entity, entityId])
+    @@index([actorId])
+    @@index([action])
+    @@index([createdAt])
 }

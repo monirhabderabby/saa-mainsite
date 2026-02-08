@@ -30,9 +30,32 @@ export default async function Home() {
   const role = cu.user.role;
 
   if (role === "SUPER_ADMIN" || role === "ADMIN") {
-    return <SuperAdminOverViewContainer />;
+    return (
+      <div className="p-5 md:p-0">
+        <SuperAdminOverViewContainer />
+      </div>
+    );
   } else if (role === "OPERATION_MEMBER") {
-    return <OperationMemberOverview />;
+    return (
+      <div className="space-y-5 p-5 md:p-0">
+        <OperationMemberOverview />
+        {/* <Button variant="outline" asChild>
+          <Link
+            className="w-[200px] h-[110px] flex flex-col gap-2"
+            href="/tools/tasks-management"
+          >
+            <FileSlidersIcon />
+            <div className="flex items-center gap-2">
+              Tasks <ExternalLink />
+            </div>
+          </Link>
+        </Button> */}
+      </div>
+    );
   }
-  return <SalesMemberOverview />;
+  return (
+    <div className="p-5 md:p-0">
+      <SalesMemberOverview />
+    </div>
+  );
 }

@@ -99,9 +99,21 @@ const routes = [
       "SALES_MEMBER",
     ] as Role[],
   },
-
   {
     id: 8,
+    label: "Station",
+    icon: Laptop,
+    href: "/station-update",
+    access: [
+      "SUPER_ADMIN",
+      "ADMIN",
+      "SALES_MEMBER",
+      "OPERATION_MEMBER",
+    ] as Role[],
+  },
+
+  {
+    id: 9,
     label: "Settings",
     icon: Settings,
     href: "/settings",
@@ -115,9 +127,10 @@ interface Props {
       designation: true;
     };
   }>;
+  onNavigationLink?: (state: boolean) => void;
 }
 
-const Sidebar = ({ cu }: Props) => {
+const Sidebar = ({ cu, onNavigationLink }: Props) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -150,7 +163,7 @@ const Sidebar = ({ cu }: Props) => {
 
   // inside Sidebar component, before return
   const accessibleRoutes = routes.filter((route) =>
-    route.access.includes(cu.role)
+    route.access.includes(cu.role),
   );
 
   return (
@@ -180,6 +193,7 @@ const Sidebar = ({ cu }: Props) => {
                   <li key={route.id}>
                     <Link
                       href={route.href}
+                      onClick={() => onNavigationLink?.(false)}
                       className={`flex items-center gap-3 rounded-md px-3 text-[14px] py-2
           ${
             isActive
