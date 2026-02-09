@@ -1,16 +1,22 @@
 import { Card } from "@/components/ui/card";
 import prisma from "@/lib/prisma";
 import { Bug, ChartSpline, FileText, KeyRound } from "lucide-react";
+import dynamic from "next/dynamic";
 import { notFound } from "next/navigation";
 import AssignedTeamCard from "./_components/cards/assigned-team-card";
 import ClientReviewCard from "./_components/cards/client-review-card";
 import ProjectDocumentsCard, {
   DocumentItem,
 } from "./_components/cards/project-document-card";
-import QuickActionCard from "./_components/cards/quick-action";
 import SalesPersonCard from "./_components/cards/sales-person-card";
 import ProjectDetailsHeader from "./_components/header/project-details-header";
 import OverViewContainer from "./_components/overview/overview-container";
+const QuickActionCard = dynamic(
+  () => import("./_components/cards/quick-action"),
+  {
+    ssr: false,
+  },
+);
 
 const Page = async ({
   params,
