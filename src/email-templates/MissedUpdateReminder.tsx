@@ -93,9 +93,9 @@ export const MissedUpdateReminder = ({
                 Hi {userName},
               </Text>
               <Text className="text-gray-600 mt-3 mb-0">
-                The following projects were scheduled for updates but haven't
-                been updated yet. Please review and provide updates as soon as
-                possible.
+                The following projects were scheduled for updates but
+                haven&apos;t been updated yet. Please review and provide updates
+                as soon as possible.
               </Text>
             </Section>
 

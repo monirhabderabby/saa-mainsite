@@ -7,6 +7,7 @@ import ClientReviewCard from "./_components/cards/client-review-card";
 import ProjectDocumentsCard, {
   DocumentItem,
 } from "./_components/cards/project-document-card";
+import QuickActionCard from "./_components/cards/quick-action";
 import SalesPersonCard from "./_components/cards/sales-person-card";
 import ProjectDetailsHeader from "./_components/header/project-details-header";
 import OverViewContainer from "./_components/overview/overview-container";
@@ -97,6 +98,7 @@ const Page = async ({
 
         {project.review && <ClientReviewCard rating={project.review} />}
         <ProjectDocumentsCard documents={documents as DocumentItem[]} />
+        <QuickActionCard projectId={project.id} />
       </div>
     </section>
   );

@@ -155,11 +155,26 @@ export async function sendMissedUpdateEmails() {
             email: userBucket.email,
             emailId: data?.id,
           };
-        } catch (err) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (err: any) {
+          console.error("Resend exception:", {
+            name: err?.name,
+            message: err?.message,
+            stack: err?.stack,
+            err,
+          });
+
           return {
             success: false as const,
             email: userBucket.email,
-            error: err,
+            error: {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              name: (err as any)?.name,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              message: (err as any)?.message,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              statusCode: (err as any)?.statusCode,
+            },
           };
         }
       }),
@@ -174,6 +189,7 @@ export async function sendMissedUpdateEmails() {
       results,
     };
   } catch (error) {
+    console.log("ERROR", error);
     return {
       success: false,
       message: "Failed to send missed update emails",
