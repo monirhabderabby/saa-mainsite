@@ -1,4 +1,3 @@
-import { sendMissedUpdateEmails } from "@/actions/cron-function/send-missedUpdate-emails";
 import { auth } from "@/auth";
 import CommandPaletteContainer from "@/components/command-palette/command-palette-container";
 import { MobileFeatureUnlock } from "@/components/popup-notifications/mobile-feature-unlock";
@@ -31,12 +30,6 @@ const SiteLayout = async ({ children }: Props) => {
   });
 
   if (!user) redirect("/login");
-
-  const response = await sendMissedUpdateEmails();
-
-  if (response && response.results) {
-    console.log("response", response.results[0].error);
-  }
 
   return (
     <>
