@@ -10,6 +10,7 @@ import {
 import prisma from "@/lib/prisma";
 import { Filter, HandHeartIcon } from "lucide-react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import TodayNeedToUpdate from "./_components/features/today-need-to-update";
 import UpcomingDeadlines from "./_components/features/upcoming-deadlines";
@@ -303,9 +304,11 @@ const Page = async () => {
               </p>
             </div>
             <div className="flex items-center gap-x-3">
-              <Button variant="outline" size="sm">
-                <HandHeartIcon />
-                Support Period
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/tools/fsd-projects/support-period">
+                  <HandHeartIcon />
+                  Support Period
+                </Link>
               </Button>
               <AddFilterFsdProject
                 trigger={
