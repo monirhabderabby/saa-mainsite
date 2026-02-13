@@ -14,7 +14,7 @@ import {
 } from "@tanstack/react-table";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
-import { useState } from "react";
+import { useSupportPeriodState } from "./states/support-period-state";
 import { getSupportPeriodColumn } from "./support-period-column";
 
 export interface FSDProjectApiProps {
@@ -31,11 +31,16 @@ export interface FSDProjectApiProps {
 }
 
 const SupportPeriodTableContainer = () => {
-  const [page, setPage] = useState(1);
+  const { page, setPage, teamIds } = useSupportPeriodState();
+
+  const preparedTeamids = teamIds ? teamIds?.join(",") : "";
+
   const { data, isError, error, isLoading } = useQuery<FSDProjectApiProps>({
-    queryKey: ["fsupport-projectss"],
+    queryKey: ["support-projects", preparedTeamids],
     queryFn: () =>
-      fetch(`/api/tools/fsd-project/supportGoing`).then((res) => res.json()),
+      fetch(
+        `/api/tools/fsd-project/supportGoing?teamIds=${preparedTeamids}`,
+      ).then((res) => res.json()),
   });
 
   if (isError) {

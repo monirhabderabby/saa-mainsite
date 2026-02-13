@@ -33,9 +33,7 @@ export const getSupportPeriodColumn = (): ColumnDef<SafeProjectDto>[] => [
     header: "Client",
     accessorKey: "clientName",
     cell: ({ row }) => (
-      <span className="text-xs text-muted-foreground">
-        {row.original.clientName ?? "—"}
-      </span>
+      <span className="text-xs">{row.original.clientName ?? "—"}</span>
     ),
   },
 
@@ -80,24 +78,33 @@ export const getSupportPeriodColumn = (): ColumnDef<SafeProjectDto>[] => [
   },
 
   {
-    header: "Period",
+    header: "Period Start",
     cell: ({ row }) => {
       const start = row.original.supportPeriodStart;
-      const end = row.original.supportPeriodEnd;
 
-      if (!start || !end) {
-        return <span className="text-xs text-muted-foreground">Not set</span>;
+      if (!start) {
+        return <span className="text-xs ">Not set</span>;
       }
 
       const s = moment(start);
+
+      // SaaS style: one clean line
+      return <span className="text-xs ">{s.format("DD MMM YYYY")}</span>;
+    },
+  },
+  {
+    header: "Period End",
+    cell: ({ row }) => {
+      const end = row.original.supportPeriodEnd;
+
+      if (!end) {
+        return <span className="text-xs ">Not set</span>;
+      }
+
       const e = moment(end);
 
       // SaaS style: one clean line
-      return (
-        <span className="text-xs text-muted-foreground">
-          {s.format("DD MMM")} – {e.format("DD MMM YYYY")}
-        </span>
-      );
+      return <span className="text-xs ">{e.format("DD MMM YYYY")}</span>;
     },
   },
 
@@ -105,7 +112,7 @@ export const getSupportPeriodColumn = (): ColumnDef<SafeProjectDto>[] => [
     header: "Team",
     cell: ({ row }) => {
       const team = row.original.team?.name ?? "—";
-      return <span className="text-xs text-muted-foreground">{team}</span>;
+      return <span className="text-xs ">{team}</span>;
     },
   },
 

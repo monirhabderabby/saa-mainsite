@@ -218,6 +218,9 @@ export async function GET(req: NextRequest) {
         review: true,
         instructionSheet: true,
 
+        supportPeriodStart: true,
+        supportPeriodEnd: true,
+
         // Minimal relations – add more only when really needed
         team: {
           select: { id: true, name: true },
