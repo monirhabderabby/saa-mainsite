@@ -10,9 +10,10 @@ import { Role } from "@prisma/client";
 
 // Roles allowed to create update sheet entries
 const ALLOWED_ROLES: Role[] = ["SUPER_ADMIN", "ADMIN", "OPERATION_MEMBER"];
+const PROJECT_NEXT_UPDATE_DAYS = 2;
 
 export async function createUpdateSheetEntries(
-  values: UpdateSheetCreateSchema
+  values: UpdateSheetCreateSchema,
 ) {
   // Step 1: Authenticate the user
   const session = await auth();
@@ -124,7 +125,12 @@ export async function createUpdateSheetEntries(
       };
     }
 
-    // Step 6: Return success response
+    // Step 6: Update associated project dates (non-blocking)
+    if (newUpdateSheetEntry.updateTo !== "DELIVERY") {
+      await updateProjectDates(newUpdateSheetEntry.orderId);
+    }
+
+    // Step 7: Return success response
     return {
       success: true,
       message: "Update sheet entry created successfully.",
@@ -139,5 +145,34 @@ export async function createUpdateSheetEntries(
       message:
         "An unexpected error occurred while creating the update sheet entry.",
     };
+  }
+}
+
+/**
+ * Updates the associated FSD project dates
+ */
+async function updateProjectDates(orderId: string) {
+  try {
+    const existingProject = await prisma.project.findUnique({
+      where: { orderId },
+      select: { id: true },
+    });
+
+    if (existingProject) {
+      const now = new Date();
+      const nextUpdateDate = new Date(now);
+      nextUpdateDate.setDate(now.getDate() + PROJECT_NEXT_UPDATE_DAYS);
+
+      await prisma.project.update({
+        where: { orderId },
+        data: {
+          lastUpdate: now,
+          nextUpdate: nextUpdateDate,
+        },
+      });
+    }
+  } catch (error) {
+    // Log the error but don't fail the entire operation
+    console.error("Error updating project dates:", error);
   }
 }

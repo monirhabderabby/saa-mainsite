@@ -38,7 +38,7 @@ const OverviewTabContainer = async ({ data }: Props) => {
         name: a.user.fullName,
         avatar: a.user.image || "",
       })),
-      backgroundColor: "bg-pink-100",
+      bgClass: "bg-pink-100 dark:bg-pink-900/30",
     },
     {
       role: "Frontend Devs",
@@ -47,7 +47,7 @@ const OverviewTabContainer = async ({ data }: Props) => {
         name: a.user.fullName,
         avatar: a.user.image || "",
       })),
-      backgroundColor: "bg-blue-100",
+      bgClass: "bg-blue-100 dark:bg-blue-900/30",
     },
     {
       role: "Backend Devs",
@@ -56,7 +56,7 @@ const OverviewTabContainer = async ({ data }: Props) => {
         name: a.user.fullName,
         avatar: a.user.image || "",
       })),
-      backgroundColor: "bg-green-100",
+      bgClass: "bg-green-100 dark:bg-green-900/30",
     },
   ];
 
@@ -132,7 +132,7 @@ const OverviewTabContainer = async ({ data }: Props) => {
               <div className="px-3 py-2 border-b border-border flex justify-between text-[13px]">
                 <p>Last Update</p>
                 <p className="font-medium">
-                  {moment(data.lastUpdate).format("MMM DD, YYYY HH:mm")}
+                  {moment(data.lastUpdate).format("MMM DD, YYYY ")}
                 </p>
               </div>
             )}
@@ -140,7 +140,15 @@ const OverviewTabContainer = async ({ data }: Props) => {
               <div className="px-3 py-2 border-b border-border flex justify-between text-[13px]">
                 <p>Next Update</p>
                 <p className="font-medium">
-                  {moment(data.nextUpdate).format("MMM DD, YYYY HH:mm")}
+                  {moment(data.nextUpdate).format("MMM DD, YYYY")}
+                </p>
+              </div>
+            )}
+            {data.probablyWillBeDeliver && (
+              <div className="px-3 py-2 border-b border-border flex justify-between text-[13px]">
+                <p>Probably Will Be Deliver</p>
+                <p className="font-medium">
+                  {moment(data.probablyWillBeDeliver).format("MMM D, YYYY")}
                 </p>
               </div>
             )}
@@ -149,6 +157,22 @@ const OverviewTabContainer = async ({ data }: Props) => {
                 <p>Delivered</p>
                 <p className="font-medium">
                   {moment(data.delivered).format("MMM DD, YYYY HH:mm")}
+                </p>
+              </div>
+            )}
+            {data.supportPeriodStart && (
+              <div className="px-3 py-2 border-b border-border flex justify-between text-[13px]">
+                <p>Support Period Start</p>
+                <p className="font-medium">
+                  {moment(data.supportPeriodStart).format("MMM DD, YYYY")}
+                </p>
+              </div>
+            )}
+            {data.supportPeriodEnd && (
+              <div className="px-3 py-2 border-b border-border flex justify-between text-[13px]">
+                <p>Support Period End</p>
+                <p className="font-medium">
+                  {moment(data.supportPeriodEnd).format("MMM DD, YYYY")}
                 </p>
               </div>
             )}

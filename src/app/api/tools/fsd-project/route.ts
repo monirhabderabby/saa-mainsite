@@ -200,6 +200,8 @@ export async function GET(req: NextRequest) {
       ],
       select: {
         id: true,
+        title: true,
+        shortDescription: true,
         clientName: true,
         orderId: true,
         orderDate: true,
@@ -215,6 +217,9 @@ export async function GET(req: NextRequest) {
         quickNoteFromLeader: true,
         review: true,
         instructionSheet: true,
+
+        supportPeriodStart: true,
+        supportPeriodEnd: true,
 
         // Minimal relations – add more only when really needed
         team: {

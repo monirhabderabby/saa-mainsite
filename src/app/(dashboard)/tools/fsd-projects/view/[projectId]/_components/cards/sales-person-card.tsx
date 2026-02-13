@@ -16,13 +16,13 @@ export default function SalesPersonCard({
 }: SalesPersonCardProps) {
   return (
     <MotionCard delay={0.05}>
-      <Card className="shadow-none">
+      <Card className="shadow-none dark:bg-white/5">
         <CardContent className="pt-3 px-3 space-y-2">
           <Label>Sales Person</Label>
 
           <div className="flex items-center gap-3">
             <Image
-              src={image || "/avatar-placeholder.png"}
+              src={image || "/placeholder.png"}
               alt={fullName}
               height={40}
               width={40}

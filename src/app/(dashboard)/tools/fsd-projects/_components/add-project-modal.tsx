@@ -59,6 +59,8 @@ import {
   ChevronsUpDown,
   Clock,
   DollarSign,
+  FileText,
+  HandHeart,
   LinkIcon,
   Loader2,
   NotebookPen,
@@ -71,6 +73,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 
 import { Card } from "@/components/ui/card";
+import InfoToolTip from "@/components/ui/custom/info-tooltip";
 import {
   InputGroup,
   InputGroupAddon,
@@ -78,8 +81,10 @@ import {
 } from "@/components/ui/input-group";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { Textarea } from "@/components/ui/textarea";
+import { useFsdProjectFilterState } from "@/zustand/tools/fsd-project";
 import "@smastrom/react-rating/style.css";
 import { toast } from "sonner";
+import { FSDProjectApiProps, toYMD } from "./fsd-project-table-container";
 
 type UserTypes = Prisma.UserGetPayload<{
   select: {
@@ -99,22 +104,56 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
   const [pending, startTransition] = useTransition();
   const [query, setQuery] = useState("");
 
+  const {
+    clientName,
+    orderId,
+    teamId,
+    profileId,
+    status,
+    shift,
+    deadlineFrom,
+    deadlineTo,
+    lastUpdateTo,
+    nextUpdateTo,
+    page,
+  } = useFsdProjectFilterState();
+  const preparedClientName = clientName ?? "";
+  const preparedOrderId = orderId ?? "";
+  const preparedTeamids = teamId ? teamId?.join(",") : "";
+  const preparedProfileIds = profileId === "All" ? "" : (profileId ?? "");
+
+  const preparedStatus = status ? status.join(",") : "";
+  const preparedShift = shift === "All" ? "" : (shift ?? "");
+
+  // Deadlines filter
+  const preparedDeadlineFrom = deadlineFrom
+    ? new Date(deadlineFrom).toISOString().split("T")[0]
+    : "";
+  const preparedDeadlineTo = deadlineTo
+    ? new Date(deadlineTo).toISOString().split("T")[0]
+    : "";
+
+  const preparedLastUpdate = toYMD(new Date(lastUpdateTo!));
+  const preparedNextUpdate = toYMD(new Date(nextUpdateTo!));
+
+  const FSDProjectTableQueryKey = [
+    "fsd-projects",
+    preparedClientName,
+    preparedOrderId,
+    preparedTeamids,
+    preparedProfileIds,
+    preparedStatus,
+    preparedShift,
+    preparedDeadlineFrom,
+    preparedDeadlineTo,
+    preparedLastUpdate,
+    preparedNextUpdate,
+    page,
+  ];
+
   const form = useForm<ProjectCreateSchemaType>({
     resolver: zodResolver(projectCreateSchema),
-    // defaultValues: {
-    //   clientName: initialData?.clientName ?? undefined,
-    //   profileId: initialData?.profile.id ?? undefined,
-    //   orderId: initialData?.orderId ?? undefined,
-    //   salesPersonId: initialData?.salesPerson.id ?? undefined,
-    //   orderDate: initialData?.orderDate ?? undefined,
-    //   deadline: initialData?.deadline ?? undefined,
-    //   shift: initialData?.shift ?? undefined,
-    //   teamId: initialData?.team.id ?? undefined,
-    //   delivered: initialData?.delivered ?? undefined,
-    // },
   });
-
-  // http://localhost:3000/api/users/fsd-members?membersOf=backend
 
   // grab profiles
   const { data: profiles, isError: isProfileError } = useQuery<Profile[]>({
@@ -180,69 +219,126 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
     return fuse.search(query).map((r) => r.item);
   }, [fuse, query, users]);
 
-  function onSubmit(values: ProjectCreateSchemaType) {
+  async function onSubmit(values: ProjectCreateSchemaType) {
+    const userAgent = window.navigator.userAgent;
+
     if (initialData) {
       // edit project
-      startTransition(() => {
-        editProject(initialData.id, values).then((res) => {
+      startTransition(async () => {
+        const ip = await fetch("https://api.ipify.org?format=json")
+          .then((res) => res.json())
+          .then((data) => data.ip)
+          .catch(() => "unknown");
+
+        editProject(initialData.id, values, {
+          userAgent: userAgent,
+          ip: ip,
+        }).then((res) => {
           if (!res.success) {
             toast.error(res.message);
             return;
           }
 
           toast.success(res.message);
-          queryClient.invalidateQueries({ queryKey: ["fsd-projects"] });
+          queryClient.setQueryData<FSDProjectApiProps>(
+            FSDProjectTableQueryKey,
+            (oldData) => {
+              if (!oldData) return oldData;
 
-          form.reset({
-            clientName: "",
-            orderId: "",
-            profileId: "",
-            salesPersonId: "",
-            orderDate: undefined,
-            deadline: undefined,
-            shift: "",
-            teamId: "",
-            value: 0,
-            monetaryValue: 0,
-            instructionSheet: "",
-          });
+              const updatedData = oldData.data.map((project) => {
+                if (project.id === initialData.id) {
+                  return res.data as SafeProjectDto;
+                }
+                return project;
+              });
+
+              return {
+                ...oldData,
+                data: updatedData,
+              };
+            },
+          );
+
+          // reset the form
+          formReset();
           setOpen?.(false);
         });
       });
     } else {
       // create a new project
-      startTransition(() => {
-        createProject(values).then((res) => {
+      startTransition(async () => {
+        const ip = await fetch("https://api.ipify.org?format=json")
+          .then((res) => res.json())
+          .then((data) => data.ip)
+          .catch(() => "unknown");
+        createProject(values, {
+          userAgent: userAgent,
+          ip: ip,
+        }).then((res) => {
           if (!res.success) {
             toast.error(res.message);
             return;
           }
 
           toast.success(res.message);
-          queryClient.invalidateQueries({ queryKey: ["fsd-projects"] });
-          form.reset({
-            clientName: "",
-            orderId: "",
-            profileId: "",
-            salesPersonId: "",
-            orderDate: undefined,
-            deadline: undefined,
-            shift: "",
-            teamId: "",
-            value: 0,
-            monetaryValue: 0,
-            instructionSheet: "",
-          });
+          const returnedata = res.data as SafeProjectDto;
+
+          queryClient.setQueryData<FSDProjectApiProps>(
+            FSDProjectTableQueryKey,
+            (oldData) => {
+              if (!oldData) return oldData;
+
+              return {
+                success: true,
+                pagination: oldData.pagination,
+                data: [returnedata, ...oldData.data],
+              };
+            },
+          );
+
+          // reset the form
+          formReset();
         });
       });
     }
   }
+
+  const formReset = () => {
+    form.reset({
+      title: "",
+      shortDescription: "",
+      clientName: "",
+      orderId: "",
+      profileId: "",
+      salesPersonId: "",
+      orderDate: undefined,
+      deadline: undefined,
+      shift: "",
+      teamId: "",
+      status: undefined,
+      delivered: undefined,
+      probablyWillBeDeliver: undefined,
+      review: undefined,
+      quickNoteFromLeader: undefined,
+      remarkFromOperation: undefined,
+      lastUpdate: undefined,
+      nextUpdate: undefined,
+      uiuxAssigned: undefined,
+      frontendAssigned: undefined,
+      backendAssigned: undefined,
+      value: 0,
+      monetaryValue: 0,
+      instructionSheet: "",
+    });
+  };
 
   useEffect(() => {
     if (!initialData) return;
     if (!profiles?.length) return; // 👈 THIS LINE FIXES IT
 
     form.reset({
+      title: initialData.title ?? "",
+      shortDescription: initialData.shortDescription ?? "",
       clientName: initialData.clientName ?? "",
       orderId: initialData.orderId ?? "",
       profileId: initialData.profile.id ?? "",
@@ -256,6 +352,9 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
       delivered: initialData.delivered
         ? new Date(initialData.delivered)
         : undefined,
+      probablyWillBeDeliver: initialData.probablyWillBeDeliver
+        ? new Date(initialData.probablyWillBeDeliver)
+        : undefined,
       shift: initialData.shift ?? "",
       teamId: initialData.team.id ?? "",
       value: initialData.value ?? undefined,
@@ -265,8 +364,26 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
       review: initialData.review ?? undefined,
       quickNoteFromLeader: initialData?.quickNoteFromLeader ?? undefined,
       remarkFromOperation: initialData?.remarkFromOperation ?? undefined,
-      lastUpdate: initialData?.lastUpdate ?? undefined,
-      nextUpdate: initialData?.nextUpdate ?? undefined,
+      lastUpdate: initialData?.lastUpdate
+        ? new Date(initialData.lastUpdate)
+        : undefined,
+
+      nextUpdate: initialData?.nextUpdate
+        ? new Date(initialData.nextUpdate)
+        : undefined,
+
+      supportPeriodStart: initialData?.supportPeriodStart
+        ? new Date(initialData.supportPeriodStart)
+        : undefined,
+      supportPeriodEnd: initialData?.supportPeriodEnd
+        ? new Date(initialData.supportPeriodEnd)
+        : undefined,
+
+      // sheets
+      progressSheet: initialData?.progressSheet ?? undefined,
+      credentialSheet: initialData?.credentialSheet ?? undefined,
+      websiteIssueTrackerSheet:
+        initialData?.websiteIssueTrackerSheet ?? undefined,
       // ✅ FIXED
       uiuxAssigned:
         initialData?.projectAssignments
@@ -334,7 +451,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
           </Button>
         </SheetTrigger>
       )}
-      <SheetContent className="w-full bg-[#F9FAFB] flex flex-col h-full px-2">
+      <SheetContent className="w-full bg-[#F9FAFB] dark:bg-black flex flex-col h-full px-2">
         <SheetHeader>
           <SheetTitle>{initialData ? "Edit" : "New"} Project</SheetTitle>
         </SheetHeader>
@@ -345,8 +462,64 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
               onSubmit={form.handleSubmit(onSubmit)}
               className="space-y-7 px-1"
             >
+              {/* basic information */}
+              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 shadow-none dark:bg-white/10">
+                <div className="flex items-center gap-x-2 mt-2 col-span-2">
+                  <div className="bg-[#FFFBEB] p-3 rounded-lg">
+                    <FileText className="size-4 text-[#D97706]" />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">
+                      Basic Information
+                    </span>
+                    <span className="font-normal text-[10px] text-muted-foreground">
+                      Supplementary project details
+                    </span>
+                  </div>
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Project Title</FormLabel>
+                      <FormControl>
+                        <Input
+                          className="w-full"
+                          placeholder="e.g: Biblioteca Legal"
+                          type="text"
+                          {...field}
+                          disabled={pending}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="shortDescription"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Short Description</FormLabel>
+                      <FormControl>
+                        <Input
+                          className="w-full"
+                          placeholder="e.g: Complete UI/UX redesign with frontend and backend integration"
+                          type="text"
+                          {...field}
+                          disabled={pending}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </Card>
               {/* client information */}
-              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 shadow-none">
+              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 shadow-none dark:bg-white/10">
                 <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
                   <div className="bg-[#EFF6FF] p-3 rounded-lg">
                     <Building2 className="size-4  text-[#2563EB]" />
@@ -545,7 +718,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
               </Card>
 
               {/* timeline */}
-              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 shadow-none">
+              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 shadow-none dark:bg-white/10">
                 <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
                   <div className="bg-[#FAF5FF] p-3 rounded-lg">
                     <CalendarRange className="size-4  text-[#9333EA]" />
@@ -665,7 +838,29 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                   name="delivered"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Delivered At</FormLabel>
+                      <div className="flex items-center gap-x-1">
+                        <FormLabel>Delivered At</FormLabel>
+                        <InfoToolTip
+                          animation="fade"
+                          placement="top"
+                          content="Used for delivery tracking and reporting. Select when the project was officially delivered."
+                        />
+                      </div>
+                      <SmartDatePicker
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="probablyWillBeDeliver"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Probably Will Be Delivered At</FormLabel>
                       <SmartDatePicker
                         value={field.value} // 👈 same fix
                         onChange={field.onChange}
@@ -676,8 +871,57 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                 />
               </Card>
 
+              {/* support period */}
+              {initialData?.status === "Delivered" && (
+                <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 shadow-none dark:bg-white/10">
+                  <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
+                    <div className="bg-rose-50 p-3 rounded-lg">
+                      <HandHeart className="size-4 text-rose-600" />
+                    </div>
+
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium">
+                        Support period
+                      </span>
+                      <span className="font-normal text-[10px]">
+                        Used for Support period tracking and reporting. Select
+                        when the project was officially delivered.
+                      </span>
+                    </div>
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name="supportPeriodStart"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Support Period Start</FormLabel>
+                        <SmartDatePicker
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="supportPeriodEnd"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Support Period End</FormLabel>
+                        <SmartDatePicker
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </Card>
+              )}
+
               {/* financial information */}
-              <Card className="grid grid-cols-2 gap-3 mt-2 shadow-none p-4">
+              <Card className="grid grid-cols-2 gap-3 mt-2 shadow-none p-4 dark:bg-white/10">
                 <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
                   <div className="bg-[#F0FDF4] p-3 rounded-lg">
                     <DollarSign className="size-4  text-[#16A34A]" />
@@ -752,7 +996,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                 />
               </Card>
 
-              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 shadow-none">
+              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 shadow-none dark:bg-white/10">
                 <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
                   <div className="bg-[#FFF7ED] p-3 rounded-lg">
                     <Clock
@@ -799,7 +1043,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                 />
               </Card>
 
-              <Card className="grid gap-3 mt-2 shadow-none p-4">
+              <Card className="grid gap-3 mt-2 shadow-none p-4 dark:bg-white/10">
                 <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
                   <div className="bg-[#FEFCE8] p-3 rounded-lg">
                     <NotebookPen className="size-4  text-[#CA8A04]" />
@@ -867,7 +1111,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                   )}
                 />
               </Card>
-              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 gap-y-5 mt-2 shadow-none p-4">
+              <Card className="grid grid-cols-1 md:grid-cols-2 gap-3 gap-y-5 mt-2 shadow-none p-4 dark:bg-white/10">
                 <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
                   <div className="bg-[#EEF2FF] p-3 rounded-lg">
                     <Users
@@ -956,7 +1200,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                   )}
                 />
               </Card>
-              <Card className="grid gap-3 mt-2 shadow-none p-4">
+              <Card className="grid gap-3 mt-2 shadow-none p-4 dark:bg-white/10">
                 <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
                   <div className="bg-[#F0FDFA] p-3 rounded-lg">
                     <LinkIcon className="size-4  text-[#1D9B90]" />
@@ -1028,7 +1272,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                 />
               </Card>
 
-              <Card className="grid gap-3 mt-2 shadow-none p-4">
+              <Card className="grid gap-3 mt-2 shadow-none p-4 dark:bg-white/10">
                 <div className="flex items-center gap-x-2 mt-2 col-span-2 ">
                   <div className="bg-[#FDF2F8] p-3 rounded-lg">
                     <Star className="size-4 stroke-[#DB2777]  fill-[#DB2777]" />
@@ -1053,6 +1297,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                         style={{
                           width: "100px",
                         }}
+                        className=""
                       />
 
                       <FormMessage />
@@ -1060,6 +1305,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                   )}
                 />
               </Card>
+
               <div className="flex justify-end gap-x-4">
                 <Button
                   variant="outline"

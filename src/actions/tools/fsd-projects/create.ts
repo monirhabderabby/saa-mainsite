@@ -1,5 +1,7 @@
 "use server";
 
+import { createProjectLog } from "@/actions/audit-log/project";
+import { SafeProjectDto } from "@/app/api/tools/fsd-project/route";
 import { auth } from "@/auth"; // adjust if you use next-auth or custom auth
 import prisma from "@/lib/prisma";
 import {
@@ -7,15 +9,19 @@ import {
   ProjectCreateSchemaType,
 } from "@/schemas/tools/fsd-projects/project-create-schema";
 import { AssignmentRole, Prisma } from "@prisma/client";
-import { revalidatePath } from "next/cache";
 
 type ActionResponse = {
   success: boolean;
   message: string;
+  data?: SafeProjectDto;
 };
 
 export async function createProject(
   data: ProjectCreateSchemaType,
+  meta?: {
+    userAgent: string;
+    ip: string;
+  },
 ): Promise<ActionResponse> {
   try {
     // ----------------------------------
@@ -42,9 +48,11 @@ export async function createProject(
     // ----------------------------------
     // 3. Transaction
     // ----------------------------------
-    await prisma.$transaction(async (tx) => {
+    const returnedData = await prisma.$transaction(async (tx) => {
       const project = await tx.project.create({
         data: {
+          title: validatedData.title,
+          shortDescription: validatedData.shortDescription,
           clientName: validatedData.clientName,
           orderId: validatedData.orderId,
           profileId: validatedData.profileId,
@@ -59,6 +67,7 @@ export async function createProject(
 
           // Optional fields
           delivered: validatedData.delivered ?? null,
+          probablyWillBeDeliver: validatedData.probablyWillBeDeliver ?? null,
           lastUpdate: validatedData.lastUpdate ?? null,
           nextUpdate: validatedData.nextUpdate ?? nextUpdate,
           remarkFromOperation: validatedData.remarkFromOperation ?? null,
@@ -112,16 +121,39 @@ export async function createProject(
           data: assignments,
         });
       }
+
+      // ✅ fetch the final shape you want to return
+      const full = await tx.project.findUnique({
+        where: { id: project.id },
+        include: {
+          team: true,
+          salesPerson: {
+            select: {
+              fullName: true,
+              id: true,
+              image: true,
+              designation: { select: { name: true } },
+            },
+          },
+          phase: true,
+          profile: true,
+          projectAssignments: true,
+        },
+      });
+
+      return full!; // safe right after create
     });
 
     // ----------------------------------
-    // 6. Cache revalidation
+    // 6. Audit log
     // ----------------------------------
-    revalidatePath("/projects");
+
+    await createProjectLog({ project: returnedData, meta });
 
     return {
       success: true,
       message: "Project created successfully ✅",
+      data: returnedData,
     };
   } catch (error: unknown) {
     // ----------------------------------

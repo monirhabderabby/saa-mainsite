@@ -30,7 +30,7 @@ const ProjectPhaseContainer = async ({ projectId }: Props) => {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <Layers className="h-5 w-5 text-orange-500" />
-            <h2 className="text-lg font-semibold text-slate-800">
+            <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
               Project Phases
             </h2>
           </div>

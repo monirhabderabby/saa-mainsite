@@ -39,7 +39,13 @@ export async function deleteProject(
     // ----------------------------------
     // 3. Cache revalidation
     // ----------------------------------
-    // revalidatePath("/projects");
+
+    await prisma.auditLog.deleteMany({
+      where: {
+        entity: "project",
+        entityId: projectId,
+      },
+    });
 
     return {
       success: true,

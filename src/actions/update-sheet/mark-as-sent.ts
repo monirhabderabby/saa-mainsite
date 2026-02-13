@@ -19,7 +19,7 @@ export async function markAsSent(id: string) {
     // Step 2: Fetch existing entry
     const existingEntry = await prisma.updateSheet.findUnique({
       where: { id },
-      select: { id: true, tlId: true },
+      select: { id: true, tlId: true, updateTo: true },
     });
 
     if (!existingEntry) {
@@ -52,8 +52,13 @@ export async function markAsSent(id: string) {
         doneById: user.id,
         sendAt: new Date(),
       },
-      select: { id: true, doneById: true, sendAt: true },
+      select: { id: true, doneById: true, sendAt: true, orderId: true },
     });
+
+    // Step 5: Update project delivered
+    if (existingEntry.updateTo === "DELIVERY") {
+      await updateProjectDelivered(updated.orderId);
+    }
 
     return {
       success: true,
@@ -66,5 +71,37 @@ export async function markAsSent(id: string) {
       success: false,
       message: "Something went wrong while marking the message as sent.",
     };
+  }
+}
+
+/**
+ * Updates the associated FSD project dates
+ */
+async function updateProjectDelivered(orderId: string) {
+  try {
+    const existingProject = await prisma.project.findUnique({
+      where: {
+        orderId,
+        status: {
+          not: "Delivered",
+        },
+      },
+      select: { id: true },
+    });
+
+    if (existingProject) {
+      const now = new Date();
+
+      await prisma.project.update({
+        where: { orderId },
+        data: {
+          status: "Delivered",
+          delivered: now,
+        },
+      });
+    }
+  } catch (error) {
+    // Log the error but don't fail the entire operation
+    console.error("Error updating project dates:", error);
   }
 }
