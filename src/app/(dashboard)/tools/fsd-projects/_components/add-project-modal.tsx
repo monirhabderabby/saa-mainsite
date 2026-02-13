@@ -372,8 +372,12 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
         ? new Date(initialData.nextUpdate)
         : undefined,
 
-      supportPeriodStart: initialData?.supportPeriodStart ?? undefined,
-      supportPeriodEnd: initialData?.supportPeriodEnd ?? undefined,
+      supportPeriodStart: initialData?.supportPeriodStart
+        ? new Date(initialData.supportPeriodStart)
+        : undefined,
+      supportPeriodEnd: initialData?.supportPeriodEnd
+        ? new Date(initialData.supportPeriodEnd)
+        : undefined,
 
       // sheets
       progressSheet: initialData?.progressSheet ?? undefined,
@@ -892,7 +896,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                       <FormItem>
                         <FormLabel>Support Period Start</FormLabel>
                         <SmartDatePicker
-                          value={field.value} // 👈 same fix
+                          value={field.value}
                           onChange={field.onChange}
                         />
                         <FormMessage />
@@ -906,7 +910,7 @@ export default function AddProjectModal({ open, initialData, setOpen }: Props) {
                       <FormItem>
                         <FormLabel>Support Period End</FormLabel>
                         <SmartDatePicker
-                          value={field.value} // 👈 same fix
+                          value={field.value}
                           onChange={field.onChange}
                         />
                         <FormMessage />

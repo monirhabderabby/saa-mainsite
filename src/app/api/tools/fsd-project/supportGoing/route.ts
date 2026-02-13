@@ -2,7 +2,7 @@
 import { auth } from "@/auth";
 import { getDayRange } from "@/lib/date";
 import prisma from "@/lib/prisma";
-import { Prisma, ProjectStatus } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -52,7 +52,6 @@ export async function GET(req: NextRequest) {
 
   // ─── Filters ───────────────────────────────────
   const teamIdsParam = searchParams.getAll("teamIds");
-  const statuses = searchParams.getAll("statuses");
   const assignedToMe = searchParams.get("assignedToMe") === "true";
   const search = searchParams.get("search")?.trim() || undefined;
   const clientName = searchParams.get("clientName")?.trim() || undefined;
@@ -67,11 +66,6 @@ export async function GET(req: NextRequest) {
   const lastUpdate = searchParams.get("lastUpdate");
 
   const teamIds = teamIdsParam
-    .flatMap((id) => id.split(",")) // split comma-separated values
-    .map((id) => id.trim())
-    .filter(Boolean);
-
-  const preparedStatuses = statuses
     .flatMap((id) => id.split(",")) // split comma-separated values
     .map((id) => id.trim())
     .filter(Boolean);
@@ -97,11 +91,10 @@ export async function GET(req: NextRequest) {
       where.shift = shift;
     }
 
-    if (preparedStatuses && preparedStatuses.length > 0) {
-      where.status = {
-        in: preparedStatuses as ProjectStatus[],
-      };
-    }
+    // status
+    where.status = {
+      in: ["Delivered"],
+    };
 
     if (clientName) {
       where.clientName = { contains: clientName, mode: "insensitive" };
@@ -185,6 +178,22 @@ export async function GET(req: NextRequest) {
         { userId }, // fallback / legacy field
       ];
     }
+
+    // support period
+    const now = new Date();
+
+    where.AND = [
+      {
+        supportPeriodStart: {
+          lte: now, // started already
+        },
+      },
+      {
+        supportPeriodEnd: {
+          gte: now, // not ended yet
+        },
+      },
+    ];
 
     // ─── Count total for pagination ────────
     const total = await prisma.project.count({ where });

@@ -16,11 +16,14 @@ import {
 import { useFsdProjectFilterState } from "@/zustand/tools/fsd-project";
 import { useQueryClient } from "@tanstack/react-query";
 import { Copy, EllipsisVertical, Eye, FileEdit, Trash2 } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import AddProjectModal from "../add-project-modal";
 import { toYMD } from "../fsd-project-table-container";
+const AddProjectModal = dynamic(() => import("../add-project-modal"), {
+  ssr: false,
+});
 // import { useRouter } from "next/navigation";             // if needed
 
 interface Props {
@@ -138,6 +141,8 @@ export default function FsdProjectActions({ project }: Props) {
       });
     });
   };
+
+  console.log("project", project);
 
   return (
     <>
