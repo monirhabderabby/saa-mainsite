@@ -12,6 +12,7 @@ export function ProjectNavigation({ children }: { children: React.ReactNode }) {
     { label: "Overview", href: "#overview" },
     { label: "Q&A", href: "#qna" },
     { label: "Activity", href: "#activity" },
+    { label: "Environment Variables", href: "#env_variables" },
   ];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -490,6 +490,9 @@ model Project {
     review Int?
     status ProjectStatus @default(NRA)
 
+    developmentEnv String?
+    productionEnv  String?
+
     // 👇 Named relations
     projectAssignments ProjectAssignment[]
 
