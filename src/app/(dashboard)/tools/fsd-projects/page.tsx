@@ -8,10 +8,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import prisma from "@/lib/prisma";
+import { Role } from "@prisma/client";
 import { Filter, HandHeartIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import TodayNeedToUpdateForAll from "./_components/features/today-need-to-sentUpdate-for-all";
 import TodayNeedToUpdate from "./_components/features/today-need-to-update";
 import UpcomingDeadlines from "./_components/features/upcoming-deadlines";
 const BackToPrevPage = dynamic(() => import("./_components/BackToPrevPage"), {
@@ -224,6 +226,27 @@ const Page = async () => {
     },
   });
 
+  const loggedinUserRole = session?.user?.role as Role;
+
+  const managementRoles = ["ADMIN", "SUPER_ADMIN", "SALES_MEMBER"] as Role[];
+
+  const isManagement = managementRoles.includes(loggedinUserRole);
+  const isLeaderOrColeaderInfo = await prisma.userTeam.findFirst({
+    where: {
+      userId: session.user.id,
+      responsibility: {
+        in: ["Leader", "Coleader"],
+      },
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  const isLeaderOrColeader = isLeaderOrColeaderInfo?.id;
+
+  const isAccessToAllNeedToUpdate = isManagement || Boolean(isLeaderOrColeader);
+
   return (
     <div className="space-y-5">
       <Card className="shadow-none">
@@ -289,7 +312,11 @@ const Page = async () => {
             <UpcomingDeadlines loggedinUserId={session.user.id} />
           </div>
           <div className="col-span-5">
-            <TodayNeedToUpdate loggedinUserId={session.user.id} />
+            {isAccessToAllNeedToUpdate ? (
+              <TodayNeedToUpdateForAll />
+            ) : (
+              <TodayNeedToUpdate loggedinUserId={session.user.id} />
+            )}
           </div>
         </div>
       </Card>
