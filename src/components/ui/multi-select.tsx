@@ -30,6 +30,7 @@ interface MultiSelectProps {
   value: string[];
   onValueChange: (value: string[]) => void;
   placeholder?: string;
+  isToolTipEnabled?: boolean;
 }
 
 export function MultiSelect({
@@ -37,6 +38,7 @@ export function MultiSelect({
   value,
   onValueChange,
   placeholder,
+  isToolTipEnabled = true,
 }: MultiSelectProps) {
   const [open, setOpen] = React.useState(false);
 
@@ -61,7 +63,7 @@ export function MultiSelect({
             role="combobox"
             className={cn(
               "w-full justify-between",
-              value.length === 0 && "text-muted-foreground"
+              value.length === 0 && "text-muted-foreground",
             )}
           >
             {value.length > 0
@@ -88,7 +90,7 @@ export function MultiSelect({
                         "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
                         value.includes(option.value)
                           ? "bg-primary text-primary-foreground"
-                          : "opacity-50 [&_svg]:invisible"
+                          : "opacity-50 [&_svg]:invisible",
                       )}
                     >
                       ✓
@@ -103,7 +105,7 @@ export function MultiSelect({
       </Popover>
 
       {/* Selected chips */}
-      {value.length > 0 && (
+      {isToolTipEnabled && value.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-2">
           {value.map((v) => {
             const option = options.find((o) => o.value === v);

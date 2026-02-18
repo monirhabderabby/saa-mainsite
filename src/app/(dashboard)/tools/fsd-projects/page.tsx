@@ -8,8 +8,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import prisma from "@/lib/prisma";
-import { Filter } from "lucide-react";
+import { Filter, HandHeartIcon } from "lucide-react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import TodayNeedToUpdate from "./_components/features/today-need-to-update";
 import UpcomingDeadlines from "./_components/features/upcoming-deadlines";
@@ -240,7 +241,9 @@ const Page = async () => {
               </div>
             </div>
 
-            <AddProjectModal />
+            <div>
+              <AddProjectModal />
+            </div>
           </div>
         </CardHeader>
 
@@ -300,15 +303,23 @@ const Page = async () => {
                 Manage and track all your projects
               </p>
             </div>
-            <AddFilterFsdProject
-              trigger={
-                <Button variant="outline">
-                  <Filter /> Filter
-                </Button>
-              }
-              profiles={profiles}
-              teams={teams}
-            />
+            <div className="flex items-center gap-x-3">
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/tools/fsd-projects/support-period">
+                  <HandHeartIcon />
+                  Support Period
+                </Link>
+              </Button>
+              <AddFilterFsdProject
+                trigger={
+                  <Button variant="outline" size="sm">
+                    <Filter /> Filter
+                  </Button>
+                }
+                profiles={profiles}
+                teams={teams}
+              />
+            </div>
           </div>
         </CardHeader>
         <CardContent>
