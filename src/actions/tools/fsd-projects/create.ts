@@ -8,7 +8,7 @@ import {
   projectCreateSchema,
   ProjectCreateSchemaType,
 } from "@/schemas/tools/fsd-projects/project-create-schema";
-import { AssignmentRole, Prisma } from "@prisma/client";
+import { AssignmentRole, Prisma, ProjectStatus } from "@prisma/client";
 
 type ActionResponse = {
   success: boolean;
@@ -64,6 +64,7 @@ export async function createProject(
           monetaryValue: validatedData.monetaryValue,
           shift: validatedData.shift,
           teamId: validatedData.teamId,
+          status: (validatedData.status as ProjectStatus) ?? null,
 
           // Optional fields
           delivered: validatedData.delivered ?? null,
