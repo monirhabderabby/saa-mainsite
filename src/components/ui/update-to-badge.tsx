@@ -13,6 +13,7 @@ export const colorMap: Record<UpdateTo, string> = {
   [UpdateTo.UPWORK_INBOX]: "bg-pink-100 text-pink-800",
   [UpdateTo.REVIEW_RESPONSE]: "bg-orange-100 text-orange-800",
   [UpdateTo.FIVERR_SUPPORT_REPLY]: "bg-red-100 text-red-800",
+  [UpdateTo.SPECIAL_ORDER_DELIVERY]: "bg-teal-100 text-teal-800",
 };
 
 export const labelMap: Record<UpdateTo, string> = {
@@ -23,6 +24,7 @@ export const labelMap: Record<UpdateTo, string> = {
   [UpdateTo.UPWORK_INBOX]: "Upwork Inbox",
   [UpdateTo.REVIEW_RESPONSE]: "Review Response",
   [UpdateTo.FIVERR_SUPPORT_REPLY]: "Fiverr Support Reply",
+  [UpdateTo.SPECIAL_ORDER_DELIVERY]: "Special Sales Delivery",
 };
 
 const UpdateToBadge: React.FC<Props> = ({ updateTo }) => {

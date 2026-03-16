@@ -3,7 +3,7 @@ const RichTextEditor = dynamic(
   () => import("@/components/shared/rich-text-editor/rich-text-editor"),
   {
     ssr: false,
-  }
+  },
 );
 import { createUpdateSheetEntries } from "@/actions/update-sheet/create";
 import { deleteUpdateSheetEntry } from "@/actions/update-sheet/delete";
@@ -112,6 +112,10 @@ export const allowUpdateTo = [
     id: UpdateTo.FIVERR_SUPPORT_REPLY,
     name: "Fiverr Support Reply",
   },
+  {
+    id: UpdateTo.SPECIAL_ORDER_DELIVERY,
+    name: "Special Sales Delivery",
+  },
 ];
 
 export default function AddUpdateForm({ profiles, initialData }: Props) {
@@ -144,7 +148,7 @@ export default function AddUpdateForm({ profiles, initialData }: Props) {
   const restrictedFound = useMemo(() => {
     if (!messageText) return [];
     return restrictedWords.filter((word) =>
-      messageText.includes(word.toLowerCase())
+      messageText.includes(word.toLowerCase()),
     );
   }, [messageText]);
 
@@ -223,7 +227,7 @@ export default function AddUpdateForm({ profiles, initialData }: Props) {
                             role="combobox"
                             className={cn(
                               "w-full justify-between",
-                              !field.value && "text-muted-foreground"
+                              !field.value && "text-muted-foreground",
                             )}
                           >
                             {field.value
@@ -252,7 +256,7 @@ export default function AddUpdateForm({ profiles, initialData }: Props) {
                                       "mr-2 h-4 w-4",
                                       field.value === p.id
                                         ? "opacity-100"
-                                        : "opacity-0"
+                                        : "opacity-0",
                                     )}
                                   />
                                   {p.name}
