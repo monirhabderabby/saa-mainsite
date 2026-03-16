@@ -5,9 +5,6 @@ import { PackageCheck } from "lucide-react";
 const SpecialSalesDeliveryInQue = async () => {
   const deliveryInQue = await prisma.updateSheet.count({
     where: {
-      tlId: {
-        not: null,
-      },
       doneById: null,
       updateTo: "SPECIAL_ORDER_DELIVERY",
     },

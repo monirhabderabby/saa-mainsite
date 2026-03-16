@@ -54,7 +54,7 @@ const SmartDatePicker = dynamic(
   () => import("@/components/ui/custom/smart-date-picker"),
   {
     ssr: false,
-  }
+  },
 );
 
 export const allowUpdateTo = [
@@ -79,6 +79,10 @@ export const allowUpdateTo = [
   {
     id: UpdateTo.FIVERR_SUPPORT_REPLY,
     name: "Fiverr Support Reply",
+  },
+  {
+    id: UpdateTo.SPECIAL_ORDER_DELIVERY,
+    name: "Special Sales Delivery",
   },
 ];
 
@@ -202,7 +206,7 @@ export default function AddFilterUpdateSheetEntries({
                             role="combobox"
                             className={cn(
                               "w-full justify-between",
-                              !field.value?.length && "text-muted-foreground"
+                              !field.value?.length && "text-muted-foreground",
                             )}
                           >
                             {field.value?.length
@@ -234,7 +238,7 @@ export default function AddFilterUpdateSheetEntries({
                                     onSelect={() => {
                                       const newValue = selected
                                         ? field.value?.filter(
-                                            (id) => id !== p.id
+                                            (id) => id !== p.id,
                                           )
                                         : [...(field.value ?? []), p.id];
                                       field.onChange(newValue);
@@ -243,7 +247,7 @@ export default function AddFilterUpdateSheetEntries({
                                     <Check
                                       className={cn(
                                         "mr-2 h-4 w-4",
-                                        selected ? "opacity-100" : "opacity-0"
+                                        selected ? "opacity-100" : "opacity-0",
                                       )}
                                     />
                                     {p.name}
