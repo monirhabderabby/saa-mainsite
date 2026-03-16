@@ -1,6 +1,7 @@
 import IssuesOpen from "@/components/shared/stats/issue-sheet/issue-open";
 import IssuesWip from "@/components/shared/stats/issue-sheet/issue-wip";
 import DeliveryInQue from "@/components/shared/stats/update-sheet/delivery-in-que";
+import SpecialSalesDeliveryInQue from "@/components/shared/stats/update-sheet/Special-sales-delivery-in-que";
 import UpdateInQue from "@/components/shared/stats/update-sheet/update-in-que";
 import { Suspense } from "react";
 import IssuesDoneToday from "./_components/issue-done-today";
@@ -62,6 +63,9 @@ const SuperAdminOverViewContainer = async () => {
 
           <Suspense fallback={<CardSkeleton />}>
             <DeliveryInQue />
+          </Suspense>
+          <Suspense fallback={<CardSkeleton />}>
+            <SpecialSalesDeliveryInQue />
           </Suspense>
         </div>
       </main>

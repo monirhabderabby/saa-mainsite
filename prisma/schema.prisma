@@ -299,6 +299,7 @@ enum UpdateTo {
     UPWORK_INBOX
     REVIEW_RESPONSE
     FIVERR_SUPPORT_REPLY
+    SPECIAL_ORDER_DELIVERY
 }
 
 model UpdateSheet {
