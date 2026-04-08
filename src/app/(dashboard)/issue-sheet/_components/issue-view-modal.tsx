@@ -146,7 +146,7 @@ const IssueViewModal = ({ data, open, onOpenChange }: Props) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[900px] p-0 gap-0 overflow-hidden max-h-[90vh]">
+      <DialogContent className="max-w-[900px] p-0 gap-0 overflow-hidden max-h-[90vh] flex flex-col">
         {/* Header */}
         <DialogHeader className="px-6 pt-6 pb-4 space-y-3">
           <div className="flex items-start justify-between gap-4">
@@ -184,9 +184,9 @@ const IssueViewModal = ({ data, open, onOpenChange }: Props) => {
         <Separator />
 
         {/* Body: Two-column layout */}
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 min-h-0 overflow-hidden">
           {/* Left: Issue Details */}
-          <ScrollArea className="flex-1 h-[60vh]">
+          <ScrollArea className="flex-1 min-h-0">
             <div className="px-6 py-4 space-y-1">
               {/* Quick Info Cards */}
               <div className="grid grid-cols-2 gap-3 mb-2">
@@ -217,64 +217,70 @@ const IssueViewModal = ({ data, open, onOpenChange }: Props) => {
               <Separator className="my-3" />
 
               {/* Detail Rows */}
-              <DetailRow icon={User} label="Profile">
-                <span className="font-medium">{data.profile.name}</span>
-              </DetailRow>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                <DetailRow icon={User} label="Profile">
+                  <span className="font-medium">{data.profile.name}</span>
+                </DetailRow>
 
-              <DetailRow icon={FileText} label="Service">
-                <Badge variant="secondary" className="font-medium">
-                  {data.service.name}
-                </Badge>
-              </DetailRow>
+                <DetailRow icon={FileText} label="Service">
+                  <Badge variant="secondary" className="font-medium">
+                    {data.service.name}
+                  </Badge>
+                </DetailRow>
 
-              <DetailRow icon={Users} label="Team">
-                {data.team ? (
-                  <span className="font-medium">{data.team.name}</span>
-                ) : (
-                  <span className="text-muted-foreground italic">
-                    No team assigned
-                  </span>
-                )}
-              </DetailRow>
-
-              <DetailRow icon={ShieldAlert} label="Risk Level">
-                <Badge
-                  className={cn(
-                    "text-xs font-medium border",
-                    riskConfig.className
-                  )}
-                >
-                  {riskConfig.icon} {riskConfig.label}
-                </Badge>
-              </DetailRow>
-
-              {data.statusChangedBy && (
-                <DetailRow icon={User} label="Status Changed By">
-                  <div className="space-y-0.5">
-                    <span className="font-medium">
-                      {data.statusChangedBy.fullName}
+                <DetailRow icon={Users} label="Team">
+                  {data.team ? (
+                    <span className="font-medium">{data.team.name}</span>
+                  ) : (
+                    <span className="text-muted-foreground italic">
+                      No team assigned
                     </span>
-                    {data.statusChangedBy.designation && (
-                      <span className="text-muted-foreground text-xs ml-2">
-                        ({data.statusChangedBy.designation.name})
-                      </span>
-                    )}
-                    {data.statusChangedAt && (
-                      <p className="text-xs text-muted-foreground">
-                        {moment(data.statusChangedAt).format(
-                          "DD MMM, YYYY [at] hh:mm A"
-                        )}
-                      </p>
-                    )}
-                  </div>
+                  )}
                 </DetailRow>
-              )}
 
-              {data.reference && (
-                <DetailRow icon={FileText} label="Reference">
-                  <LinkButton href={data.reference} label="View Reference" />
+                <DetailRow icon={ShieldAlert} label="Risk Level">
+                  <Badge
+                    className={cn(
+                      "text-xs font-medium border",
+                      riskConfig.className
+                    )}
+                  >
+                    {riskConfig.icon} {riskConfig.label}
+                  </Badge>
                 </DetailRow>
-              )}
+
+                {data.statusChangedBy && (
+                  <DetailRow icon={User} label="Status Changed By">
+                    <div className="space-y-0.5">
+                      <span className="font-medium">
+                        {data.statusChangedBy.fullName}
+                      </span>
+                      {data.statusChangedBy.designation && (
+                        <span className="text-muted-foreground text-xs ml-2">
+                          ({data.statusChangedBy.designation.name})
+                        </span>
+                      )}
+                      {data.statusChangedAt && (
+                        <p className="text-xs text-muted-foreground">
+                          {moment(data.statusChangedAt).format(
+                            "DD MMM, YYYY [at] hh:mm A"
+                          )}
+                        </p>
+                      )}
+                    </div>
+                  </DetailRow>
+                )}
+
+                {data.reference && (
+                  <div className="col-span-2">
+                    <DetailRow icon={FileText} label="Reference">
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                        {data.reference}
+                      </p>
+                    </DetailRow>
+                  </div>
+                )}
+              </div>
 
               <Separator className="my-3" />
 

@@ -1,5 +1,5 @@
 import { changeIssueStatusAction } from "@/actions/issue-sheet/status-change";
-import MarkAsSentReferenceModal from "@/app/(dashboard)/update-sheet/_components/tables/columns/_components/mark-as-sent-reference-modal";
+import IssueDoneReferenceModal from "./issue-done-reference-modal";
 import {
   Select,
   SelectContent,
@@ -122,7 +122,7 @@ const onConfirmWithReference = (referenceLink: string) => {
       </SelectContent>
     </Select>
     
-     <MarkAsSentReferenceModal
+     <IssueDoneReferenceModal
       open={referenceModalOpen}
       onOpenChange={setReferenceModalOpen}
       onConfirm={onConfirmWithReference}

@@ -221,7 +221,7 @@ const IssueActivityPanel = ({ issueSheetId }: Props) => {
   };
 
   return (
-    <div className="w-[280px] border-l border-border/50 bg-muted/20 flex flex-col shrink-0">
+    <div className="w-[280px] border-l border-border/50 bg-muted/20 flex flex-col shrink-0 h-[80vh] min-h-0">
       {/* Header */}
       <div className="px-4 py-3 border-b border-border/50">
         <h3 className="text-sm font-semibold text-foreground">Activity</h3>
@@ -231,7 +231,7 @@ const IssueActivityPanel = ({ issueSheetId }: Props) => {
       </div>
 
       {/* Activity List */}
-      <ScrollArea className="flex-1 h-[45vh]">
+      <ScrollArea className="flex-1 min-h-0">
         <div className="px-3 py-2">
           {loading ? (
             <div className="flex flex-col items-center justify-center text-center py-12">
