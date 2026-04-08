@@ -2,15 +2,12 @@ import { Button } from "@/components/ui/button";
 import { IssueSheetData } from "@/helper/issue-sheets/get-issue-sheets";
 import { Role } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
-import { Pencil } from "lucide-react";
 import moment from "moment";
-import Link from "next/link";
 import IssueSheetServiceLine from "./action/issue-sheet-service-line";
 import IssueSheetStatusAction from "./action/issue-sheet-status-action";
-import NoteForSales from "./action/note-for-sales";
 import SpecialNotes from "./action/special-notes";
-import StatusChangeBy from "./action/status-change-by";
 import TeamSelector from "./action/team-selector";
+import IssueSheetColumnAction from "./issue-sheet-column-action";
 
 const CenteredHeader = (title: string) => {
   const Comp = () => <div className="text-center">{title}</div>;
@@ -59,11 +56,11 @@ export const issueSheetColumns = ({
       accessorKey: "clientName",
       header: "Client Name",
     },
-    {
-      accessorKey: "orderId",
-      header: "Order ID",
-      size: 160,
-    },
+    // {
+    //   accessorKey: "orderId",
+    //   header: "Order ID",
+    //   size: 160,
+    // },
     {
       accessorKey: "serviceId",
       header: "Service",
@@ -127,46 +124,30 @@ export const issueSheetColumns = ({
           </Button>
         ),
     },
-    {
-      accessorKey: "noteForSales",
-      header: "Note for Sales",
-      cell: ({ row }) => <NoteForSales data={row.original} />,
-    },
+    // {
+    //   accessorKey: "noteForSales",
+    //   header: "Note for Sales",
+    //   cell: ({ row }) => <NoteForSales data={row.original} />,
+    // },
     {
       accessorKey: "status",
       header: "Status",
       cell: ({ row }) => <IssueSheetStatusAction data={row.original} />,
     },
-    {
-      accessorKey: "statusChangedById",
-      header: CenteredHeader("Changed By"),
-      cell: ({ row }) => <StatusChangeBy data={row.original} />,
-    },
+    // {
+    //   accessorKey: "statusChangedById",
+    //   header: CenteredHeader("Changed By"),
+    //   cell: ({ row }) => <StatusChangeBy data={row.original} />,
+    // },
     {
       header: "Action",
       cell: ({ row }) => {
-        // Conditions:
-        // - Admin/Super Admin can always edit
-        // - Non-admins can edit only if canEdit=true
-        const editable =
-          currentUserRole === "SUPER_ADMIN" ||
-          currentUserRole === "ADMIN" ||
-          canEdit;
-
         return (
-          <>
-            {editable ? (
-              <Button size="icon" variant="ghost" asChild>
-                <Link href={`/issue-sheet/edit/${row.original.id}`}>
-                  <Pencil />
-                </Link>
-              </Button>
-            ) : (
-              <Button size="icon" variant="ghost" disabled>
-                <Pencil />
-              </Button>
-            )}
-          </>
+          <IssueSheetColumnAction
+            data={row.original}
+            currentUserRole={currentUserRole}
+            canEdit={canEdit}
+          />
         );
       },
     },
