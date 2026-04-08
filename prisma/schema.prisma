@@ -349,6 +349,13 @@ enum IssueStatus {
     dispute
 }
 
+enum RiskLevel {
+    low
+    medium
+    high
+    critical
+}
+
 model IssueSheet {
     id         String  @id @default(auto()) @map("_id") @db.ObjectId
     clientName String
@@ -368,6 +375,7 @@ model IssueSheet {
     statusChangedBy User? @relation("issueShetStatusChange", fields: [statusChangedById], references: [id], onDelete: Cascade)
 
     reference String?
+    riskLevel RiskLevel @default(low)
 
     creatorId String @db.ObjectId
     creator   User   @relation(fields: [creatorId], references: [id], onDelete: Cascade)

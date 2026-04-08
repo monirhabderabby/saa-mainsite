@@ -82,6 +82,7 @@ export async function editIssueAction(id: string, data: IssueSheetSchemaType) {
       specialNotes,
       noteForSales,
       fileOrMeetingLink,
+      riskLevel,
     } = parsed.data;
 
     // Step 6: Update issue
@@ -96,6 +97,7 @@ export async function editIssueAction(id: string, data: IssueSheetSchemaType) {
         inboxPageUrl: inboxPageUrl || null,
         specialNotes: specialNotes || null,
         noteForSales: noteForSales || null,
+        riskLevel: riskLevel,
         fileOrMeetingLink: fileOrMeetingLink || null,
         // Optionally track who last modified the issue
         // updatedById: user.id,
