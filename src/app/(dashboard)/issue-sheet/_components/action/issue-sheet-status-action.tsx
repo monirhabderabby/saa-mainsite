@@ -1,4 +1,5 @@
 import { changeIssueStatusAction } from "@/actions/issue-sheet/status-change";
+import MarkAsSentReferenceModal from "@/app/(dashboard)/update-sheet/_components/tables/columns/_components/mark-as-sent-reference-modal";
 import {
   Select,
   SelectContent,
@@ -52,28 +53,54 @@ const formatStatusText = (status: IssueStatus) => {
 const IssueSheetStatusAction = ({ data }: Props) => {
   const [val, setVal] = useState<IssueStatus>(data.status);
   const [pending, startTransition] = useTransition();
+  const [referenceModalOpen, setReferenceModalOpen] = useState(false);
+const [pendingStatus, setPendingStatus] = useState<IssueStatus | null>(null);
 
-  const onStatusChange = (value: IssueStatus) => {
-    setVal(value);
-    startTransition(() => {
-      changeIssueStatusAction(data.id, value).then((res) => {
-        if (!res.success) {
-          toast.error(res.message);
-          setVal(data.status);
-          return;
-        }
+ const onStatusChange = (value: IssueStatus) => {
+  if (value === "done") {
+    setPendingStatus(value);
+    setReferenceModalOpen(true);
+    return; // don't fire action yet
+  }
 
-        // handle success
-        toast.success(res.message);
-      });
+  // for all other statuses, fire immediately as before
+  setVal(value);
+  startTransition(() => {
+    changeIssueStatusAction(data.id, value).then((res) => {
+      if (!res.success) {
+        toast.error(res.message);
+        setVal(data.status);
+        return;
+      }
+      toast.success(res.message);
     });
-  };
+  });
+};
+
+const onConfirmWithReference = (referenceLink: string) => {
+  if (!pendingStatus) return;
+
+  setVal(pendingStatus);
+  startTransition(() => {
+    changeIssueStatusAction(data.id, pendingStatus, referenceLink).then((res) => {
+      if (!res.success) {
+        toast.error(res.message);
+        setVal(data.status);
+        return;
+      }
+      setReferenceModalOpen(false);
+      setPendingStatus(null);
+      toast.success(res.message);
+    });
+  });
+};
 
   useEffect(() => {
     setVal(data.status);
   }, [data.status]);
 
   return (
+    <>
     <Select value={val} onValueChange={onStatusChange} disabled={pending}>
       <SelectTrigger
         className={cn(
@@ -94,6 +121,14 @@ const IssueSheetStatusAction = ({ data }: Props) => {
         ))}
       </SelectContent>
     </Select>
+    
+     <MarkAsSentReferenceModal
+      open={referenceModalOpen}
+      onOpenChange={setReferenceModalOpen}
+      onConfirm={onConfirmWithReference}
+      isPending={pending}
+    />
+    </>
   );
 };
 

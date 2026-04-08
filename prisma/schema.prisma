@@ -367,6 +367,8 @@ model IssueSheet {
 
     statusChangedBy User? @relation("issueShetStatusChange", fields: [statusChangedById], references: [id], onDelete: Cascade)
 
+    reference String?
+
     creatorId String @db.ObjectId
     creator   User   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
 

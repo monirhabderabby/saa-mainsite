@@ -8,7 +8,8 @@ const allowedRoles: Role[] = ["SUPER_ADMIN", "ADMIN", "OPERATION_MEMBER"]; // Ad
 
 export async function changeIssueStatusAction(
   issueId: string,
-  status: IssueStatus
+  status: IssueStatus,
+  referenceLink?: string,
 ) {
   const session = await auth();
 
@@ -57,6 +58,7 @@ export async function changeIssueStatusAction(
         // Optionally track who changed the status and when
         statusChangedAt: new Date(),
         statusChangedById: session.user.id as string,
+        reference: referenceLink,
       },
     });
 
