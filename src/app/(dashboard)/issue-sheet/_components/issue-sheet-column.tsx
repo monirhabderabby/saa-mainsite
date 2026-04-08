@@ -9,11 +9,11 @@ import SpecialNotes from "./action/special-notes";
 import TeamSelector from "./action/team-selector";
 import IssueSheetColumnAction from "./issue-sheet-column-action";
 
-const CenteredHeader = (title: string) => {
-  const Comp = () => <div className="text-center">{title}</div>;
-  Comp.displayName = `CenteredHeader(${title})`;
-  return Comp;
-};
+// const CenteredHeader = (title: string) => {
+//   const Comp = () => <div className="text-center">{title}</div>;
+//   Comp.displayName = `CenteredHeader(${title})`;
+//   return Comp;
+// };
 
 interface Props {
   currentUserRole: Role;

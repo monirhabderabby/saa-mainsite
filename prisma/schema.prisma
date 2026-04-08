@@ -78,6 +78,7 @@ model User {
     salesProjects Project[]    @relation("SalesPersonProjects")
     projectQnas   ProjectQna[]
     auditLogs     AuditLog[]
+    issueActivities IssueActivity[] @relation("IssueActivityActor")
 }
 
 model UserVerification {
@@ -389,8 +390,39 @@ model IssueSheet {
     profileId String  @db.ObjectId
     profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
+    activities IssueActivity[]
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+}
+
+enum IssueActivityType {
+    COMMENT
+    STATUS_CHANGE
+    TEAM_ASSIGNED
+    ISSUE_UPDATED
+    ISSUE_CREATED
+}
+
+model IssueActivity {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    type    IssueActivityType
+    content String?
+
+    // Optional metadata for system events (e.g., "open → done")
+    meta Json?
+
+    issueSheetId String     @db.ObjectId
+    issueSheet   IssueSheet @relation(fields: [issueSheetId], references: [id], onDelete: Cascade)
+
+    actorId String @db.ObjectId
+    actor   User   @relation("IssueActivityActor", fields: [actorId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+
+    @@index([issueSheetId])
+    @@index([actorId])
 }
 
 enum ApplicationStatus {

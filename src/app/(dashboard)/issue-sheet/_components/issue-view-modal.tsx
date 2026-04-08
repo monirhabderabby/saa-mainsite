@@ -27,6 +27,7 @@ import {
   Video,
 } from "lucide-react";
 import moment from "moment";
+import IssueActivityPanel from "./issue-activity-panel";
 
 interface Props {
   data: IssueSheetData;
@@ -351,29 +352,7 @@ const IssueViewModal = ({ data, open, onOpenChange }: Props) => {
           </ScrollArea>
 
           {/* Right: Activity Panel */}
-          <div className="w-[280px] border-l border-border/50 bg-muted/20 flex flex-col shrink-0">
-            <div className="px-4 py-3 border-b border-border/50">
-              <h3 className="text-sm font-semibold text-foreground">
-                Activity
-              </h3>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Recent updates & changes
-              </p>
-            </div>
-            <ScrollArea className="flex-1 h-[55vh]">
-              <div className="px-4 py-6 flex flex-col items-center justify-center text-center h-full min-h-[300px]">
-                <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mb-3">
-                  <Clock className="w-5 h-5 text-muted-foreground/50" />
-                </div>
-                <p className="text-sm font-medium text-muted-foreground/70">
-                  No activity yet
-                </p>
-                <p className="text-xs text-muted-foreground/50 mt-1 max-w-[180px]">
-                  Activity history will appear here once available
-                </p>
-              </div>
-            </ScrollArea>
-          </div>
+          <IssueActivityPanel issueSheetId={data.id} />
         </div>
       </DialogContent>
     </Dialog>

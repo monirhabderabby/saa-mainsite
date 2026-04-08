@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import { issueSheetSchema, IssueSheetSchemaType } from "@/schemas/issue-sheet";
 import { Role } from "@prisma/client";
+import { logIssueActivity } from "./activity";
 
 const ALLOWED_ROLES: Role[] = ["SUPER_ADMIN", "ADMIN"];
 
@@ -102,6 +103,14 @@ export async function editIssueAction(id: string, data: IssueSheetSchemaType) {
         // Optionally track who last modified the issue
         // updatedById: user.id,
       },
+    });
+
+    // Log issue updated activity
+    await logIssueActivity({
+      issueSheetId: id,
+      actorId: user.id as string,
+      type: "ISSUE_UPDATED",
+      content: `Updated issue details`,
     });
 
     return {
