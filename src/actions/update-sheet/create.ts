@@ -7,6 +7,7 @@ import {
   UpdateSheetCreateSchema,
 } from "@/schemas/update-sheet/create";
 import { Role } from "@prisma/client";
+import { logUpdateActivity } from "./activity";
 
 // Roles allowed to create update sheet entries
 const ALLOWED_ROLES: Role[] = ["SUPER_ADMIN", "ADMIN", "OPERATION_MEMBER"];
@@ -125,7 +126,14 @@ export async function createUpdateSheetEntries(
       };
     }
 
-    // Step 6: Update associated project dates (non-blocking)
+    // Step 6: Log activity
+    await logUpdateActivity({
+      updateSheetId: newUpdateSheetEntry.id,
+      actorId: user.id as string,
+      type: "ENTRY_CREATED",
+    });
+
+    // Step 6.5: Update associated project dates (non-blocking)
     if (newUpdateSheetEntry.updateTo !== "DELIVERY") {
       await updateProjectDates(newUpdateSheetEntry.orderId);
     }

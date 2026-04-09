@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
+import { logUpdateActivity } from "./activity";
 
 interface Props {
   note: string;
@@ -48,6 +49,14 @@ export async function AddSalesNote({ note, messageId }: Props) {
       data: {
         commentFromSales: note.trim(),
       },
+    });
+
+    // Log activity
+    await logUpdateActivity({
+      updateSheetId: messageId,
+      actorId: cu.user.id as string,
+      type: "SALES_NOTE_ADDED",
+      content: note.trim(),
     });
 
     return {

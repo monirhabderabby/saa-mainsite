@@ -3,6 +3,7 @@
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import { Role } from "@prisma/client";
+import { logUpdateActivity } from "./activity";
 
 const ALLOWED_ROLES: Role[] = ["SUPER_ADMIN", "ADMIN"];
 
@@ -115,6 +116,13 @@ export async function tlCheck(id: string) {
       tlCheckAt: isAlreadyChecked ? null : new Date(),
     },
     select: { id: true, tlId: true, tlCheckAt: true },
+  });
+
+  // Log activity
+  await logUpdateActivity({
+    updateSheetId: id,
+    actorId: user.id as string,
+    type: isAlreadyChecked ? "TL_UNCHECKED" : "TL_CHECKED",
   });
 
   return {

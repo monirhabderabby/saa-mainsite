@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
+import { logUpdateActivity } from "./activity";
 
 export async function markAsSent(id: string, reference: string) {
   try {
@@ -60,6 +61,14 @@ export async function markAsSent(id: string, reference: string) {
     if (existingEntry.updateTo === "DELIVERY") {
       await updateProjectDelivered(updated.orderId);
     }
+
+    // Log activity
+    await logUpdateActivity({
+      updateSheetId: id,
+      actorId: user.id as string,
+      type: "MARKED_AS_SENT",
+      meta: { reference },
+    });
 
     return {
       success: true,
