@@ -119,6 +119,18 @@ const routes = [
     href: "/settings",
     access: ["SUPER_ADMIN"] as Role[],
   },
+  {
+    id: 10,
+     label: "Complains",
+     icon: CircleQuestionMark,
+     href: "/complains",
+     access: [
+      "ADMIN",
+      "SUPER_ADMIN",
+      "OPERATION_MEMBER",
+      "SALES_MEMBER",
+    ] as Role[],
+  }
 ];
 
 interface Props {

@@ -80,6 +80,7 @@ model User {
     auditLogs     AuditLog[]
     issueActivities IssueActivity[] @relation("IssueActivityActor")
     updateSheetActivities UpdateActivity[] @relation("UpdateActivityActor")
+    complaints Complaint[]
 }
 
 model UserVerification {
@@ -686,4 +687,32 @@ model AuditLog {
     @@index([actorId])
     @@index([action])
     @@index([createdAt])
+}
+
+enum ComplaintSource {
+    ISSUE_SHEET
+    UPDATE_SHEET
+}
+
+enum ComplaintPriority {
+    LOW
+    MEDIUM
+    HIGH
+}
+
+model Complaint {
+    id            String            @id @default(auto()) @map("_id") @db.ObjectId
+    subject       String
+    source        ComplaintSource
+    priority      ComplaintPriority
+    message       String
+    supportingDocs String[]
+
+    creatorId     String            @db.ObjectId
+    creator       User              @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+    createdAt     DateTime          @default(now())
+    updatedAt     DateTime          @updatedAt
+
+    @@index([creatorId])
 }
