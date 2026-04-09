@@ -3,7 +3,6 @@
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import { IssueActivityType, Prisma } from "@prisma/client";
-import { revalidatePath } from "next/cache";
 
 /**
  * Adds a comment activity to an issue sheet.
@@ -47,7 +46,8 @@ export async function addIssueComment(
       },
     });
 
-    revalidatePath("/issue-sheet");
+    // Note: Not calling revalidatePath here because it would re-render the page
+    // and close the issue view modal. The panel re-fetches activities manually.
 
     return {
       success: true,

@@ -203,7 +203,7 @@ const IssueActivityPanel = ({ issueSheetId }: Props) => {
     startTransition(async () => {
       const result = await addIssueComment(issueSheetId, comment);
       if (result.success) {
-        setComment("");
+        setComment("")
         toast.success("Comment added");
         // Re-fetch activities to get the new comment
         await fetchActivities();
