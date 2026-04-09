@@ -63,7 +63,7 @@ const IssueTableContainer = ({ currentUserRole, canEdit }: Props) => {
     ],
     queryFn: () =>
       fetch(
-        `/api/issue-sheets?status=${joinedStatus}&page=${page}&limit=10&profileId=${profileId}&serviceId=${serviceId}&teamId=${teamId}&clientName=${clientName}&orderId=${orderId}&createdFrom=${createdFrom}&createdTo=${createdTo}`
+        `/api/issue-sheets?status=${joinedStatus}&page=${page}&limit=10&profileId=${profileId}&serviceId=${serviceId}&teamId=${teamId}&clientName=${clientName}&orderId=${orderId}&createdFrom=${createdFrom}&createdTo=${createdTo}`,
       ).then((res) => res.json()),
   });
 

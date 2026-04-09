@@ -45,11 +45,11 @@ const SuperAdminOverViewContainer = async () => {
 
           {/* Issue Tracking */}
           <Suspense fallback={<CardSkeleton />}>
-            <IssuesOpen />
+            <IssuesOpen redirectTo="/issue-sheet?issue=open" />
           </Suspense>
 
           <Suspense fallback={<CardSkeleton />}>
-            <IssuesWip />
+            <IssuesWip redirectTo="/issue-sheet?issue=wip" />
           </Suspense>
 
           <Suspense fallback={<CardSkeleton />}>

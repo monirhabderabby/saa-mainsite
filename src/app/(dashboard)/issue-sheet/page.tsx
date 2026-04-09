@@ -18,17 +18,22 @@ const IssueTableContainer = dynamic(
   () => import("./_components/table-container"),
   {
     ssr: false,
-  }
+  },
 );
 
 const AddFilterIssueSheetEntries = dynamic(
   () => import("./_components/filter/add-filter-issue-sheet-entries"),
   {
     ssr: false,
-  }
+  },
 );
 
-const Page = async () => {
+interface PageProps {
+  searchParams: Promise<{ issue?: string }>;
+}
+
+const Page = async ({ searchParams }: PageProps) => {
+  const { issue } = await searchParams;
   // Authenticated user data
   const currentUserSession = await auth();
   if (!currentUserSession || !currentUserSession?.user?.id) {
@@ -163,6 +168,7 @@ const Page = async () => {
                   <Filter /> Filter
                 </Button>
               }
+              defaultIssueFilter={issue}
             />
             {/* Add Issue Button */}
             {canCreateIssues && (
