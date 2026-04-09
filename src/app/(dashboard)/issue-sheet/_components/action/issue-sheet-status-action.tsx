@@ -10,6 +10,7 @@ import {
 import { IssueSheetData } from "@/helper/issue-sheets/get-issue-sheets";
 import { cn } from "@/lib/utils"; // You might need to install or create this
 import { IssueStatus } from "@prisma/client";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -51,10 +52,11 @@ const formatStatusText = (status: IssueStatus) => {
 };
 
 const IssueSheetStatusAction = ({ data }: Props) => {
+  const queryClient = useQueryClient();
   const [val, setVal] = useState<IssueStatus>(data.status);
   const [pending, startTransition] = useTransition();
   const [referenceModalOpen, setReferenceModalOpen] = useState(false);
-const [pendingStatus, setPendingStatus] = useState<IssueStatus | null>(null);
+  const [pendingStatus, setPendingStatus] = useState<IssueStatus | null>(null);
 
  const onStatusChange = (value: IssueStatus) => {
   if (value === "done") {
@@ -72,6 +74,7 @@ const [pendingStatus, setPendingStatus] = useState<IssueStatus | null>(null);
         setVal(data.status);
         return;
       }
+      queryClient.invalidateQueries({ queryKey: ["issue-sheet"] });
       toast.success(res.message);
     });
   });
@@ -88,6 +91,7 @@ const onConfirmWithReference = (referenceLink: string) => {
         setVal(data.status);
         return;
       }
+      queryClient.invalidateQueries({ queryKey: ["issue-sheet"] });
       setReferenceModalOpen(false);
       setPendingStatus(null);
       toast.success(res.message);
