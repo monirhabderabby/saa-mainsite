@@ -72,27 +72,31 @@ const getStatusConfig = (status: IssueStatus) => {
 const getRiskConfig = (risk: RiskLevel) => {
   const configs: Record<
     RiskLevel,
-    { label: string; className: string; icon: string }
+    { label: string; className: string; dotColor: string }
   > = {
     low: {
       label: "Low",
-      className: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-      icon: "🟢",
+      className:
+        "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/10",
+      dotColor: "bg-emerald-500",
     },
     medium: {
       label: "Medium",
-      className: "bg-amber-500/10 text-amber-500 border-amber-500/20",
-      icon: "🟡",
+      className:
+        "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 hover:bg-amber-500/10",
+      dotColor: "bg-amber-500",
     },
     high: {
       label: "High",
-      className: "bg-orange-500/10 text-orange-500 border-orange-500/20",
-      icon: "🟠",
+      className:
+        "bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20 hover:bg-orange-500/10",
+      dotColor: "bg-orange-500",
     },
     critical: {
       label: "Critical",
-      className: "bg-red-500/10 text-red-500 border-red-500/20",
-      icon: "🔴",
+      className:
+        "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20 hover:bg-red-500/10",
+      dotColor: "bg-red-500",
     },
   };
   return configs[risk] ?? configs.low;
@@ -165,11 +169,12 @@ const IssueViewModal = ({ data, open, onOpenChange }: Props) => {
                 </Badge>
                 <Badge
                   className={cn(
-                    "text-xs font-medium border",
+                    "text-xs font-medium border cursor-default gap-1.5",
                     riskConfig.className
                   )}
                 >
-                  {riskConfig.icon} {riskConfig.label} Risk
+                  <span className={cn("h-1.5 w-1.5 rounded-full shrink-0", riskConfig.dotColor)} />
+                  {riskConfig.label} Risk
                 </Badge>
               </div>
               {data.orderId && (
@@ -241,11 +246,12 @@ const IssueViewModal = ({ data, open, onOpenChange }: Props) => {
                 <DetailRow icon={ShieldAlert} label="Risk Level">
                   <Badge
                     className={cn(
-                      "text-xs font-medium border",
+                      "text-xs font-medium border cursor-default gap-1.5",
                       riskConfig.className
                     )}
                   >
-                    {riskConfig.icon} {riskConfig.label}
+                    <span className={cn("h-1.5 w-1.5 rounded-full shrink-0", riskConfig.dotColor)} />
+                    {riskConfig.label}
                   </Badge>
                 </DetailRow>
 
