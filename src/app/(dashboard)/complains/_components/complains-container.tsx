@@ -1,5 +1,6 @@
 "use client";
 
+import ComplaintViewModal from "@/components/shared/modal/complains/ComplaintViewModal";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,6 +18,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
+  Eye,
   FileText,
   Loader2,
   MessageSquare,
@@ -31,7 +33,7 @@ import { useState } from "react";
 import DeleteButton from "./delete-button";
 
 // ── Status config ──────────────────────────────────────────────────────────────
-const STATUS_CONFIG: Record<
+export const STATUS_CONFIG: Record<
   ComplaintStatus,
   { label: string; icon: React.ReactNode; cls: string }
 > = {
@@ -57,12 +59,14 @@ const STATUS_CONFIG: Record<
   },
 };
 
-const PRIORITY_CONFIG: Record<ComplaintPriority, { cls: string; dot: string }> =
-  {
-    HIGH: { cls: "text-red-500", dot: "bg-red-500" },
-    MEDIUM: { cls: "text-amber-500", dot: "bg-amber-500" },
-    LOW: { cls: "text-emerald-500", dot: "bg-emerald-500" },
-  };
+export const PRIORITY_CONFIG: Record<
+  ComplaintPriority,
+  { cls: string; dot: string }
+> = {
+  HIGH: { cls: "text-red-500", dot: "bg-red-500" },
+  MEDIUM: { cls: "text-amber-500", dot: "bg-amber-500" },
+  LOW: { cls: "text-emerald-500", dot: "bg-emerald-500" },
+};
 
 // ── Component ──────────────────────────────────────────────────────────────────
 const ComplainsContainer = () => {
@@ -319,7 +323,10 @@ const ComplainsContainer = () => {
                     {complaint.subject}
                   </h3>
                   <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
-                    {complaint.message}
+                    {complaint.message
+                      .replace(/<[^>]*>/g, " ")
+                      .replace(/\s+/g, " ")
+                      .trim()}
                   </p>
                 </div>
 
@@ -351,6 +358,19 @@ const ComplainsContainer = () => {
                       )}
                     </span>
 
+                    <ComplaintViewModal
+                      complaint={complaint}
+                      trigger={
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100"
+                        >
+                          <Eye className="h-3.5 w-3.5" />
+                          <span className="sr-only">View complaint</span>
+                        </Button>
+                      }
+                    />
                     <DeleteButton complaintId={complaint.id} />
                   </div>
                 </div>
