@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import DeleteButton from "./delete-button";
 
 // ── Status config ──────────────────────────────────────────────────────────────
 const STATUS_CONFIG: Record<
@@ -380,13 +381,20 @@ const ComplainsContainer = () => {
                   </div>
 
                   {/* Date */}
-                  <span className="text-[10px] tabular-nums text-muted-foreground">
-                    {new Date(complaint.createdAt).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] tabular-nums text-muted-foreground">
+                      {new Date(complaint.createdAt).toLocaleDateString(
+                        "en-US",
+                        {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        },
+                      )}
+                    </span>
+
+                    <DeleteButton complaintId={complaint.id} />
+                  </div>
                 </div>
               </div>
             );
