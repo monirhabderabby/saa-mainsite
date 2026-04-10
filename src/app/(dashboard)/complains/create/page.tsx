@@ -17,10 +17,8 @@ const Page = () => {
         <CardHeader>
           <div className="flex justify-between items-start">
             <div className="space-y-2">
-              <CardTitle className="text-3xl font-bold tracking-tight text-foreground">
-                New Complaint
-              </CardTitle>
-              <CardDescription className="text-muted-foreground text-lg max-w-2xl">
+              <CardTitle>New Complaint</CardTitle>
+              <CardDescription className="text-xs">
                 Submit a formal complaint. Management will review all
                 submissions within 72 hours.
               </CardDescription>
