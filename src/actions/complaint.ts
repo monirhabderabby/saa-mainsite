@@ -5,6 +5,18 @@ import prisma from "@/lib/prisma";
 import { complaintSchema, ComplaintSchemaType } from "@/schemas/complaint";
 import { revalidatePath } from "next/cache";
 
+const generateUniqueId = async (): Promise<string> => {
+  let id: string;
+  let exists = true;
+
+  do {
+    id = `SC-${Math.floor(100000 + Math.random() * 900000)}`;
+    exists = !!(await prisma.complaint.findUnique({ where: { uniqueId: id } }));
+  } while (exists);
+
+  return id;
+};
+
 export async function createComplaintAction(data: ComplaintSchemaType) {
   const session = await auth();
 
@@ -14,6 +26,8 @@ export async function createComplaintAction(data: ComplaintSchemaType) {
       message: "You must be logged in to submit a complaint.",
     };
   }
+
+  const uniqueId = await generateUniqueId();
 
   try {
     const parsed = complaintSchema.safeParse(data);
@@ -29,11 +43,14 @@ export async function createComplaintAction(data: ComplaintSchemaType) {
     const complaint = await prisma.complaint.create({
       data: {
         subject,
+        uniqueId: uniqueId,
         source,
         priority,
         message,
         supportingDocs: supportingDocs
-          ? supportingDocs.map((doc) => doc.value).filter((v) => v.trim() !== "")
+          ? supportingDocs
+              .map((doc) => doc.value)
+              .filter((v) => v.trim() !== "")
           : [],
         creatorId: session.user.id,
       },
@@ -43,7 +60,8 @@ export async function createComplaintAction(data: ComplaintSchemaType) {
 
     return {
       success: true,
-      message: "Your complaint has been submitted successfully. Management will review it within 72 hours.",
+      message:
+        "Your complaint has been submitted successfully. Management will review it within 72 hours.",
       data: complaint,
     };
   } catch (error) {

@@ -700,11 +700,20 @@ enum ComplaintPriority {
     HIGH
 }
 
+enum ComplaintStatus {
+    OPEN
+    IN_PROGRESS
+    RESOLVED
+    REJECTED
+}
+
 model Complaint {
     id            String            @id @default(auto()) @map("_id") @db.ObjectId
+    uniqueId      String            @unique
     subject       String
     source        ComplaintSource
     priority      ComplaintPriority
+    status        ComplaintStatus   @default(OPEN)
     message       String
     supportingDocs String[]
 
@@ -714,5 +723,5 @@ model Complaint {
     createdAt     DateTime          @default(now())
     updatedAt     DateTime          @updatedAt
 
-    @@index([creatorId])
+    @@index([creatorId, uniqueId])
 }
