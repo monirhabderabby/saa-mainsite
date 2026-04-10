@@ -38,13 +38,12 @@ export async function createComplaintAction(data: ComplaintSchemaType) {
       };
     }
 
-    const { subject, source, priority, message, supportingDocs } = parsed.data;
+    const { subject, priority, message, supportingDocs } = parsed.data;
 
     const complaint = await prisma.complaint.create({
       data: {
         subject,
         uniqueId: uniqueId,
-        source,
         priority,
         message,
         supportingDocs: supportingDocs

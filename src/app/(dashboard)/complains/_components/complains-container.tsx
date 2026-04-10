@@ -11,11 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useGetMyComplains } from "@/hook/complains/use-get-my-complains";
-import {
-  ComplaintPriority,
-  ComplaintSource,
-  ComplaintStatus,
-} from "@prisma/client";
+import { ComplaintPriority, ComplaintStatus } from "@prisma/client";
 import {
   CheckCircle2,
   ChevronLeft,
@@ -74,14 +70,12 @@ const ComplainsContainer = () => {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<ComplaintStatus | undefined>();
   const [priority, setPriority] = useState<ComplaintPriority | undefined>();
-  const [source, setSource] = useState<ComplaintSource | undefined>();
 
   const { data, isLoading, isError } = useGetMyComplains({
     page,
     limit: 9,
     status,
     priority,
-    source,
   });
 
   const complaints = data?.data ?? [];
@@ -99,12 +93,11 @@ const ComplainsContainer = () => {
   const resetFilters = () => {
     setStatus(undefined);
     setPriority(undefined);
-    setSource(undefined);
     setSearch("");
     setPage(1);
   };
 
-  const hasFilters = status || priority || source || search;
+  const hasFilters = status || priority || search;
 
   return (
     <Card className="space-y-5 p-5  pb-12">
@@ -198,29 +191,6 @@ const ComplainsContainer = () => {
           </SelectContent>
         </Select>
 
-        {/* Source */}
-        <Select
-          value={source ?? "ALL"}
-          onValueChange={(v) => {
-            setSource(v === "ALL" ? undefined : (v as ComplaintSource));
-            setPage(1);
-          }}
-        >
-          <SelectTrigger className="h-8 text-xs w-full sm:w-[145px]">
-            <SelectValue placeholder="Source" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL" className="text-xs">
-              All Sources
-            </SelectItem>
-            {Object.values(ComplaintSource).map((s) => (
-              <SelectItem key={s} value={s} className="text-xs">
-                {s.replace("_", " ")}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
         {/* Clear filters */}
         {hasFilters && (
           <Button
@@ -248,11 +218,7 @@ const ComplainsContainer = () => {
               Priority: {priority.charAt(0) + priority.slice(1).toLowerCase()}
             </span>
           )}
-          {source && (
-            <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border bg-muted/40 text-muted-foreground">
-              Source: {source.replace("_", " ")}
-            </span>
-          )}
+
           {search && (
             <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border bg-muted/40 text-muted-foreground">
               Search: &quot;{search}&quot;
@@ -369,14 +335,6 @@ const ComplainsContainer = () => {
                       />
                       {complaint.priority.charAt(0) +
                         complaint.priority.slice(1).toLowerCase()}
-                    </span>
-
-                    {/* Divider */}
-                    <span className="h-3 w-px bg-border" />
-
-                    {/* Source */}
-                    <span className="text-[10px] text-muted-foreground">
-                      {complaint.source.replace("_", " ")}
                     </span>
                   </div>
 

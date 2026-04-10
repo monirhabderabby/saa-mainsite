@@ -689,10 +689,6 @@ model AuditLog {
     @@index([createdAt])
 }
 
-enum ComplaintSource {
-    ISSUE_SHEET
-    UPDATE_SHEET
-}
 
 enum ComplaintPriority {
     LOW
@@ -711,7 +707,6 @@ model Complaint {
     id            String            @id @default(auto()) @map("_id") @db.ObjectId
     uniqueId      String            @unique
     subject       String
-    source        ComplaintSource
     priority      ComplaintPriority
     status        ComplaintStatus   @default(OPEN)
     message       String

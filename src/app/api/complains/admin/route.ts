@@ -2,11 +2,7 @@
 
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
-import {
-  ComplaintPriority,
-  ComplaintSource,
-  ComplaintStatus,
-} from "@prisma/client";
+import { ComplaintPriority, ComplaintStatus } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -30,7 +26,6 @@ export async function GET(req: NextRequest) {
 
   const status = searchParams.get("status") as ComplaintStatus | null;
   const priority = searchParams.get("priority") as ComplaintPriority | null;
-  const source = searchParams.get("ComplaintSource") as ComplaintSource | null;
 
   const validStatus =
     status && Object.values(ComplaintStatus).includes(status)
@@ -40,15 +35,10 @@ export async function GET(req: NextRequest) {
     priority && Object.values(ComplaintPriority).includes(priority)
       ? priority
       : undefined;
-  const validSource =
-    source && Object.values(ComplaintSource).includes(source)
-      ? source
-      : undefined;
 
   const where = {
     ...(validStatus && { status: validStatus }),
     ...(validPriority && { priority: validPriority }),
-    ...(validSource && { source: validSource }),
   };
 
   const [complaints, total] = await prisma.$transaction([

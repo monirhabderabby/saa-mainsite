@@ -1,9 +1,4 @@
-import {
-  Complaint,
-  ComplaintPriority,
-  ComplaintSource,
-  ComplaintStatus,
-} from "@prisma/client";
+import { Complaint, ComplaintPriority, ComplaintStatus } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 
 interface GetMyComplainsResponse {
@@ -22,7 +17,6 @@ interface UseGetMyComplainsOptions {
   limit?: number;
   status?: ComplaintStatus;
   priority?: ComplaintPriority;
-  source?: ComplaintSource;
 }
 
 export function useGetMyComplains({
@@ -30,10 +24,9 @@ export function useGetMyComplains({
   limit = 10,
   status,
   priority,
-  source,
 }: UseGetMyComplainsOptions = {}) {
   return useQuery({
-    queryKey: ["admin-complains", page, limit, status, priority, source],
+    queryKey: ["admin-complains", page, limit, status, priority],
     queryFn: async (): Promise<GetMyComplainsResponse> => {
       const params = new URLSearchParams();
 
@@ -41,7 +34,6 @@ export function useGetMyComplains({
       params.set("limit", String(limit));
       if (status) params.set("status", status);
       if (priority) params.set("priority", priority);
-      if (source) params.set("ComplaintSource", source);
 
       const res = await fetch(`/api/complains/admin?${params.toString()}`, {
         method: "GET",

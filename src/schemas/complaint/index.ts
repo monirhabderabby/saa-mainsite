@@ -1,20 +1,32 @@
-import { ComplaintPriority, ComplaintSource } from "@prisma/client";
+import { countTipTapCharacters, getTextFromHtml } from "@/lib/utils";
+import { ComplaintPriority } from "@prisma/client";
 import { z } from "zod";
 
-export const complaintSources = Object.values(ComplaintSource);
 export const complaintPriorities = Object.values(ComplaintPriority);
 
 export const complaintSchema = z.object({
   subject: z.string().min(1, "Subject is required"),
-  source: z.nativeEnum(ComplaintSource, {
-    message: "Please select a source",
-  }),
+
   priority: z.nativeEnum(ComplaintPriority, {
     message: "Please select a priority level",
   }),
-  message: z.string().min(10, "Message must be at least 10 characters"),
+  message: z
+    .string({
+      message: "Please write your message here",
+    })
+    .trim()
+    .refine(
+      (val) => countTipTapCharacters(val) <= 2500,
+      "Message cannot exceed 2500 characters",
+    )
+    .refine((val) => {
+      const text = getTextFromHtml(val).toLowerCase();
+      return !["mc"].some((word) => text.includes(word.toLowerCase()));
+    }),
   supportingDocs: z.array(
-    z.object({ value: z.string().url("Must be a valid URL").or(z.literal("")) })
+    z.object({
+      value: z.string().url("Must be a valid URL").or(z.literal("")),
+    }),
   ),
 });
 
