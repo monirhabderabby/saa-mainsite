@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import CommandPaletteContainer from "@/components/command-palette/command-palette-container";
-import { MobileFeatureUnlock } from "@/components/popup-notifications/mobile-feature-unlock";
+import { PohelaBoishakhAnnouncement } from "@/components/popup-notifications/pohela-boisakh=announcement";
 import prisma from "@/lib/prisma";
 import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
@@ -47,8 +47,8 @@ const SiteLayout = async ({ children }: Props) => {
           </div>
         </div>
       </div>
-      {/* <NewYearCelebration employeeId={user.employeeId} /> */}
-      <MobileFeatureUnlock employeeId={user.employeeId} />
+
+      <PohelaBoishakhAnnouncement employeeId={user.employeeId} />
 
       <CommandPaletteContainer />
     </>
