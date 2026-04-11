@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useGetMyComplains } from "@/hook/complains/use-get-my-complains";
+import { useGetAdminComplains } from "@/hook/complains/use-get-admin-complains";
 import { ComplaintPriority, ComplaintStatus } from "@prisma/client";
 import {
   CheckCircle2,
@@ -68,14 +68,18 @@ export const PRIORITY_CONFIG: Record<
   LOW: { cls: "text-emerald-500", dot: "bg-emerald-500" },
 };
 
+interface Props {
+  isAdmin: boolean;
+}
+
 // ── Component ──────────────────────────────────────────────────────────────────
-const ComplainsContainer = () => {
+const ComplainsContainerForAdmin = ({ isAdmin }: Props) => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<ComplaintStatus | undefined>();
   const [priority, setPriority] = useState<ComplaintPriority | undefined>();
 
-  const { data, isLoading, isError } = useGetMyComplains({
+  const { data, isLoading, isError } = useGetAdminComplains({
     page,
     limit: 9,
     status,
@@ -360,7 +364,7 @@ const ComplainsContainer = () => {
                     </span>
 
                     <ComplaintViewModal
-                      isAdmin={false}
+                      isAdmin={isAdmin}
                       complaint={complaint}
                       trigger={
                         <Button
@@ -452,4 +456,4 @@ const ComplainsContainer = () => {
   );
 };
 
-export default ComplainsContainer;
+export default ComplainsContainerForAdmin;

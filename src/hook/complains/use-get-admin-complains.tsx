@@ -1,9 +1,10 @@
-import { Complaint, ComplaintPriority, ComplaintStatus } from "@prisma/client";
+import { ComplaintPriority, ComplaintStatus } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
+import { ComplaintWithCreator } from "./use-get-my-complains";
 
 interface GetMyComplainsResponse {
   success: boolean;
-  data: Complaint[];
+  data: ComplaintWithCreator[];
   pagination: {
     total: number;
     page: number;
@@ -19,7 +20,7 @@ interface UseGetMyComplainsOptions {
   priority?: ComplaintPriority;
 }
 
-export function useGetMyComplains({
+export function useGetAdminComplains({
   page = 1,
   limit = 10,
   status,

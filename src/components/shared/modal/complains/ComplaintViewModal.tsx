@@ -1,5 +1,6 @@
 "use client";
 
+import { changeComplaintStatusAction } from "@/actions/complains/change-status";
 import {
   PRIORITY_CONFIG,
   STATUS_CONFIG,
@@ -16,10 +17,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ComplaintWithCreator } from "@/hook/complains/use-get-my-complains";
 import { normalizeEditorHtml } from "@/lib/html-parse"; // your existing util
 import { cn } from "@/lib/utils";
-import { FileText, X } from "lucide-react";
+import { ComplaintStatus } from "@prisma/client";
+import { Check, FileText, Info, X } from "lucide-react";
 import moment from "moment";
 import Image from "next/image";
-import { ReactNode } from "react";
+import { ReactNode, useState, useTransition } from "react";
+import { toast } from "sonner";
 
 // ── Info row helper (mirrors ClipboardCopy visually, no copy action needed) ──
 function InfoRow({
@@ -48,14 +51,47 @@ function InfoRow({
   );
 }
 
+const STATUS_OPTIONS = [
+  {
+    value: "OPEN",
+    label: "Open",
+    dotCls: "bg-amber-500",
+    activeCls: "bg-amber-100 border-amber-500 text-amber-800",
+  },
+  {
+    value: "IN_PROGRESS",
+    label: "In progress",
+    dotCls: "bg-blue-500",
+    activeCls: "bg-blue-100  border-blue-500  text-blue-800",
+  },
+  {
+    value: "RESOLVED",
+    label: "Resolved",
+    dotCls: "bg-emerald-500",
+    activeCls: "bg-emerald-100 border-emerald-500 text-emerald-800",
+  },
+  {
+    value: "REJECTED",
+    label: "Rejected",
+    dotCls: "bg-red-500",
+    activeCls: "bg-red-100   border-red-500   text-red-800",
+  },
+];
+
 // ── Props ──────────────────────────────────────────────────────────────────────
 interface Props {
   complaint: ComplaintWithCreator;
   trigger: ReactNode;
+  isAdmin: boolean;
 }
 
 // ── Modal ──────────────────────────────────────────────────────────────────────
-const ComplaintViewModal = ({ complaint, trigger }: Props) => {
+const ComplaintViewModal = ({ complaint, trigger, isAdmin }: Props) => {
+  const [pending, startTransition] = useTransition();
+  const [selectedStatus, setSelectedStatus] = useState<ComplaintStatus>(
+    complaint.status,
+  );
+  const [isSaving, setIsSaving] = useState(false);
   const statusCfg = STATUS_CONFIG[complaint.status];
   const priorityCfg = PRIORITY_CONFIG[complaint.priority];
   const normalizedHtml = normalizeEditorHtml(complaint.message);
@@ -63,9 +99,32 @@ const ComplaintViewModal = ({ complaint, trigger }: Props) => {
   const creatorName = creator.fullName;
   const creatorProfileImage = creator.image;
   const creatorServiceLine = creator.service?.name ?? "N/A";
-  const creatorDesignation = creator.designation.name ?? "N/A";
+  const creatorDesignation = creator.designation?.name ?? "N/A";
   const creatorDepartment = creator.department?.name ?? "N/A";
   const creatorEmployeeId = creator.employeeId;
+
+  const onChangeStatus = () => {
+    if (!selectedStatus) {
+      toast.error("");
+      return;
+    }
+
+    // changing the status
+    startTransition(() => {
+      changeComplaintStatusAction({
+        complaintId: complaint.id,
+        status: selectedStatus,
+      }).then((res) => {
+        if (!res.success) {
+          toast.error(res.message);
+          return;
+        }
+
+        // handle success
+        toast.success(res.message);
+      });
+    });
+  };
 
   return (
     <AlertDialog>
@@ -189,6 +248,59 @@ const ComplaintViewModal = ({ complaint, trigger }: Props) => {
                     Document {i + 1}
                   </a>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* ── Admin: Update status ── */}
+          {isAdmin && (
+            <div className="px-5 py-4 border-b border-border bg-blue-50/20">
+              <div className="flex items-center gap-1.5 mb-3">
+                <Info className="h-3.5 w-3.5 text-blue-500" />
+                <span className="text-[10px] font-medium uppercase tracking-wide text-blue-500">
+                  Admin · Update status
+                </span>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                {STATUS_OPTIONS.map(({ value, label, dotCls, activeCls }) => (
+                  <button
+                    key={value}
+                    onClick={() => setSelectedStatus(value as ComplaintStatus)}
+                    className={cn(
+                      "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all",
+                      selectedStatus === value
+                        ? activeCls + " border-[1.5px]"
+                        : "bg-background border-border text-muted-foreground hover:bg-muted",
+                    )}
+                  >
+                    <span className={cn("h-2 w-2 rounded-full", dotCls)} />
+                    {label}
+                  </button>
+                ))}
+
+                {/* Divider */}
+                <div className="h-6 w-px bg-border mx-1" />
+
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={
+                    selectedStatus === complaint.status || isSaving || pending
+                  }
+                  className={cn(
+                    "gap-1.5 text-xs transition-all",
+                    selectedStatus !== complaint.status &&
+                      "border-blue-400 text-blue-700 bg-blue-50 hover:bg-blue-100",
+                  )}
+                  onClick={() => {
+                    setIsSaving(true);
+                    onChangeStatus();
+                  }}
+                >
+                  <Check className="h-3.5 w-3.5" />
+                  Save status
+                </Button>
               </div>
             </div>
           )}
