@@ -74,13 +74,14 @@ model User {
     tasksId            String?             @db.ObjectId
     projectAssignments ProjectAssignment[]
 
-    projects      Project[]
-    salesProjects Project[]    @relation("SalesPersonProjects")
-    projectQnas   ProjectQna[]
-    auditLogs     AuditLog[]
-    issueActivities IssueActivity[] @relation("IssueActivityActor")
-    updateSheetActivities UpdateActivity[] @relation("UpdateActivityActor")
-    complaints Complaint[]
+    projects              Project[]
+    salesProjects         Project[]         @relation("SalesPersonProjects")
+    projectQnas           ProjectQna[]
+    auditLogs             AuditLog[]
+    issueActivities       IssueActivity[]   @relation("IssueActivityActor")
+    updateSheetActivities UpdateActivity[]  @relation("UpdateActivityActor")
+    complaints            Complaint[]
+    complaintManager      ComplaintManager?
 }
 
 model UserVerification {
@@ -689,7 +690,6 @@ model AuditLog {
     @@index([createdAt])
 }
 
-
 enum ComplaintPriority {
     LOW
     MEDIUM
@@ -704,19 +704,27 @@ enum ComplaintStatus {
 }
 
 model Complaint {
-    id            String            @id @default(auto()) @map("_id") @db.ObjectId
-    uniqueId      String            @unique
-    subject       String
-    priority      ComplaintPriority
-    status        ComplaintStatus   @default(OPEN)
-    message       String
+    id             String            @id @default(auto()) @map("_id") @db.ObjectId
+    uniqueId       String            @unique
+    subject        String
+    priority       ComplaintPriority
+    status         ComplaintStatus   @default(OPEN)
+    message        String
     supportingDocs String[]
 
-    creatorId     String            @db.ObjectId
-    creator       User              @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+    creatorId String @db.ObjectId
+    creator   User   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
 
-    createdAt     DateTime          @default(now())
-    updatedAt     DateTime          @updatedAt
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
     @@index([creatorId, uniqueId])
+}
+
+model ComplaintManager {
+    id     String @id @default(auto()) @map("_id") @db.ObjectId
+    userId String @unique @db.ObjectId
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
 }

@@ -4,13 +4,7 @@ import ComplaintViewModal from "@/components/shared/modal/complains/ComplaintVie
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { MultiSelectDropdown } from "@/components/ui/multi-select-dropdown";
 import { useGetAdminComplains } from "@/hook/complains/use-get-admin-complains";
 import { ComplaintPriority, ComplaintStatus } from "@prisma/client";
 import {
@@ -22,9 +16,9 @@ import {
   FileText,
   Loader2,
   MessageSquare,
-  PlusCircle,
   Search,
   SlidersHorizontal,
+  X,
   XCircle,
   Zap,
 } from "lucide-react";
@@ -76,14 +70,14 @@ interface Props {
 const ComplainsContainerForAdmin = ({ isAdmin }: Props) => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<ComplaintStatus | undefined>();
-  const [priority, setPriority] = useState<ComplaintPriority | undefined>();
+  const [statuses, setStatuses] = useState<ComplaintStatus[]>([]);
+  const [priorities, setPriorities] = useState<ComplaintPriority[]>([]);
 
   const { data, isLoading, isError } = useGetAdminComplains({
     page,
     limit: 9,
-    status,
-    priority,
+    statuses,
+    priorities,
   });
 
   const complaints = data?.data ?? [];
@@ -100,13 +94,13 @@ const ComplainsContainerForAdmin = ({ isAdmin }: Props) => {
     : complaints;
 
   const resetFilters = () => {
-    setStatus(undefined);
-    setPriority(undefined);
+    setStatuses([]);
+    setPriorities([]);
     setSearch("");
     setPage(1);
   };
 
-  const hasFilters = status || priority || search;
+  const hasFilters = statuses.length > 0 || priorities.length > 0 || search;
 
   return (
     <Card className="space-y-5 p-5  pb-12">
@@ -125,17 +119,6 @@ const ComplainsContainerForAdmin = ({ isAdmin }: Props) => {
             )}
           </p>
         </div>
-        <Button
-          size="sm"
-          effect="gooeyLeft"
-          asChild
-          className="h-8 text-xs px-3"
-        >
-          <Link href="/complains/create" className="flex items-center gap-1.5">
-            <PlusCircle className="h-3.5 w-3.5" />
-            New Complaint
-          </Link>
-        </Button>
       </div>
 
       {/* ── Filters Bar ── */}
@@ -155,50 +138,33 @@ const ComplainsContainerForAdmin = ({ isAdmin }: Props) => {
         </div>
 
         {/* Status */}
-        <Select
-          value={status ?? "ALL"}
-          onValueChange={(v) => {
-            setStatus(v === "ALL" ? undefined : (v as ComplaintStatus));
+        <MultiSelectDropdown
+          placeholder="Status"
+          options={Object.values(ComplaintStatus).map((s) => ({
+            value: s,
+            label: STATUS_CONFIG[s].label,
+            icon: STATUS_CONFIG[s].icon,
+          }))}
+          selected={statuses}
+          onChange={(vals) => {
+            setStatuses(vals as ComplaintStatus[]);
             setPage(1);
           }}
-        >
-          <SelectTrigger className="h-8 text-xs w-full sm:w-[130px]">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL" className="text-xs">
-              All Statuses
-            </SelectItem>
-            {Object.values(ComplaintStatus).map((s) => (
-              <SelectItem key={s} value={s} className="text-xs">
-                {STATUS_CONFIG[s].label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        />
 
         {/* Priority */}
-        <Select
-          value={priority ?? "ALL"}
-          onValueChange={(v) => {
-            setPriority(v === "ALL" ? undefined : (v as ComplaintPriority));
+        <MultiSelectDropdown
+          placeholder="Priority"
+          options={Object.values(ComplaintPriority).map((p) => ({
+            value: p,
+            label: p.charAt(0) + p.slice(1).toLowerCase(),
+          }))}
+          selected={priorities}
+          onChange={(vals) => {
+            setPriorities(vals as ComplaintPriority[]);
             setPage(1);
           }}
-        >
-          <SelectTrigger className="h-8 text-xs w-full sm:w-[130px]">
-            <SelectValue placeholder="Priority" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL" className="text-xs">
-              All Priorities
-            </SelectItem>
-            {Object.values(ComplaintPriority).map((p) => (
-              <SelectItem key={p} value={p} className="text-xs capitalize">
-                {p.charAt(0) + p.slice(1).toLowerCase()}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        />
 
         {/* Clear filters */}
         {hasFilters && (
@@ -217,20 +183,49 @@ const ComplainsContainerForAdmin = ({ isAdmin }: Props) => {
       {/* ── Active filter pills ── */}
       {hasFilters && (
         <div className="flex flex-wrap gap-1.5 -mt-1">
-          {status && (
-            <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border bg-muted/40 text-muted-foreground">
-              Status: {STATUS_CONFIG[status].label}
+          {statuses.map((s) => (
+            <span
+              key={s}
+              className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border bg-muted/40 text-muted-foreground"
+            >
+              {STATUS_CONFIG[s].label}
+              <button
+                onClick={() => {
+                  setStatuses((prev) => prev.filter((x) => x !== s));
+                  setPage(1);
+                }}
+              >
+                <X className="h-2.5 w-2.5" />
+              </button>
             </span>
-          )}
-          {priority && (
-            <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border bg-muted/40 text-muted-foreground">
-              Priority: {priority.charAt(0) + priority.slice(1).toLowerCase()}
+          ))}
+          {priorities.map((p) => (
+            <span
+              key={p}
+              className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border bg-muted/40 text-muted-foreground"
+            >
+              {p.charAt(0) + p.slice(1).toLowerCase()}
+              <button
+                onClick={() => {
+                  setPriorities((prev) => prev.filter((x) => x !== p));
+                  setPage(1);
+                }}
+              >
+                <X className="h-2.5 w-2.5" />
+              </button>
             </span>
-          )}
-
+          ))}
           {search && (
             <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border bg-muted/40 text-muted-foreground">
-              Search: &quot;{search}&quot;
+              &quot;{search}&quot;
+              <button
+                onClick={() => {
+                  setSearch("");
+                  setPage(1);
+                }}
+              >
+                <X className="h-2.5 w-2.5" />
+              </button>
             </span>
           )}
         </div>

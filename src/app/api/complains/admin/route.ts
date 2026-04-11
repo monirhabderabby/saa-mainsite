@@ -1,5 +1,3 @@
-// /api/complains/me/route.ts
-
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import { ComplaintPriority, ComplaintStatus } from "@prisma/client";
@@ -24,21 +22,20 @@ export async function GET(req: NextRequest) {
   );
   const skip = (page - 1) * limit;
 
-  const status = searchParams.get("status") as ComplaintStatus | null;
-  const priority = searchParams.get("priority") as ComplaintPriority | null;
+  // ── Multi-value: ?status=OPEN&status=IN_PROGRESS
+  const rawStatuses = searchParams.getAll("status");
+  const rawPriorities = searchParams.getAll("priority");
 
-  const validStatus =
-    status && Object.values(ComplaintStatus).includes(status)
-      ? status
-      : undefined;
-  const validPriority =
-    priority && Object.values(ComplaintPriority).includes(priority)
-      ? priority
-      : undefined;
+  const validStatuses = rawStatuses.filter((s): s is ComplaintStatus =>
+    Object.values(ComplaintStatus).includes(s as ComplaintStatus),
+  );
+  const validPriorities = rawPriorities.filter((p): p is ComplaintPriority =>
+    Object.values(ComplaintPriority).includes(p as ComplaintPriority),
+  );
 
   const where = {
-    ...(validStatus && { status: validStatus }),
-    ...(validPriority && { priority: validPriority }),
+    ...(validStatuses.length > 0 && { status: { in: validStatuses } }),
+    ...(validPriorities.length > 0 && { priority: { in: validPriorities } }),
   };
 
   const [complaints, total] = await prisma.$transaction([
@@ -47,24 +44,14 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "desc" },
       skip,
       take: limit,
-      include: {
-        creator: true,
-      },
+      include: { creator: true },
     }),
     prisma.complaint.count({ where }),
   ]);
 
-  return NextResponse.json(
-    {
-      success: true,
-      data: complaints,
-      pagination: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
-    },
-    { status: 200 },
-  );
+  return NextResponse.json({
+    success: true,
+    data: complaints,
+    pagination: { total, page, limit, totalPages: Math.ceil(total / limit) },
+  });
 }
