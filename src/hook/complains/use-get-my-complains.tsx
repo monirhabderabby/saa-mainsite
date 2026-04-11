@@ -1,9 +1,21 @@
-import { Complaint, ComplaintPriority, ComplaintStatus } from "@prisma/client";
+import { ComplaintPriority, ComplaintStatus, Prisma } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
+
+export type ComplaintWithCreator = Prisma.ComplaintGetPayload<{
+  include: {
+    creator: {
+      include: {
+        service: true;
+        designation: true;
+        department: true;
+      };
+    };
+  };
+}>;
 
 export interface GetMyComplainsResponse {
   success: boolean;
-  data: Complaint[];
+  data: ComplaintWithCreator[];
   pagination: {
     total: number;
     page: number;

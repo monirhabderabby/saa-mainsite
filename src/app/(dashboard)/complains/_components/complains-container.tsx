@@ -90,7 +90,8 @@ const ComplainsContainer = () => {
     ? complaints.filter(
         (c) =>
           c.subject.toLowerCase().includes(search.toLowerCase()) ||
-          c.message.toLowerCase().includes(search.toLowerCase()),
+          c.message.toLowerCase().includes(search.toLowerCase()) ||
+          c.uniqueId.toLowerCase().includes(search.toLowerCase()),
       )
     : complaints;
 
@@ -139,7 +140,7 @@ const ComplainsContainer = () => {
         <div className="relative flex-1 min-w-0">
           <Input
             startIcon={Search}
-            placeholder="Search by subject or message…"
+            placeholder="Search by subject or complain ID or message…"
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);

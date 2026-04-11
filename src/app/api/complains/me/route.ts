@@ -48,6 +48,15 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "desc" },
       skip,
       take: limit,
+      include: {
+        creator: {
+          include: {
+            service: true,
+            designation: true,
+            department: true,
+          },
+        },
+      },
     }),
     prisma.complaint.count({ where }),
   ]);

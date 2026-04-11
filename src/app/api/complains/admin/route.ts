@@ -47,6 +47,9 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "desc" },
       skip,
       take: limit,
+      include: {
+        creator: true,
+      },
     }),
     prisma.complaint.count({ where }),
   ]);

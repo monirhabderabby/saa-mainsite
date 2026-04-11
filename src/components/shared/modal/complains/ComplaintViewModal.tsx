@@ -13,11 +13,12 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ComplaintWithCreator } from "@/hook/complains/use-get-my-complains";
 import { normalizeEditorHtml } from "@/lib/html-parse"; // your existing util
 import { cn } from "@/lib/utils";
-import { Complaint } from "@prisma/client";
 import { FileText, X } from "lucide-react";
 import moment from "moment";
+import Image from "next/image";
 import { ReactNode } from "react";
 
 // ── Info row helper (mirrors ClipboardCopy visually, no copy action needed) ──
@@ -49,7 +50,7 @@ function InfoRow({
 
 // ── Props ──────────────────────────────────────────────────────────────────────
 interface Props {
-  complaint: Complaint;
+  complaint: ComplaintWithCreator;
   trigger: ReactNode;
 }
 
@@ -58,12 +59,19 @@ const ComplaintViewModal = ({ complaint, trigger }: Props) => {
   const statusCfg = STATUS_CONFIG[complaint.status];
   const priorityCfg = PRIORITY_CONFIG[complaint.priority];
   const normalizedHtml = normalizeEditorHtml(complaint.message);
+  const creator = complaint.creator;
+  const creatorName = creator.fullName;
+  const creatorProfileImage = creator.image;
+  const creatorServiceLine = creator.service?.name ?? "N/A";
+  const creatorDesignation = creator.designation.name ?? "N/A";
+  const creatorDepartment = creator.department?.name ?? "N/A";
+  const creatorEmployeeId = creator.employeeId;
 
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
 
-      <AlertDialogContent className="p-0 gap-0 max-w-lg">
+      <AlertDialogContent className="p-0 gap-0 max-w-[900px]">
         {/* ── Header ── */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-2.5">
@@ -98,7 +106,7 @@ const ComplaintViewModal = ({ complaint, trigger }: Props) => {
         {/* ── Meta section ── */}
         <ScrollArea className="max-h-[70vh]">
           <div className="p-5 border-b border-border bg-muted/40">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <InfoRow label="Complaint ID" value={complaint.uniqueId} />
               <InfoRow label="Subject" value={complaint.subject} />
               <InfoRow
@@ -121,6 +129,44 @@ const ComplaintViewModal = ({ complaint, trigger }: Props) => {
                     )}
                   />
                 )}
+            </div>
+
+            {/* ── Issuer ── */}
+            <div className=" py-4 border-t border-border">
+              <div className="grid grid-cols-1 md:grid-cols-2  gap-x-5">
+                <div className="flex items-center gap-3">
+                  {/* Avatar */}
+                  {creatorProfileImage ? (
+                    <Image
+                      src={creatorProfileImage}
+                      alt={creatorName}
+                      className="h-10 w-10 rounded-full object-cover border border-border"
+                      height={40}
+                      width={40}
+                    />
+                  ) : (
+                    <div className="h-10 w-10 rounded-full bg-muted border border-border flex items-center justify-center text-sm font-medium text-muted-foreground">
+                      {creatorName?.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+
+                  {/* Name + designation */}
+                  <div>
+                    <p className="text-sm font-medium text-foreground">
+                      {creatorName}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {creatorDesignation} ({creatorEmployeeId})
+                    </p>
+                  </div>
+                </div>
+
+                {/* Extra meta */}
+                <div className=" grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <InfoRow label="Department" value={creatorDepartment} />
+                  <InfoRow label="Service Line" value={creatorServiceLine} />
+                </div>
+              </div>
             </div>
           </div>
 
