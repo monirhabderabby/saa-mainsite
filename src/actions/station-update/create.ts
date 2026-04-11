@@ -46,6 +46,7 @@ export async function createStationUpdate(data: StationFormValues) {
 
     // Optional: revalidate page/cache
     revalidatePath("/station-updates");
+    revalidatePath("/update-sheet");
 
     return {
       success: true,

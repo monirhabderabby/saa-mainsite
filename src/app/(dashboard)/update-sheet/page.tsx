@@ -15,13 +15,13 @@ const FilterContainer = dynamic(
   () => import("./_components/filters/filter-container"),
   {
     ssr: false,
-  }
+  },
 );
 const TableContainer = dynamic(
   () => import("./_components/tables/table-container"),
   {
     ssr: false,
-  }
+  },
 );
 
 const Page = async () => {
