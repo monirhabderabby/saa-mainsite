@@ -13,6 +13,11 @@ enum AccountStatus {
     DEACTIVE
 }
 
+enum EmployeeStatus {
+    PROBATION
+    PARMANENT
+}
+
 enum Role {
     SUPER_ADMIN
     ADMIN
@@ -39,9 +44,10 @@ model User {
 
     emailVerified DateTime?
 
-    accountStatus AccountStatus @default(PENDING)
-    role          Role
-    password      String
+    accountStatus  AccountStatus  @default(PENDING)
+    employeeStatus EmployeeStatus @default(PROBATION)
+    role           Role
+    password       String
 
     designationId String       @db.ObjectId
     designation   Designations @relation(fields: [designationId], references: [id], onDelete: Cascade)

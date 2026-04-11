@@ -70,7 +70,10 @@ interface Props {
 const ComplainsContainerForAdmin = ({ isAdmin }: Props) => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [statuses, setStatuses] = useState<ComplaintStatus[]>([]);
+  const [statuses, setStatuses] = useState<ComplaintStatus[]>([
+    "IN_PROGRESS",
+    "OPEN",
+  ]);
   const [priorities, setPriorities] = useState<ComplaintPriority[]>([]);
 
   const { data, isLoading, isError } = useGetAdminComplains({
