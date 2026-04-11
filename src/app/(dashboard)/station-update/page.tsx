@@ -70,7 +70,7 @@ const Page = async () => {
         )}
       </div>
 
-      <div className="mt-5 grid gap-5">
+      <div className="mt-5 grid gap-5 ">
         {stations.map((station) => (
           <Card
             className="border-2 hover:shadow-lg transition-all hover:border-primary/20"
@@ -99,7 +99,7 @@ const Page = async () => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
+              <div className="items-start grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                 {station.assignments.map((assignment, index) => (
                   <div
                     key={index}
