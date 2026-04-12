@@ -353,7 +353,7 @@ export function QueuePageClient({
             )}
           </div>
         ) : (
-          <div className="space-y-2 pb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 pb-4">
             {queues.map((queue) => (
               <QueueCard
                 key={queue.id}

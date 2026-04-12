@@ -187,7 +187,7 @@ export function QueueCard({
 
       {/* Message */}
       <div className="px-4 pb-3">
-        <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+        <p className="text-xs  font-medium leading-relaxed line-clamp-2">
           {queue.message}
         </p>
       </div>
