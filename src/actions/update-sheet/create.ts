@@ -1,11 +1,15 @@
 "use server";
 
 import { auth } from "@/auth";
+import { getSalesMembersForProfile } from "@/helper/notification/notification-helpers";
 import prisma from "@/lib/prisma";
+import { getUserChannel, PUSHER_EVENTS } from "@/lib/pusher/constants";
+import pusherServer from "@/lib/pusher/pusher";
 import {
   updateSheetCreateSchema,
   UpdateSheetCreateSchema,
 } from "@/schemas/update-sheet/create";
+import { UpdateSheetNotificationPayload } from "@/types/notification/notifications";
 import { Role } from "@prisma/client";
 import { logUpdateActivity } from "./activity";
 
@@ -116,6 +120,9 @@ export async function createUpdateSheetEntries(
         teamId,
         serviceId,
       },
+      include: {
+        profile: true,
+      },
     });
 
     if (!newUpdateSheetEntry) {
@@ -136,6 +143,34 @@ export async function createUpdateSheetEntries(
     // Step 6.5: Update associated project dates (non-blocking)
     if (newUpdateSheetEntry.updateTo !== "DELIVERY") {
       await updateProjectDates(newUpdateSheetEntry.orderId);
+    }
+
+    // Notification
+    const salesMemberIds = await getSalesMembersForProfile(
+      newUpdateSheetEntry.profileId,
+    );
+
+    if (salesMemberIds.length > 0) {
+      const payload: UpdateSheetNotificationPayload = {
+        type: "UPDATE_SHEET_CREATED",
+        updateSheetId: newUpdateSheetEntry.id,
+        clientName: newUpdateSheetEntry.clientName,
+        orderId: newUpdateSheetEntry.orderId,
+        profileName: newUpdateSheetEntry.profile.name,
+        profileId: newUpdateSheetEntry.profileId,
+        createdBy: session.user.name ?? "Someone",
+        createdAt: newUpdateSheetEntry.createdAt.toISOString(),
+      };
+
+      await Promise.all(
+        salesMemberIds.map((userId) =>
+          pusherServer.trigger(
+            getUserChannel(userId),
+            PUSHER_EVENTS.UPDATE_SHEET_CREATED,
+            payload,
+          ),
+        ),
+      );
     }
 
     // Step 7: Return success response
