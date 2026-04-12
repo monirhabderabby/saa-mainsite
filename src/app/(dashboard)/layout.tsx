@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import CommandPaletteContainer from "@/components/command-palette/command-palette-container";
 import prisma from "@/lib/prisma";
+import { NotificationProvider } from "@/providers/notification/notification-provider";
 import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
@@ -50,6 +51,8 @@ const SiteLayout = async ({ children }: Props) => {
       {/* <PohelaBoishakhAnnouncement employeeId={user.employeeId} /> */}
 
       <CommandPaletteContainer />
+
+      <NotificationProvider />
     </>
   );
 };
