@@ -17,7 +17,7 @@ const UpdatedByComponents = dynamic(
   () => import("./columns/updated-by-component"),
   {
     ssr: false,
-  }
+  },
 );
 
 const ViewUpdateSheetModal = dynamic(() => import("./columns/view-modal"), {
@@ -118,6 +118,26 @@ export const updateSheetColumns = ({
         currentUserTeam={currentUserTeam}
       />
     ),
+  },
+  {
+    accessorKey: "tlCheckAt",
+    header: () => <p className="text-center">Tl At</p>,
+    cell: ({ row }) => {
+      const tlBy = row.original.tlBy;
+
+      if (!tlBy) {
+        return <div></div>;
+      }
+      return (
+        <ProfileToolTip
+          trigger={<Button variant="link">@{tlBy?.nickName}</Button>}
+          fullName={tlBy?.fullName ?? ""}
+          joiningDate={row.original.tlCheckAt}
+          designation={tlBy?.designation.name ?? ""}
+          profilePhoto={tlBy?.image ?? ""}
+        />
+      );
+    },
   },
   {
     accessorKey: "updateTo",

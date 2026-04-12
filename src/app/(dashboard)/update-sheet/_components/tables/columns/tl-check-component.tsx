@@ -1,18 +1,11 @@
 import { tlCheck } from "@/actions/update-sheet/tl-check";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { UpdateSheetData } from "@/helper/update-sheet/update-sheet";
 import { Role } from "@prisma/client";
-import dynamic from "next/dynamic";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { CurrentUserTeam } from "../table-container";
-const ProfileToolTip = dynamic(
-  () => import("@/components/ui/profile-tooltip"),
-  {
-    ssr: false,
-  }
-);
 
 interface Props {
   data: UpdateSheetData;
@@ -32,6 +25,8 @@ const TlCheckComponent = ({
   const [pending, startTransition] = useTransition();
   const [isChecked, setIsChecked] = useState(!!data.tlId);
 
+  const queryClient = useQueryClient();
+
   // const queryClient = useQueryClient();
 
   const onChange = () => {
@@ -46,7 +41,7 @@ const TlCheckComponent = ({
           toast.error(result.message);
         } else {
           toast.success(result.message);
-          // queryClient.invalidateQueries({ queryKey: ["update-entries"] });
+          queryClient.invalidateQueries({ queryKey: ["update-entries"] });
         }
       } catch {
         setIsChecked(previousState);
@@ -83,16 +78,8 @@ const TlCheckComponent = ({
           disabled={pending}
           aria-label="TL Check"
         />
-      ) : data.tlId && data.tlCheckAt ? (
-        <ProfileToolTip
-          trigger={<Button variant="link">@{data.tlBy?.nickName}</Button>}
-          fullName={data.tlBy?.fullName ?? ""}
-          joiningDate={data.tlCheckAt}
-          designation={data.tlBy?.designation.name ?? ""}
-          profilePhoto={data.tlBy?.image ?? ""}
-        />
       ) : (
-        "N/A"
+        "—"
       )}
     </div>
   );
