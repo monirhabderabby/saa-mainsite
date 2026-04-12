@@ -9,6 +9,12 @@ import DoneByComponent from "./columns/done-by-component";
 import TlCheckComponent from "./columns/tl-check-component";
 import UpdateSheetRowAction from "./columns/update-sheet-row-action";
 import { CurrentUserTeam } from "./table-container";
+const ProfileToolTip = dynamic(
+  () => import("@/components/ui/profile-tooltip"),
+  {
+    ssr: false,
+  },
+);
 
 const UpdateToComponents = dynamic(() => import("./columns/update-to"), {
   ssr: false,
