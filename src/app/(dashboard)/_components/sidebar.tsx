@@ -121,16 +121,28 @@ const routes = [
   },
   {
     id: 10,
-     label: "Complains",
-     icon: CircleQuestionMark,
-     href: "/complains",
-     access: [
+    label: "Complains",
+    icon: CircleQuestionMark,
+    href: "/complains",
+    access: [
       "ADMIN",
       "SUPER_ADMIN",
       "OPERATION_MEMBER",
       "SALES_MEMBER",
     ] as Role[],
-  }
+  },
+  {
+    id: 11,
+    label: "Queue",
+    icon: Laptop,
+    href: "/queue",
+    access: [
+      "SUPER_ADMIN",
+      "ADMIN",
+      "SALES_MEMBER",
+      "OPERATION_MEMBER",
+    ] as Role[],
+  },
 ];
 
 interface Props {
