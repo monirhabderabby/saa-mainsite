@@ -29,10 +29,10 @@ import { toast } from "sonner";
 const LINK_TITLE_SUGGESTIONS = [
   "Conversation",
   "Attachment",
-  "Meeting",
-  "Proposal",
-  "Invoice",
-  "Contract",
+  "Meeting Link",
+  "Fiverr Support Message",
+  "Full Order Page",
+  "Full Inbox Page",
   "Other",
 ];
 
@@ -127,7 +127,7 @@ export default function SubmitLinksModal({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[480px] p-0 gap-0 overflow-hidden">
+      <DialogContent className="sm:max-w-[580px] p-0 gap-0 overflow-hidden">
         {/* Header */}
         <DialogHeader className="px-5 pt-5 pb-4 border-b border-border/60">
           <div className="flex items-center gap-2.5">
@@ -162,58 +162,60 @@ export default function SubmitLinksModal({
         {/* Links */}
         <div className="px-5 py-4 space-y-3 max-h-[320px] overflow-y-auto">
           {links.map((link, index) => (
-            <div key={link.id} className="space-y-2">
-              {index > 0 && <Separator className="mb-3" />}
-              <div className="flex items-center justify-between">
-                <Label className="text-xs font-medium text-muted-foreground">
-                  Link {index + 1}
-                </Label>
+            <div className="space-y-2" key={index}>
+              <div className="flex items-center gap-2">
+                {/* Inputs */}
+                <div className="grid grid-cols-2 gap-2 flex-1">
+                  <div className="space-y-1">
+                    <Label className="text-[11px] text-muted-foreground">
+                      Title
+                    </Label>
+                    <Select
+                      value={link.title}
+                      onValueChange={(val) => updateLink(link.id, "title", val)}
+                      disabled={isPending}
+                    >
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {LINK_TITLE_SUGGESTIONS.map((s) => (
+                          <SelectItem key={s} value={s} className="text-xs">
+                            {s}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label className="text-[11px] text-muted-foreground">
+                      URL
+                    </Label>
+                    <Input
+                      value={link.url}
+                      onChange={(e) =>
+                        updateLink(link.id, "url", e.target.value)
+                      }
+                      placeholder="https://..."
+                      className="h-8 text-xs"
+                      disabled={isPending}
+                    />
+                  </div>
+                </div>
+
+                {/* Trash button aligned right */}
                 {links.length > 1 && (
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-5 w-5 text-muted-foreground hover:text-destructive"
+                    className="h-8 w-8 mt-5 shrink-0 text-muted-foreground hover:text-destructive"
                     onClick={() => removeLink(link.id)}
                     disabled={isPending}
                   >
-                    <Trash2 className="h-3 w-3" />
+                    <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 )}
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="space-y-1">
-                  <Label className="text-[11px] text-muted-foreground">
-                    Title
-                  </Label>
-                  <Select
-                    value={link.title}
-                    onValueChange={(val) => updateLink(link.id, "title", val)}
-                    disabled={isPending}
-                  >
-                    <SelectTrigger className="h-8 text-xs">
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {LINK_TITLE_SUGGESTIONS.map((s) => (
-                        <SelectItem key={s} value={s} className="text-xs">
-                          {s}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-[11px] text-muted-foreground">
-                    URL
-                  </Label>
-                  <Input
-                    value={link.url}
-                    onChange={(e) => updateLink(link.id, "url", e.target.value)}
-                    placeholder="https://..."
-                    className="h-8 text-xs"
-                    disabled={isPending}
-                  />
-                </div>
               </div>
             </div>
           ))}
