@@ -44,6 +44,7 @@ export async function deleteStation(id: string) {
     });
 
     revalidatePath("/station-update");
+    revalidatePath("/update-sheet");
 
     return {
       success: true,

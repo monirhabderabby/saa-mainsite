@@ -3,7 +3,13 @@ import prisma from "@/lib/prisma";
 import { Users } from "lucide-react";
 
 const TotalEmployees = async () => {
-  const totalEmployee = await prisma.user.count();
+  const totalEmployee = await prisma.user.count({
+    where: {
+      accountStatus: {
+        in: ["ACTIVE"],
+      },
+    },
+  });
   return (
     <StatsCard
       title="Total Employees"

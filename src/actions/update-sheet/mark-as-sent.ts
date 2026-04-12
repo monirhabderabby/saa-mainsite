@@ -2,8 +2,9 @@
 
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
+import { logUpdateActivity } from "./activity";
 
-export async function markAsSent(id: string) {
+export async function markAsSent(id: string, reference: string) {
   try {
     // Step 1: Authenticate the user
     const session = await auth();
@@ -51,6 +52,7 @@ export async function markAsSent(id: string) {
       data: {
         doneById: user.id,
         sendAt: new Date(),
+        reference,
       },
       select: { id: true, doneById: true, sendAt: true, orderId: true },
     });
@@ -59,6 +61,14 @@ export async function markAsSent(id: string) {
     if (existingEntry.updateTo === "DELIVERY") {
       await updateProjectDelivered(updated.orderId);
     }
+
+    // Log activity
+    await logUpdateActivity({
+      updateSheetId: id,
+      actorId: user.id as string,
+      type: "MARKED_AS_SENT",
+      meta: { reference },
+    });
 
     return {
       success: true,

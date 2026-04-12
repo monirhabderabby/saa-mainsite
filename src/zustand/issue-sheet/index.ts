@@ -17,6 +17,7 @@ type IssueSheetFilterState = {
   setPage: (page: number) => void;
   setAllValues: (data: Partial<IssueSheetFilterState>) => void;
   clearFilters: () => void;
+  setStatus: (data: string[]) => void;
 };
 
 export const useIssueSheetFilterState = create<IssueSheetFilterState>(
@@ -35,6 +36,7 @@ export const useIssueSheetFilterState = create<IssueSheetFilterState>(
     setServiceId: (id) => set({ serviceId: id }),
     setTeamId: (id) => set({ teamId: id }),
     setPage: (page) => set({ page }),
+    setStatus: (status) => set({ status }),
 
     setAllValues: (data) =>
       set((state) => ({
@@ -61,5 +63,5 @@ export const useIssueSheetFilterState = create<IssueSheetFilterState>(
         createdFrom: undefined,
         createdTo: undefined,
       }),
-  })
+  }),
 );

@@ -91,12 +91,14 @@ interface Props {
   profiles: Profile[];
   cuServiceId?: string;
   services: Services[];
+  defaultSelectedProfiles: string[] | [];
 }
 export default function AddFilterUpdateSheetEntries({
   trigger,
   profiles,
   services,
   cuServiceId,
+  defaultSelectedProfiles,
 }: Props) {
   const [open, setOpen] = useState(false);
   const {
@@ -112,6 +114,7 @@ export default function AddFilterUpdateSheetEntries({
     sendFrom,
     serviceId,
     setServiceId,
+    setProfileId,
   } = useUpdateSheetFilterState();
 
   const form = useForm<UpdateSheetFilter>({
@@ -119,7 +122,7 @@ export default function AddFilterUpdateSheetEntries({
     defaultValues: {
       clientName: clientName ?? "",
       orderId: orderId ?? undefined,
-      profileId: profileId ?? undefined,
+      profileId: defaultSelectedProfiles ?? profileId ?? undefined,
       updateTo: updateTo ?? undefined,
       tl: tl ?? undefined,
       done: done ?? "notDone",
@@ -140,6 +143,8 @@ export default function AddFilterUpdateSheetEntries({
   useEffect(() => {
     if (cuServiceId && !serviceId) {
       setServiceId(cuServiceId);
+    } else if (defaultSelectedProfiles && defaultSelectedProfiles.length > 0) {
+      setProfileId(defaultSelectedProfiles);
     }
   }, [cuServiceId, serviceId, setServiceId]);
 

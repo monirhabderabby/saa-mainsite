@@ -28,7 +28,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Profile } from "@prisma/client";
 import { ArrowLeft, Check, ChevronsUpDown, Plus, X } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useFieldArray, useForm } from "react-hook-form";
 
 import {
@@ -50,6 +49,7 @@ import {
 import { cn } from "@/lib/utils";
 import { stationForm, StationFormValues } from "@/schemas/station-update";
 import { Prisma } from "@prisma/client";
+import { useRouter } from "nextjs-toploader/app";
 import { useEffect, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -115,6 +115,7 @@ export default function CreateStationUpdateForm({
             return;
           }
           toast.success(res.message);
+          router.back();
         });
       });
     } else {
@@ -128,7 +129,7 @@ export default function CreateStationUpdateForm({
 
           toast.success(res.message);
           form.reset();
-          console.log(res);
+          router.back();
         });
       });
     }
@@ -247,12 +248,12 @@ export default function CreateStationUpdateForm({
                                           className={cn(
                                             "w-full justify-between",
                                             !field.value &&
-                                              "text-muted-foreground"
+                                              "text-muted-foreground",
                                           )}
                                         >
                                           {field.value
                                             ? users.find(
-                                                (p) => p.id === field.value
+                                                (p) => p.id === field.value,
                                               )?.fullName
                                             : "Select a person"}
                                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -280,7 +281,7 @@ export default function CreateStationUpdateForm({
                                                     "mr-2 h-4 w-4",
                                                     field.value === p.id
                                                       ? "opacity-100"
-                                                      : "opacity-0"
+                                                      : "opacity-0",
                                                   )}
                                                 />
                                                 {p.fullName}
@@ -321,7 +322,7 @@ export default function CreateStationUpdateForm({
                               size="sm"
                               onClick={() => {
                                 const profiles = form.getValues(
-                                  `assignments.${index}.profiles`
+                                  `assignments.${index}.profiles`,
                                 );
                                 form.setValue(`assignments.${index}.profiles`, [
                                   ...profiles,
@@ -355,13 +356,13 @@ export default function CreateStationUpdateForm({
                                                 className={cn(
                                                   "w-full justify-between",
                                                   !field.value &&
-                                                    "text-muted-foreground"
+                                                    "text-muted-foreground",
                                                 )}
                                               >
                                                 {field.value
                                                   ? profiles.find(
                                                       (p) =>
-                                                        p.id === field.value
+                                                        p.id === field.value,
                                                     )?.name
                                                   : "Select a profile"}
                                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -389,7 +390,7 @@ export default function CreateStationUpdateForm({
                                                           "mr-2 h-4 w-4",
                                                           field.value === p.id
                                                             ? "opacity-100"
-                                                            : "opacity-0"
+                                                            : "opacity-0",
                                                         )}
                                                       />
                                                       {p.name}
@@ -402,7 +403,7 @@ export default function CreateStationUpdateForm({
                                         </Popover>
                                       </FormControl>
                                       {form.watch(
-                                        `assignments.${index}.profiles`
+                                        `assignments.${index}.profiles`,
                                       ).length > 1 && (
                                         <Button
                                           type="button"
@@ -410,13 +411,13 @@ export default function CreateStationUpdateForm({
                                           size="icon"
                                           onClick={() => {
                                             const profiles = form.getValues(
-                                              `assignments.${index}.profiles`
+                                              `assignments.${index}.profiles`,
                                             );
                                             form.setValue(
                                               `assignments.${index}.profiles`,
                                               profiles.filter(
-                                                (_, i) => i !== profileIndex
-                                              )
+                                                (_, i) => i !== profileIndex,
+                                              ),
                                             );
                                           }}
                                           className="h-10 w-10"

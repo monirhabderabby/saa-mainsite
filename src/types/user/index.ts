@@ -10,6 +10,7 @@ export type UserWithAllIncludes = Prisma.UserGetPayload<{
         team: true;
       };
     };
+    department: true;
   };
 }>;
 

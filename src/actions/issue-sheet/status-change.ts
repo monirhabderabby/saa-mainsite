@@ -3,12 +3,14 @@
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import { IssueStatus, Role } from "@prisma/client";
+import { logIssueActivity } from "./activity";
 
 const allowedRoles: Role[] = ["SUPER_ADMIN", "ADMIN", "OPERATION_MEMBER"]; // Added SUPPORT if they should be able to change status
 
 export async function changeIssueStatusAction(
   issueId: string,
-  status: IssueStatus
+  status: IssueStatus,
+  referenceLink?: string,
 ) {
   const session = await auth();
 
@@ -57,6 +59,20 @@ export async function changeIssueStatusAction(
         // Optionally track who changed the status and when
         statusChangedAt: new Date(),
         statusChangedById: session.user.id as string,
+        reference: referenceLink,
+      },
+    });
+
+    // Log status change activity
+    await logIssueActivity({
+      issueSheetId: issueId,
+      actorId: session.user.id as string,
+      type: "STATUS_CHANGE",
+      content: `Status changed from ${existingIssue.status} to ${status}`,
+      meta: {
+        from: existingIssue.status,
+        to: status,
+        reference: referenceLink || null,
       },
     });
 

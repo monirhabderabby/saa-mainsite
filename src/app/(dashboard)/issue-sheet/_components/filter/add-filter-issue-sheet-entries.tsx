@@ -36,13 +36,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Profile, Services, Team } from "@prisma/client";
 import { Repeat } from "lucide-react";
 import dynamic from "next/dynamic";
-import { ReactNode, useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 const SmartDatePicker = dynamic(
   () => import("@/components/ui/custom/smart-date-picker"),
   {
     ssr: false,
-  }
+  },
 );
 
 export const allowStatus = [
@@ -60,6 +61,7 @@ interface Props {
   services: Services[];
   currentUserServiceId?: string;
   currentUserTeamId?: string;
+  defaultIssueFilter?: string;
 }
 export default function AddFilterIssueSheetEntries({
   trigger,
@@ -68,9 +70,15 @@ export default function AddFilterIssueSheetEntries({
   services,
   currentUserServiceId,
   currentUserTeamId,
+  defaultIssueFilter,
 }: Props) {
   const [open, setOpen] = useState(false);
-  const { setAllValues, clearFilters } = useIssueSheetFilterState();
+  const { setAllValues, clearFilters, setStatus } = useIssueSheetFilterState();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const hasAppliedDefault = useRef(false);
 
   const form = useForm<IssueSheetFilter>({
     resolver: zodResolver(issueSheetFilterSchema),
@@ -81,7 +89,7 @@ export default function AddFilterIssueSheetEntries({
       createdFrom: undefined,
       createdTo: undefined,
       serviceId: currentUserServiceId ?? undefined,
-      status: undefined,
+      status: defaultIssueFilter ? [defaultIssueFilter] : ["open", "wip"],
       teamId: currentUserTeamId ?? undefined,
     },
   });
@@ -92,6 +100,16 @@ export default function AddFilterIssueSheetEntries({
       createdFrom: values.createdFrom?.toISOString(),
       createdTo: values.createdTo?.toISOString(),
     });
+
+    // Remove "issue" from searchParams
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("issue");
+    router.replace(`${pathname}?${params.toString()}`);
+    // If no other params remain, this becomes just pathname with no "?"
+    // So clean it up:
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname);
+
     setOpen(false);
   }
 
@@ -101,6 +119,13 @@ export default function AddFilterIssueSheetEntries({
       teamId: currentUserTeamId,
     });
   }, [currentUserServiceId, setAllValues, currentUserTeamId]);
+
+  useEffect(() => {
+    if (defaultIssueFilter && !hasAppliedDefault.current) {
+      setStatus([defaultIssueFilter]); // ["open"]
+      hasAppliedDefault.current = true;
+    }
+  }, [defaultIssueFilter]);
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>

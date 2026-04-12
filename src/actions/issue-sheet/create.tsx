@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import { issueSheetSchema, IssueSheetSchemaType } from "@/schemas/issue-sheet";
 import { Role } from "@prisma/client";
+import { logIssueActivity } from "./activity";
 
 const allowedRoles: Role[] = ["SUPER_ADMIN", "ADMIN"];
 
@@ -61,6 +62,7 @@ export async function createIssueAction(data: IssueSheetSchemaType) {
       specialNotes,
       noteForSales,
       fileOrMeetingLink,
+      riskLevel,
     } = parsed.data;
 
     // ✅ Create issue
@@ -75,8 +77,17 @@ export async function createIssueAction(data: IssueSheetSchemaType) {
         specialNotes: specialNotes || null,
         noteForSales: noteForSales || null,
         fileOrMeetingLink: fileOrMeetingLink || null,
+        riskLevel,
         creatorId: session.user.id as string,
       },
+    });
+
+    // Log issue created activity
+    await logIssueActivity({
+      issueSheetId: issue.id,
+      actorId: session.user.id as string,
+      type: "ISSUE_CREATED",
+      content: `Created issue for client ${issue.clientName}`,
     });
 
     return {

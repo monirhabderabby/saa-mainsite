@@ -3,6 +3,7 @@
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import { Role } from "@prisma/client";
+import { logIssueActivity } from "./activity";
 
 /**
  * Assigns a team to an existing Issue Sheet.
@@ -91,6 +92,25 @@ export async function assignTeamIntoIssueSheet(
     const updatedIssue = await prisma.issueSheet.update({
       where: { id: issueSheetId },
       data: { teamId },
+    });
+
+    // Get the team name for the activity log
+    const team = await prisma.team.findUnique({
+      where: { id: teamId },
+      select: { name: true },
+    });
+
+    // Log team assignment activity
+    await logIssueActivity({
+      issueSheetId,
+      actorId: userId,
+      type: "TEAM_ASSIGNED",
+      content: `Assigned team ${team?.name || "Unknown"}`,
+      meta: {
+        teamId,
+        teamName: team?.name || null,
+        previousTeamId: issue.teamId || null,
+      },
     });
 
     return {

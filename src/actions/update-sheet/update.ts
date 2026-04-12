@@ -7,6 +7,7 @@ import {
   updateSheetCreateSchema,
   UpdateSheetCreateSchema,
 } from "@/schemas/update-sheet/create";
+import { logUpdateActivity } from "./activity";
 
 /**
  * Updates an existing entry in the Update Sheet.
@@ -98,6 +99,13 @@ export async function updateUpdateSheetEntry(
     const updatedEntry = await prisma.updateSheet.update({
       where: { id },
       data: { ...validData },
+    });
+
+    // Log activity
+    await logUpdateActivity({
+      updateSheetId: id,
+      actorId: user.id as string,
+      type: "ENTRY_UPDATED",
     });
 
     return {

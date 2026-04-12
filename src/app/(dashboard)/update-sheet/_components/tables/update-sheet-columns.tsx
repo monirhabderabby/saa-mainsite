@@ -2,14 +2,14 @@ import { Button } from "@/components/ui/button";
 import { UpdateSheetData } from "@/helper/update-sheet/update-sheet";
 import { Role } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
-import { Pencil } from "lucide-react";
 import moment from "moment";
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import CommentFormOperation from "./columns/comment-from-operation";
 import DoneByComponent from "./columns/done-by-component";
 import TlCheckComponent from "./columns/tl-check-component";
+import UpdateSheetRowAction from "./columns/update-sheet-row-action";
 import { CurrentUserTeam } from "./table-container";
+
 const UpdateToComponents = dynamic(() => import("./columns/update-to"), {
   ssr: false,
 });
@@ -131,29 +131,6 @@ export const updateSheetColumns = ({
   },
   {
     header: "Action",
-    cell: ({ row }) => {
-      const tlChecked = row.original.tlId ?? undefined;
-      const isTlChecked = !!tlChecked;
-
-      return (
-        <>
-          {row.original.sendAt ? (
-            <Button disabled variant="ghost" size="sm">
-              Sent ✅
-            </Button>
-          ) : isTlChecked ? (
-            <Button disabled size="icon" variant="ghost">
-              <Pencil />
-            </Button>
-          ) : (
-            <Button size="icon" variant="ghost" asChild>
-              <Link href={`/update-sheet/edit/${row.original.id}`}>
-                <Pencil />
-              </Link>
-            </Button>
-          )}
-        </>
-      );
-    },
+    cell: ({ row }) => <UpdateSheetRowAction data={row.original} />,
   },
 ];

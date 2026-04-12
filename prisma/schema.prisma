@@ -13,6 +13,11 @@ enum AccountStatus {
     DEACTIVE
 }
 
+enum EmployeeStatus {
+    PROBATION
+    PARMANENT
+}
+
 enum Role {
     SUPER_ADMIN
     ADMIN
@@ -39,9 +44,10 @@ model User {
 
     emailVerified DateTime?
 
-    accountStatus AccountStatus @default(PENDING)
-    role          Role
-    password      String
+    accountStatus  AccountStatus  @default(PENDING)
+    employeeStatus EmployeeStatus @default(PROBATION)
+    role           Role
+    password       String
 
     designationId String       @db.ObjectId
     designation   Designations @relation(fields: [designationId], references: [id], onDelete: Cascade)
@@ -74,10 +80,17 @@ model User {
     tasksId            String?             @db.ObjectId
     projectAssignments ProjectAssignment[]
 
-    projects      Project[]
-    salesProjects Project[]    @relation("SalesPersonProjects")
-    projectQnas   ProjectQna[]
-    auditLogs     AuditLog[]
+    projects              Project[]
+    salesProjects         Project[]         @relation("SalesPersonProjects")
+    projectQnas           ProjectQna[]
+    auditLogs             AuditLog[]
+    issueActivities       IssueActivity[]   @relation("IssueActivityActor")
+    updateSheetActivities UpdateActivity[]  @relation("UpdateActivityActor")
+    complaints            Complaint[]
+    complaintManager      ComplaintManager?
+    requestedQueues       Queue[]           @relation("RequestedQueues")
+    assignedQueues        Queue[]           @relation("AssignedQueues")
+    queues                Queue[]
 }
 
 model UserVerification {
@@ -174,6 +187,7 @@ model Profile {
     updatedAt          DateTime            @updatedAt
     stationAssignments StationAssignment[]
     projects           Project[]
+    queues             Queue[]
 }
 
 model Team {
@@ -330,6 +344,8 @@ model UpdateSheet {
     profileId String  @db.ObjectId
     profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
+    reference String?
+
     teamId String? @db.ObjectId
     team   Team?   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
@@ -337,6 +353,8 @@ model UpdateSheet {
     service   Services? @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
     createdAt DateTime @default(now())
+
+    activities UpdateActivity[]
 }
 
 enum IssueStatus {
@@ -345,6 +363,13 @@ enum IssueStatus {
     done
     cancelled
     dispute
+}
+
+enum RiskLevel {
+    low
+    medium
+    high
+    critical
 }
 
 model IssueSheet {
@@ -365,6 +390,9 @@ model IssueSheet {
 
     statusChangedBy User? @relation("issueShetStatusChange", fields: [statusChangedById], references: [id], onDelete: Cascade)
 
+    reference String?
+    riskLevel RiskLevel @default(low)
+
     creatorId String @db.ObjectId
     creator   User   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
 
@@ -377,8 +405,71 @@ model IssueSheet {
     profileId String  @db.ObjectId
     profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
+    activities IssueActivity[]
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+}
+
+enum IssueActivityType {
+    COMMENT
+    STATUS_CHANGE
+    TEAM_ASSIGNED
+    ISSUE_UPDATED
+    ISSUE_CREATED
+}
+
+model IssueActivity {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    type    IssueActivityType
+    content String?
+
+    // Optional metadata for system events (e.g., "open → done")
+    meta Json?
+
+    issueSheetId String     @db.ObjectId
+    issueSheet   IssueSheet @relation(fields: [issueSheetId], references: [id], onDelete: Cascade)
+
+    actorId String @db.ObjectId
+    actor   User   @relation("IssueActivityActor", fields: [actorId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+
+    @@index([issueSheetId])
+    @@index([actorId])
+}
+
+enum UpdateActivityType {
+    COMMENT
+    ENTRY_CREATED
+    ENTRY_UPDATED
+    TL_CHECKED
+    TL_UNCHECKED
+    MARKED_AS_SENT
+    SALES_NOTE_ADDED
+    OP_COMMENT_ADDED
+}
+
+model UpdateActivity {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    type    UpdateActivityType
+    content String?
+
+    // Optional metadata for system events
+    meta Json?
+
+    updateSheetId String      @db.ObjectId
+    updateSheet   UpdateSheet @relation(fields: [updateSheetId], references: [id], onDelete: Cascade)
+
+    actorId String @db.ObjectId
+    actor   User   @relation("UpdateActivityActor", fields: [actorId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+
+    @@index([updateSheetId])
+    @@index([actorId])
 }
 
 enum ApplicationStatus {
@@ -607,4 +698,97 @@ model AuditLog {
     @@index([actorId])
     @@index([action])
     @@index([createdAt])
+}
+
+enum ComplaintPriority {
+    LOW
+    MEDIUM
+    HIGH
+}
+
+enum ComplaintStatus {
+    OPEN
+    IN_PROGRESS
+    RESOLVED
+    REJECTED
+}
+
+model Complaint {
+    id             String            @id @default(auto()) @map("_id") @db.ObjectId
+    uniqueId       String            @unique
+    subject        String
+    priority       ComplaintPriority
+    status         ComplaintStatus   @default(OPEN)
+    message        String
+    supportingDocs String[]
+
+    creatorId String @db.ObjectId
+    creator   User   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([creatorId, uniqueId])
+}
+
+model ComplaintManager {
+    id     String @id @default(auto()) @map("_id") @db.ObjectId
+    userId String @unique @db.ObjectId
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+}
+
+enum QueueStatus {
+    REQUESTED
+    GIVEN
+}
+
+enum UserRole {
+    OPERATION
+    SALES
+    ADMIN
+}
+
+model Queue {
+    id         String      @id @default(auto()) @map("_id") @db.ObjectId
+    queueKey   String      @unique
+    profileId  String      @db.ObjectId // ✅ important for MongoDB
+    clientName String
+    orderId    String?
+    message    String
+    status     QueueStatus @default(REQUESTED)
+
+    // ✅ ADD THIS RELATION
+    profile Profile @relation(fields: [profileId], references: [id])
+
+    // Relations
+    requestedById String
+    requestedBy   User   @relation("RequestedQueues", fields: [requestedById], references: [id])
+
+    assignedToId String?
+    assignedTo   User?   @relation("AssignedQueues", fields: [assignedToId], references: [id])
+
+    links QueueLink[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    user   User?   @relation(fields: [userId], references: [id])
+    userId String? @db.ObjectId
+
+    @@index([requestedById])
+    @@index([assignedToId])
+    @@index([status])
+}
+
+model QueueLink {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    queueId   String
+    queue     Queue    @relation(fields: [queueId], references: [id], onDelete: Cascade)
+    title     String // e.g. "conversation", "attachment", "meeting"
+    url       String
+    createdAt DateTime @default(now())
+
+    @@index([queueId])
 }

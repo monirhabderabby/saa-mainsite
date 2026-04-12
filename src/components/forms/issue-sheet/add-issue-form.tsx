@@ -32,9 +32,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { issueSheetSchema, IssueSheetSchemaType } from "@/schemas/issue-sheet";
+import {
+  issueSheetSchema,
+  IssueSheetSchemaType,
+  riskLevels,
+} from "@/schemas/issue-sheet";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { IssueSheet, Profile, Role, Services } from "@prisma/client";
+import { IssueSheet, Profile, RiskLevel, Role, Services } from "@prisma/client";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
@@ -47,6 +51,40 @@ interface Props {
   initianData?: IssueSheet;
   currentUserRole: Role;
 }
+
+const riskConfig: Record<
+  RiskLevel,
+  { label: string; color: string; bg: string; border: string; dot: string }
+> = {
+  low: {
+    label: "Low",
+    color: "text-emerald-700 dark:text-emerald-400",
+    bg: "bg-emerald-50 dark:bg-emerald-950/40",
+    border: "border-emerald-200 dark:border-emerald-800",
+    dot: "bg-emerald-500",
+  },
+  medium: {
+    label: "Medium",
+    color: "text-amber-700 dark:text-amber-400",
+    bg: "bg-amber-50 dark:bg-amber-950/40",
+    border: "border-amber-200 dark:border-amber-800",
+    dot: "bg-amber-500",
+  },
+  high: {
+    label: "High",
+    color: "text-orange-700 dark:text-orange-400",
+    bg: "bg-orange-50 dark:bg-orange-950/40",
+    border: "border-orange-200 dark:border-orange-800",
+    dot: "bg-orange-500",
+  },
+  critical: {
+    label: "Critical",
+    color: "text-red-700 dark:text-red-400",
+    bg: "bg-red-50 dark:bg-red-950/40",
+    border: "border-red-200 dark:border-red-800",
+    dot: "bg-red-500",
+  },
+};
 
 export default function AddIssueForm({
   profiles,
@@ -67,6 +105,7 @@ export default function AddIssueForm({
       inboxPageUrl: initianData?.inboxPageUrl ?? "",
       specialNotes: initianData?.specialNotes ?? "",
       noteForSales: initianData?.noteForSales ?? "",
+      riskLevel: initianData?.riskLevel ?? "low",
     },
   });
 
@@ -159,7 +198,7 @@ export default function AddIssueForm({
                           role="combobox"
                           className={cn(
                             "w-full justify-between",
-                            !field.value && "text-muted-foreground"
+                            !field.value && "text-muted-foreground",
                           )}
                         >
                           {field.value
@@ -188,7 +227,7 @@ export default function AddIssueForm({
                                     "mr-2 h-4 w-4",
                                     field.value === p.id
                                       ? "opacity-100"
-                                      : "opacity-0"
+                                      : "opacity-0",
                                   )}
                                 />
                                 {p.name}
@@ -277,7 +316,7 @@ export default function AddIssueForm({
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           <FormField
             control={form.control}
             name="specialNotes"
@@ -316,6 +355,56 @@ export default function AddIssueForm({
                 </FormControl>
 
                 <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="riskLevel"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Risk Level <span className="text-destructive">*</span>
+                </FormLabel>
+                <div className="grid grid-cols-4 gap-2">
+                  {riskLevels.map((level) => {
+                    const cfg = riskConfig[level];
+                    const isSelected = field.value === level;
+                    return (
+                      <button
+                        key={level}
+                        type="button"
+                        onClick={() => field.onChange(level)}
+                        className={cn(
+                          "relative flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2 text-xs font-medium transition-all duration-150 cursor-pointer",
+                          isSelected
+                            ? cn(cfg.bg, cfg.border, cfg.color, "shadow-sm")
+                            : "border-border bg-background text-muted-foreground hover:border-border hover:bg-muted/50",
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            "h-1.5 w-1.5 rounded-full shrink-0",
+                            isSelected ? cfg.dot : "bg-muted-foreground/40",
+                          )}
+                        />
+                        {cfg.label}
+                        {isSelected && (
+                          <span
+                            className={cn(
+                              "absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full flex items-center justify-center",
+                              cfg.dot,
+                            )}
+                          >
+                            <Check className="h-2 w-2 text-white" />
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+                <FormMessage className="text-xs" />
               </FormItem>
             )}
           />
