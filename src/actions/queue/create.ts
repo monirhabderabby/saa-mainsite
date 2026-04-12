@@ -1,8 +1,12 @@
 "use server";
 
 import { auth } from "@/auth";
+import { getSalesMembersForProfile } from "@/helper/notification/notification-helpers";
 import prisma from "@/lib/prisma";
+import { getUserChannel, PUSHER_EVENTS } from "@/lib/pusher/constants";
+import pusherServer from "@/lib/pusher/pusher";
 import { generateUniqueIdForQueue } from "@/lib/utils";
+import { QueueNotificationPayload } from "@/types/notification/notifications";
 
 export async function createQueueAction(input: {
   profileId: string;
@@ -48,6 +52,34 @@ export async function createQueueAction(input: {
         profile: true,
       },
     });
+
+    // 🔔 Find all sales members assigned to this profile
+    const salesMemberIds = await getSalesMembersForProfile(profileId.trim());
+
+    if (salesMemberIds.length > 0) {
+      const payload: QueueNotificationPayload = {
+        type: "QUEUE_REQUESTED",
+        queueId: queue.id,
+        queueKey: queue.queueKey,
+        clientName: queue.clientName,
+        profileName: queue.profile.name,
+        profileId: queue.profileId,
+        requestedBy: queue.requestedBy.fullName,
+        message: queue.message,
+        createdAt: queue.createdAt.toISOString(),
+      };
+
+      // Trigger on each sales member's private channel
+      await Promise.all(
+        salesMemberIds.map((userId) =>
+          pusherServer.trigger(
+            getUserChannel(userId),
+            PUSHER_EVENTS.QUEUE_REQUESTED,
+            payload,
+          ),
+        ),
+      );
+    }
 
     return {
       success: true,
