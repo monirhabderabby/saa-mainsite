@@ -18,6 +18,12 @@ const RestrictedWords = Mark.create<RestrictedWordsOptions>({
   addProseMirrorPlugins() {
     const { words } = this.options;
 
+    const validWords = (words || []).filter((w) => w.trim().length > 0);
+
+    if (validWords.length === 0) {
+      return [];
+    }
+
     return [
       new Plugin({
         key: new PluginKey("restrictedWords"), // ✅ unique key
@@ -26,12 +32,17 @@ const RestrictedWords = Mark.create<RestrictedWordsOptions>({
             const { doc } = state;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const decorations: any[] = [];
-            const regex = new RegExp(`\\b(${words.join("|")})\\b`, "gi");
+            const regex = new RegExp(`\\b(${validWords.join("|")})\\b`, "gi");
 
             doc.descendants((node, pos) => {
               if (node.isText) {
                 let match;
                 while ((match = regex.exec(node.text ?? ""))) {
+                  if (match[0].length === 0) {
+                    regex.lastIndex++;
+                    continue;
+                  }
+                  
                   const start = pos + match.index;
                   const end = start + match[0].length;
 

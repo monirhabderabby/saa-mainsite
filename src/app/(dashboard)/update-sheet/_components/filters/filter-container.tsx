@@ -7,7 +7,7 @@ const AddFilterUpdateSheetEntries = dynamic(
   () => import("./add-filter-update-sheet-entries"),
   {
     ssr: false,
-  }
+  },
 );
 
 interface Props {
@@ -59,11 +59,22 @@ const FilterContainer = async ({ userId }: Props) => {
     redirect("/login");
   }
 
+  const stationHandled = await prisma.stationAssignmentProfile.findMany({
+    where: {
+      assignment: {
+        userId: userId,
+      },
+    },
+  });
+
+  const defaultSelectedProfiles = stationHandled.map((i) => i.profileId);
+
   const currentUserServiceid = userInfo.serviceId;
 
   return (
     <div>
       <AddFilterUpdateSheetEntries
+        defaultSelectedProfiles={defaultSelectedProfiles}
         cuServiceId={currentUserServiceid!}
         profiles={profiles ?? []}
         services={serviceLine ?? []}

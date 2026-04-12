@@ -1,4 +1,5 @@
 import { changeIssueStatusAction } from "@/actions/issue-sheet/status-change";
+import IssueDoneReferenceModal from "./issue-done-reference-modal";
 import {
   Select,
   SelectContent,
@@ -9,6 +10,7 @@ import {
 import { IssueSheetData } from "@/helper/issue-sheets/get-issue-sheets";
 import { cn } from "@/lib/utils"; // You might need to install or create this
 import { IssueStatus } from "@prisma/client";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -50,30 +52,59 @@ const formatStatusText = (status: IssueStatus) => {
 };
 
 const IssueSheetStatusAction = ({ data }: Props) => {
+  const queryClient = useQueryClient();
   const [val, setVal] = useState<IssueStatus>(data.status);
   const [pending, startTransition] = useTransition();
+  const [referenceModalOpen, setReferenceModalOpen] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState<IssueStatus | null>(null);
 
-  const onStatusChange = (value: IssueStatus) => {
-    setVal(value);
-    startTransition(() => {
-      changeIssueStatusAction(data.id, value).then((res) => {
-        if (!res.success) {
-          toast.error(res.message);
-          setVal(data.status);
-          return;
-        }
+ const onStatusChange = (value: IssueStatus) => {
+  if (value === "done") {
+    setPendingStatus(value);
+    setReferenceModalOpen(true);
+    return; // don't fire action yet
+  }
 
-        // handle success
-        toast.success(res.message);
-      });
+  // for all other statuses, fire immediately as before
+  setVal(value);
+  startTransition(() => {
+    changeIssueStatusAction(data.id, value).then((res) => {
+      if (!res.success) {
+        toast.error(res.message);
+        setVal(data.status);
+        return;
+      }
+      queryClient.invalidateQueries({ queryKey: ["issue-sheet"] });
+      toast.success(res.message);
     });
-  };
+  });
+};
+
+const onConfirmWithReference = (referenceLink: string) => {
+  if (!pendingStatus) return;
+
+  setVal(pendingStatus);
+  startTransition(() => {
+    changeIssueStatusAction(data.id, pendingStatus, referenceLink).then((res) => {
+      if (!res.success) {
+        toast.error(res.message);
+        setVal(data.status);
+        return;
+      }
+      queryClient.invalidateQueries({ queryKey: ["issue-sheet"] });
+      setReferenceModalOpen(false);
+      setPendingStatus(null);
+      toast.success(res.message);
+    });
+  });
+};
 
   useEffect(() => {
     setVal(data.status);
   }, [data.status]);
 
   return (
+    <>
     <Select value={val} onValueChange={onStatusChange} disabled={pending}>
       <SelectTrigger
         className={cn(
@@ -94,6 +125,14 @@ const IssueSheetStatusAction = ({ data }: Props) => {
         ))}
       </SelectContent>
     </Select>
+    
+     <IssueDoneReferenceModal
+      open={referenceModalOpen}
+      onOpenChange={setReferenceModalOpen}
+      onConfirm={onConfirmWithReference}
+      isPending={pending}
+    />
+    </>
   );
 };
 

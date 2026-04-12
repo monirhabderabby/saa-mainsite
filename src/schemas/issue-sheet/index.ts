@@ -24,6 +24,9 @@ const restrictedUrlSchema = z
 
 const fiverrOrderIdRegex = /^FO[A-Z0-9]+$/; // matches FO followed by alphanumeric characters
 
+export const riskLevels = ["low", "medium", "high", "critical"] as const;
+export type RiskLevel = (typeof riskLevels)[number];
+
 export const issueSheetSchema = z
   .object({
     clientName: z
@@ -50,6 +53,11 @@ export const issueSheetSchema = z
     fileOrMeetingLink: z.string().optional(),
     specialNotes: z.string().optional(),
     noteForSales: z.string().optional(),
+    riskLevel: z.enum(riskLevels).pipe(
+      z.enum(riskLevels, {
+        message: "Please select a risk level",
+      }),
+    ),
   })
   .refine(
     (data) =>
@@ -60,7 +68,7 @@ export const issueSheetSchema = z
       message:
         "Please provide at least one: Order Page URL, Inbox Page URL, or File/Meeting Link",
       path: ["urlGroup"],
-    }
+    },
   );
 
 export type IssueSheetSchemaType = z.infer<typeof issueSheetSchema> & {

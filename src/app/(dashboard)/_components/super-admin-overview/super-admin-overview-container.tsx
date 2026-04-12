@@ -4,6 +4,7 @@ import DeliveryInQue from "@/components/shared/stats/update-sheet/delivery-in-qu
 import SpecialSalesDeliveryInQue from "@/components/shared/stats/update-sheet/Special-sales-delivery-in-que";
 import UpdateInQue from "@/components/shared/stats/update-sheet/update-in-que";
 import { Suspense } from "react";
+import ComplaintsOpen from "./_components/complain-open";
 import IssuesDoneToday from "./_components/issue-done-today";
 import TotalEmployees from "./_components/total-employees";
 
@@ -45,11 +46,11 @@ const SuperAdminOverViewContainer = async () => {
 
           {/* Issue Tracking */}
           <Suspense fallback={<CardSkeleton />}>
-            <IssuesOpen />
+            <IssuesOpen redirectTo="/issue-sheet?issue=open" />
           </Suspense>
 
           <Suspense fallback={<CardSkeleton />}>
-            <IssuesWip />
+            <IssuesWip redirectTo="/issue-sheet?issue=wip" />
           </Suspense>
 
           <Suspense fallback={<CardSkeleton />}>
@@ -66,6 +67,9 @@ const SuperAdminOverViewContainer = async () => {
           </Suspense>
           <Suspense fallback={<CardSkeleton />}>
             <SpecialSalesDeliveryInQue />
+          </Suspense>
+          <Suspense fallback={<CardSkeleton />}>
+            <ComplaintsOpen />
           </Suspense>
         </div>
       </main>
