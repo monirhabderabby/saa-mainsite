@@ -27,12 +27,23 @@ export default async function QueuePage() {
     redirect("/login");
   }
 
+  const stationAssignment = await prisma.stationAssignmentProfile.findMany({
+    where: {
+      assignment: {
+        userId: user.id,
+      },
+    },
+  });
+
+  const selectedProfilesShouldBe = stationAssignment.map((i) => i.profileId);
+
   return (
     <Card className="p-5">
       <QueuePageClient
         userRole={user.role}
         currentUserId={user.id}
         profiles={profiles}
+        defaultSelectedProfiles={selectedProfilesShouldBe}
       />
     </Card>
   );

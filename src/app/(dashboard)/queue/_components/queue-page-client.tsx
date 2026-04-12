@@ -54,6 +54,7 @@ interface QueuePageClientProps {
   userRole: Role;
   currentUserId: string;
   profiles: Profile[];
+  defaultSelectedProfiles: string[];
 }
 
 type StatusFilter = "ALL" | "REQUESTED" | "GIVEN";
@@ -62,6 +63,7 @@ export function QueuePageClient({
   userRole,
   currentUserId,
   profiles,
+  defaultSelectedProfiles,
 }: QueuePageClientProps) {
   // Modal states
   const [queueModal, setQueueModal] = useState<{
@@ -81,7 +83,9 @@ export function QueuePageClient({
 
   // Filter states (these drive the API query)
   const [search, setSearch] = useState("");
-  const [selectedProfiles, setSelectedProfiles] = useState<string[]>([]);
+  const [selectedProfiles, setSelectedProfiles] = useState<string[]>(
+    defaultSelectedProfiles ?? [],
+  );
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
   const [deleting, startTransition] = useTransition();
 
