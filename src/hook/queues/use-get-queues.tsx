@@ -41,7 +41,7 @@ export interface UseGetQueuesOptions {
   page?: number;
   limit?: number;
   status?: "REQUESTED" | "GIVEN";
-  profileId?: string;
+  profileIds?: string;
   clientName?: string;
   orderId?: string;
   queueKey?: string;
@@ -51,7 +51,7 @@ export function useGetQueues({
   page = 1,
   limit = 10,
   status,
-  profileId,
+  profileIds,
   clientName,
   orderId,
   queueKey,
@@ -62,7 +62,7 @@ export function useGetQueues({
       page,
       limit,
       status,
-      profileId,
+      profileIds,
       clientName,
       orderId,
       queueKey,
@@ -74,7 +74,7 @@ export function useGetQueues({
       params.set("limit", String(limit));
 
       if (status) params.set("status", status);
-      if (profileId) params.set("profileId", profileId);
+      if (profileIds) params.set("profileIds", profileIds);
       if (clientName) params.set("clientName", clientName);
       if (orderId) params.set("orderId", orderId);
       if (queueKey) params.set("queueKey", queueKey);

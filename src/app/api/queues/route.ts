@@ -41,10 +41,17 @@ export async function GET(req: NextRequest) {
 
     // Filters
     const status = searchParams.get("status") as "REQUESTED" | "GIVEN" | null;
-    const profileId = searchParams.get("profileId")?.trim() || null;
+    const profileIdsParam = searchParams.get("profileIds")?.trim() || null;
     const clientName = searchParams.get("clientName")?.trim() || null;
     const orderId = searchParams.get("orderId")?.trim() || null;
     const queueKey = searchParams.get("queueKey")?.trim() || null;
+
+    const profileIds = profileIdsParam
+      ? profileIdsParam
+          .split(",")
+          .map((id) => id.trim())
+          .filter(Boolean)
+      : [];
 
     // Build where clause
     const where: Prisma.QueueWhereInput = {};
@@ -58,8 +65,8 @@ export async function GET(req: NextRequest) {
       where.status = status;
     }
 
-    if (profileId) {
-      where.profileId = { contains: profileId, mode: "insensitive" };
+    if (profileIds.length > 0) {
+      where.profileId = { in: profileIds };
     }
 
     if (clientName) {

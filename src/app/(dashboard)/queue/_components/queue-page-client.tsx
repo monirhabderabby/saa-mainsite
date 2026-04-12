@@ -5,8 +5,21 @@ import { useState, useTransition } from "react";
 
 import { deleteQueueAction } from "@/actions/queue/delete";
 import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import AlertModal from "@/components/ui/custom/alert-modal";
 import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -20,9 +33,18 @@ import {
   QueueWithRelations,
   useGetQueues,
 } from "@/hook/queues/use-get-queues";
+import { cn } from "@/lib/utils";
 import { Profile, Role } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { Inbox, ListFilter, PlusCircle, RefreshCw, Search } from "lucide-react";
+import {
+  Check,
+  ChevronsUpDown,
+  Inbox,
+  ListFilter,
+  PlusCircle,
+  RefreshCw,
+  Search,
+} from "lucide-react";
 import { toast } from "sonner";
 import { AddQueueModal } from "./modals/add-queue-modal";
 import SubmitLinksModal from "./modals/submit-links";
@@ -59,6 +81,7 @@ export function QueuePageClient({
 
   // Filter states (these drive the API query)
   const [search, setSearch] = useState("");
+  const [selectedProfiles, setSelectedProfiles] = useState<string[]>([]);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
   const [deleting, startTransition] = useTransition();
 
@@ -66,6 +89,9 @@ export function QueuePageClient({
     status: statusFilter === "ALL" ? undefined : statusFilter,
     // Pass search as clientName filter; extend as needed
     clientName: search || undefined,
+    profileIds: selectedProfiles.length
+      ? selectedProfiles.join(",")
+      : undefined,
     limit: 50,
   });
 
@@ -201,14 +227,73 @@ export function QueuePageClient({
             placeholder="Search by client name..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="h-7 pl-7 text-xs"
+            className="h-8 pl-7 text-xs"
           />
+        </div>
+        <div>
+          <Popover modal={false}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "h-8 w-full justify-between text-xs",
+                  selectedProfiles.length === 0 && "text-muted-foreground",
+                )}
+              >
+                {selectedProfiles.length > 0
+                  ? `${selectedProfiles.length} selected`
+                  : "Select profiles"}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+
+            <PopoverContent
+              side="bottom"
+              align="start"
+              className="w-[250px] p-0"
+            >
+              <Command>
+                <CommandInput placeholder="Search profiles..." />
+                <CommandList className="max-h-60 overflow-y-auto">
+                  <CommandEmpty>No profile found.</CommandEmpty>
+
+                  <CommandGroup>
+                    {profiles.map((p) => {
+                      const isSelected = selectedProfiles.includes(p.id);
+
+                      return (
+                        <CommandItem
+                          key={p.id}
+                          value={p.name}
+                          onSelect={() => {
+                            setSelectedProfiles((prev) =>
+                              isSelected
+                                ? prev.filter((id) => id !== p.id)
+                                : [...prev, p.id],
+                            );
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              isSelected ? "opacity-100" : "opacity-0",
+                            )}
+                          />
+                          {p.name}
+                        </CommandItem>
+                      );
+                    })}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
         </div>
         <Select
           value={statusFilter}
           onValueChange={(v) => setStatusFilter(v as StatusFilter)}
         >
-          <SelectTrigger className="h-7 w-32 text-xs gap-1">
+          <SelectTrigger className="h-8 w-32 text-xs gap-1">
             <ListFilter className="h-3 w-3 text-muted-foreground" />
             <SelectValue />
           </SelectTrigger>
