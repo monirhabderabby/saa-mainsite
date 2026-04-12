@@ -42,9 +42,7 @@ export async function GET(req: NextRequest) {
     // Filters
     const status = searchParams.get("status") as "REQUESTED" | "GIVEN" | null;
     const profileIdsParam = searchParams.get("profileIds")?.trim() || null;
-    const clientName = searchParams.get("clientName")?.trim() || null;
-    const orderId = searchParams.get("orderId")?.trim() || null;
-    const queueKey = searchParams.get("queueKey")?.trim() || null;
+    const searchQuery = searchParams.get("searchQuery")?.trim() || null;
 
     const profileIds = profileIdsParam
       ? profileIdsParam
@@ -56,7 +54,6 @@ export async function GET(req: NextRequest) {
     // Build where clause
     const where: Prisma.QueueWhereInput = {};
 
-    // OPERATION role can only see their own queues
     if (user.role === "OPERATION_MEMBER") {
       where.requestedById = session.user.id;
     }
@@ -69,16 +66,27 @@ export async function GET(req: NextRequest) {
       where.profileId = { in: profileIds };
     }
 
-    if (clientName) {
-      where.clientName = { contains: clientName, mode: "insensitive" };
-    }
-
-    if (orderId) {
-      where.orderId = { contains: orderId, mode: "insensitive" };
-    }
-
-    if (queueKey) {
-      where.queueKey = { contains: queueKey, mode: "insensitive" };
+    if (searchQuery) {
+      where.OR = [
+        {
+          clientName: {
+            equals: searchQuery,
+            mode: "insensitive",
+          },
+        },
+        {
+          orderId: {
+            contains: searchQuery,
+            mode: "insensitive",
+          },
+        },
+        {
+          queueKey: {
+            contains: searchQuery,
+            mode: "insensitive",
+          },
+        },
+      ];
     }
 
     const [queues, total] = await prisma.$transaction([

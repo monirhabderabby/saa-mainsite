@@ -31,10 +31,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
-import { GetQueuesResponse } from "@/hook/queues/use-get-queues";
 import type { Queue } from "@/types/queue";
 import { Profile } from "@prisma/client";
-import { useQueryClient } from "@tanstack/react-query";
 import {
   Check,
   ChevronsUpDown,
@@ -49,6 +47,7 @@ interface AddQueueModalProps {
   onOpenChange: (open: boolean) => void;
   queue?: Queue | null;
   profiles: Profile[];
+  onSuccess?: () => void;
 }
 
 interface FormState {
@@ -70,12 +69,12 @@ export function AddQueueModal({
   onOpenChange,
   queue,
   profiles,
+  onSuccess,
 }: AddQueueModalProps) {
   const isEditMode = !!queue;
   const [isPending, startTransition] = useTransition();
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [profilePopoverOpen, setProfilePopoverOpen] = useState(false);
-  const queryClient = useQueryClient();
 
   // Sync form when switching between create / edit
   useEffect(() => {
@@ -124,21 +123,7 @@ export function AddQueueModal({
           toast.success(result.message);
           onOpenChange(false);
 
-          queryClient.setQueriesData(
-            { queryKey: ["queues"] },
-            (oldData: GetQueuesResponse | undefined) => {
-              if (!oldData) return oldData;
-
-              return {
-                ...oldData,
-                data: [result.data, ...oldData.data], // 🔥 add to top
-                pagination: {
-                  ...oldData.pagination,
-                  total: oldData.pagination.total + 1,
-                },
-              };
-            },
-          );
+          onSuccess?.();
         } else {
           toast.error(result.message);
         }
@@ -156,21 +141,23 @@ export function AddQueueModal({
           });
 
           onOpenChange(false);
-          queryClient.setQueriesData(
-            { queryKey: ["queues"] },
-            (oldData: GetQueuesResponse | undefined) => {
-              if (!oldData) return oldData;
+          // queryClient.setQueriesData(
+          //   { queryKey: ["queues"] },
+          //   (oldData: GetQueuesResponse | undefined) => {
+          //     if (!oldData) return oldData;
 
-              return {
-                ...oldData,
-                data: [result.data, ...oldData.data], // 🔥 add to top
-                pagination: {
-                  ...oldData.pagination,
-                  total: oldData.pagination.total + 1,
-                },
-              };
-            },
-          );
+          //     return {
+          //       ...oldData,
+          //       data: [result.data, ...oldData.data], // 🔥 add to top
+          //       pagination: {
+          //         ...oldData.pagination,
+          //         total: oldData.pagination.total + 1,
+          //       },
+          //     };
+          //   },
+          // );
+
+          onSuccess?.();
         } else {
           toast.error(result.message);
         }

@@ -42,9 +42,7 @@ export interface UseGetQueuesOptions {
   limit?: number;
   status?: "REQUESTED" | "GIVEN";
   profileIds?: string;
-  clientName?: string;
-  orderId?: string;
-  queueKey?: string;
+  searchQuery?: string;
 }
 
 export function useGetQueues({
@@ -52,21 +50,10 @@ export function useGetQueues({
   limit = 10,
   status,
   profileIds,
-  clientName,
-  orderId,
-  queueKey,
+  searchQuery,
 }: UseGetQueuesOptions = {}) {
   return useQuery({
-    queryKey: [
-      "queues",
-      page,
-      limit,
-      status,
-      profileIds,
-      clientName,
-      orderId,
-      queueKey,
-    ],
+    queryKey: ["queues", page, limit, status, profileIds, searchQuery],
     queryFn: async (): Promise<GetQueuesResponse> => {
       const params = new URLSearchParams();
 
@@ -75,9 +62,7 @@ export function useGetQueues({
 
       if (status) params.set("status", status);
       if (profileIds) params.set("profileIds", profileIds);
-      if (clientName) params.set("clientName", clientName);
-      if (orderId) params.set("orderId", orderId);
-      if (queueKey) params.set("queueKey", queueKey);
+      if (searchQuery) params.set("searchQuery", searchQuery);
 
       const res = await fetch(`/api/queues?${params.toString()}`, {
         method: "GET",

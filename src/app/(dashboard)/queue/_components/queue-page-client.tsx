@@ -28,14 +28,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  GetQueuesResponse,
-  QueueWithRelations,
-  useGetQueues,
-} from "@/hook/queues/use-get-queues";
+import { QueueWithRelations, useGetQueues } from "@/hook/queues/use-get-queues";
 import { cn } from "@/lib/utils";
 import { Profile, Role } from "@prisma/client";
-import { useQueryClient } from "@tanstack/react-query";
 import {
   Check,
   ChevronsUpDown,
@@ -92,7 +87,7 @@ export function QueuePageClient({
   const { data, isLoading, isError, refetch, isFetching } = useGetQueues({
     status: statusFilter === "ALL" ? undefined : statusFilter,
     // Pass search as clientName filter; extend as needed
-    clientName: search || undefined,
+    searchQuery: search || undefined,
     profileIds: selectedProfiles.length
       ? selectedProfiles.join(",")
       : undefined,
@@ -110,8 +105,6 @@ export function QueuePageClient({
     requested: queues.filter((q) => q.status === "REQUESTED").length,
     given: queues.filter((q) => q.status === "GIVEN").length,
   };
-
-  const queryClient = useQueryClient();
 
   const handleSuccess = () => {
     refetch();
@@ -133,21 +126,7 @@ export function QueuePageClient({
 
         toast.success(res.message);
         setDeleteDialog((prev) => ({ ...prev, open: false, queue: null }));
-        queryClient.setQueriesData(
-          { queryKey: ["queues"] },
-          (oldData: GetQueuesResponse | undefined) => {
-            if (!oldData) return oldData;
-
-            return {
-              ...oldData,
-              data: oldData.data.filter((q) => q.queueKey !== queueId),
-              pagination: {
-                ...oldData.pagination,
-                total: oldData.pagination.total - 1,
-              },
-            };
-          },
-        );
+        handleSuccess();
       });
     });
   };
@@ -226,9 +205,9 @@ export function QueuePageClient({
       {/* Filters row */}
       <div className="flex items-center gap-2 mb-4">
         <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
           <Input
-            placeholder="Search by client name..."
+            startIcon={Search}
+            placeholder="Search by client name, order ID, or queue key..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="h-8 pl-7 text-xs"
@@ -396,6 +375,7 @@ export function QueuePageClient({
         onOpenChange={(open) => setQueueModal((prev) => ({ ...prev, open }))}
         queue={queueModal.queue}
         profiles={profiles}
+        onSuccess={handleSuccess}
       />
 
       {/* Submit links modal (sales) */}

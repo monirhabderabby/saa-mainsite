@@ -2,14 +2,7 @@
 
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
-
-async function generateQueueKey(): Promise<string> {
-  const count = await prisma.queue.count();
-  const next = count + 1;
-  const padded = String(next).padStart(6, "0");
-  return `QU${padded}`;
-}
+import { generateUniqueIdForQueue } from "@/lib/utils";
 
 export async function createQueueAction(input: {
   profileId: string;
@@ -36,7 +29,7 @@ export async function createQueueAction(input: {
   }
 
   try {
-    const queueKey = await generateQueueKey();
+    const queueKey = await generateUniqueIdForQueue("QU");
 
     const queue = await prisma.queue.create({
       data: {
@@ -56,7 +49,6 @@ export async function createQueueAction(input: {
       },
     });
 
-    revalidatePath("/dashboard/queue");
     return {
       success: true,
       message: "Queue created successfully.",

@@ -2,20 +2,9 @@
 
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
+import { generateUniqueIdForComplain } from "@/lib/utils";
 import { complaintSchema, ComplaintSchemaType } from "@/schemas/complaint";
 import { revalidatePath } from "next/cache";
-
-const generateUniqueId = async (): Promise<string> => {
-  let id: string;
-  let exists = true;
-
-  do {
-    id = `SC-${Math.floor(100000 + Math.random() * 900000)}`;
-    exists = !!(await prisma.complaint.findUnique({ where: { uniqueId: id } }));
-  } while (exists);
-
-  return id;
-};
 
 export async function createComplaintAction(data: ComplaintSchemaType) {
   const session = await auth();
@@ -27,7 +16,7 @@ export async function createComplaintAction(data: ComplaintSchemaType) {
     };
   }
 
-  const uniqueId = await generateUniqueId();
+  const uniqueId = await generateUniqueIdForComplain("SC");
 
   try {
     const parsed = complaintSchema.safeParse(data);
