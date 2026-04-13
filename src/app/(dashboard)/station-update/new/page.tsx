@@ -9,9 +9,12 @@ const Page = async () => {
       fullName: true,
     },
     where: {
-      role: "SALES_MEMBER",
+      role: {
+        in: ["ADMIN", "SALES_MEMBER"],
+      },
     },
   });
+
   return (
     <div>
       <CreateStationUpdateForm profiles={profiles ?? []} users={users ?? []} />
