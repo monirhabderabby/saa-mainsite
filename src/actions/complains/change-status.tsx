@@ -70,10 +70,16 @@ export async function changeComplaintStatusAction(
       };
     }
 
+    const resolvedAt = new Date();
+
     // 🔄 Update status
     const updatedComplaint = await prisma.complaint.update({
       where: { id: complaintId },
-      data: { status },
+      data: {
+        status: status,
+        resolvedById: session.user.id,
+        resolvedAt: resolvedAt,
+      },
     });
 
     // 🔄 Revalidate relevant paths
