@@ -3,7 +3,7 @@
 import { deleteAllStations } from "@/actions/station-update/delete";
 import { Button } from "@/components/ui/button";
 import AlertModal from "@/components/ui/custom/alert-modal";
-import { Plus, Trash } from "lucide-react";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -12,7 +12,7 @@ interface Props {
   isStationAvailable: boolean;
 }
 
-const StationHeaderAction = ({ isStationAvailable }: Props) => {
+const StationHeaderAction = ({}: Props) => {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -30,11 +30,11 @@ const StationHeaderAction = ({ isStationAvailable }: Props) => {
   };
   return (
     <div className="flex items-center  gap-5">
-      {isStationAvailable && (
+      {/* {isStationAvailable && (
         <Button variant="destructive" onClick={() => setOpen(true)}>
           <Trash /> Clear Station
         </Button>
-      )}
+      )} */}
       <Link href="/station-update/new">
         <Button>
           <Plus className="h-4 w-4" />

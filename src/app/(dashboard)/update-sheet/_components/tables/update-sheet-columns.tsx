@@ -124,6 +124,7 @@ export const updateSheetColumns = ({
         currentUserTeam={currentUserTeam}
       />
     ),
+    enableHiding: currentUserRole === "SALES_MEMBER",
   },
   {
     accessorKey: "tlCheckAt",
