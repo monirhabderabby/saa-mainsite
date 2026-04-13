@@ -52,7 +52,13 @@ const Page = async () => {
   };
 
   const formatShift = (shift: string) => {
-    return shift.charAt(0).toUpperCase() + shift.slice(1);
+    const shiftLabels: Record<string, string> = {
+      morning: "Morning",
+      day: "Evening",
+      night: "Night",
+    };
+
+    return shiftLabels[shift] ?? shift.charAt(0).toUpperCase() + shift.slice(1);
   };
 
   return (
@@ -90,7 +96,9 @@ const Page = async () => {
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar className="h-4 w-4" />
                     <span>
-                      {moment(station.createdAt).format("MMM DD, YYYY h:mm A")}
+                      {moment(station.createdAt)
+                        .utcOffset("+06:00")
+                        .format("MMM DD, YYYY h:mm A")}
                     </span>
                   </div>
                 </div>
