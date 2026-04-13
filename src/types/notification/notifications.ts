@@ -1,5 +1,5 @@
 export type QueueNotificationPayload = {
-  type: "QUEUE_REQUESTED";
+  type: "QUEUE_REQUESTED" | "QUEUE_GIVEN";
   queueId: string;
   queueKey: string;
   clientName: string;

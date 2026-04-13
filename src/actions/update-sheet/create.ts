@@ -159,6 +159,7 @@ export async function createUpdateSheetEntries(
         profileName: newUpdateSheetEntry.profile.name,
         profileId: newUpdateSheetEntry.profileId,
         createdBy: session.user.name ?? "Someone",
+
         createdAt: newUpdateSheetEntry.createdAt.toISOString(),
       };
 
