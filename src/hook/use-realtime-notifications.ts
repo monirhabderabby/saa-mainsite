@@ -43,6 +43,25 @@ export function useRealtimeNotifications() {
       },
     );
 
+    // 🔔 Queue Given Notification
+    channel.bind(
+      PUSHER_EVENTS.QUEUE_GIVEN,
+      (payload: QueueNotificationPayload) => {
+        playNotificationSound();
+
+        toast(`✅ Queue Given: ${payload.clientName}`, {
+          description: `Sales team respond on your queue`,
+          duration: 8000,
+          action: {
+            label: "View",
+            onClick: () => {
+              window.location.href = `/queue`;
+            },
+          },
+        });
+      },
+    );
+
     // 🔔 Update Sheet Notification
     channel.bind(
       PUSHER_EVENTS.UPDATE_SHEET_CREATED,
@@ -50,7 +69,7 @@ export function useRealtimeNotifications() {
         playNotificationSound();
 
         toast(`📝 Update Sheet: ${payload.clientName}`, {
-          description: `Please sent this update ASAP!`,
+          description: `A new update sheet has been created. Please submit it as soon as possible.`,
           duration: 8000,
           action: {
             label: "View",
