@@ -81,7 +81,9 @@ export function QueuePageClient({
   const [selectedProfiles, setSelectedProfiles] = useState<string[]>(
     defaultSelectedProfiles ?? [],
   );
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>(
+    userRole === "SALES_MEMBER" ? "REQUESTED" : "ALL",
+  );
   const [deleting, startTransition] = useTransition();
 
   const { data, isLoading, isError, refetch, isFetching } = useGetQueues({
