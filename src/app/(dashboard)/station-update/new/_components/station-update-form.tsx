@@ -105,6 +105,8 @@ export default function CreateStationUpdateForm({
     name: "assignments",
   });
 
+  console.log(users);
+
   const onSubmit = (data: StationFormValues) => {
     if (initialData) {
       startTransition(() => {
