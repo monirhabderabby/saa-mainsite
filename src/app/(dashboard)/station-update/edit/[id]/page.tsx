@@ -10,7 +10,9 @@ const Page = async ({ params }: { params: { id: string } }) => {
       fullName: true,
     },
     where: {
-      role: "SALES_MEMBER",
+      role: {
+        in: ["ADMIN", "SALES_MEMBER"],
+      },
     },
   });
 
