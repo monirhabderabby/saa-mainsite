@@ -2,6 +2,9 @@
 
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
+import { getUserChannel, PUSHER_EVENTS } from "@/lib/pusher/constants";
+import pusherServer from "@/lib/pusher/pusher";
+import { QueueNotificationPayload } from "@/types/notification/notifications";
 import { revalidatePath } from "next/cache";
 
 export async function submitQueueLinksAction(input: {
@@ -44,7 +47,10 @@ export async function submitQueueLinksAction(input: {
 
     const queue = await prisma.queue.findUnique({
       where: { id: queueId },
-      select: { id: true },
+      include: {
+        requestedBy: true,
+        profile: true,
+      },
     });
 
     if (!queue) {
@@ -69,6 +75,27 @@ export async function submitQueueLinksAction(input: {
         },
       }),
     ]);
+
+    const queueCreatorId = queue.requestedBy.id;
+
+    const payload: QueueNotificationPayload = {
+      type: "QUEUE_GIVEN",
+      queueId: queue.id,
+      queueKey: queue.queueKey,
+      clientName: queue.clientName,
+      profileName: queue.profile.name,
+      profileId: queue.profileId,
+      requestedBy: queue.requestedBy.fullName,
+      message: queue.message,
+      createdAt: queue.createdAt.toISOString(),
+    };
+
+    // Trigger operation member who requested
+    pusherServer.trigger(
+      getUserChannel(queueCreatorId),
+      PUSHER_EVENTS.QUEUE_GIVEN,
+      payload,
+    );
 
     revalidatePath("/dashboard/queue");
     return {
