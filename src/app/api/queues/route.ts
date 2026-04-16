@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = req.nextUrl;
 
-    // Pagination
+    // ─── Pagination ────────────────────────────────────────────────────────────
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
     const limit = Math.min(
       100,
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
     );
     const skip = (page - 1) * limit;
 
-    // Filters
+    // ─── Filters ───────────────────────────────────────────────────────────────
     const status = searchParams.get("status") as "REQUESTED" | "GIVEN" | null;
     const profileIdsParam = searchParams.get("profileIds")?.trim() || null;
     const searchQuery = searchParams.get("searchQuery")?.trim() || null;
@@ -51,23 +51,21 @@ export async function GET(req: NextRequest) {
           .filter(Boolean)
       : [];
 
-    // Build where clause
-    const where: Prisma.QueueWhereInput = {};
+    // ─── Base where (no status filter) ────────────────────────────────────────
+    // Used for stable counts — so the stat strip always shows real totals
+    // regardless of which status tab the user has selected.
+    const baseWhere: Prisma.QueueWhereInput = {};
 
     if (user.role === "OPERATION_MEMBER") {
-      where.requestedById = session.user.id;
-    }
-
-    if (status && ["REQUESTED", "GIVEN"].includes(status)) {
-      where.status = status;
+      baseWhere.requestedById = session.user.id;
     }
 
     if (profileIds.length > 0) {
-      where.profileId = { in: profileIds };
+      baseWhere.profileId = { in: profileIds };
     }
 
     if (searchQuery) {
-      where.OR = [
+      baseWhere.OR = [
         {
           clientName: {
             equals: searchQuery,
@@ -89,36 +87,65 @@ export async function GET(req: NextRequest) {
       ];
     }
 
-    const [queues, total] = await prisma.$transaction([
-      prisma.queue.findMany({
-        where,
-        include: {
-          requestedBy: {
-            select: { id: true, fullName: true, email: true, role: true },
-          },
-          assignedTo: {
-            select: { id: true, fullName: true, email: true, role: true },
-          },
-          links: {
-            orderBy: { createdAt: "asc" },
-          },
-          profile: true,
-        },
-        orderBy: { createdAt: "desc" },
-        skip,
-        take: limit,
-      }),
-      prisma.queue.count({ where }),
-    ]);
+    // ─── Filtered where (includes status) ─────────────────────────────────────
+    // Used for the actual queue list query and its paginated total.
+    const filteredWhere: Prisma.QueueWhereInput = { ...baseWhere };
 
-    const totalPages = Math.ceil(total / limit);
+    if (status && ["REQUESTED", "GIVEN"].includes(status)) {
+      filteredWhere.status = status;
+    }
+
+    // ─── Run all queries in a single transaction ───────────────────────────────
+    const [queues, filteredTotal, requestedCount, givenCount] =
+      await prisma.$transaction([
+        // 1. Paginated queue list (respects status filter)
+        prisma.queue.findMany({
+          where: filteredWhere,
+          include: {
+            requestedBy: {
+              select: { id: true, fullName: true, email: true, role: true },
+            },
+            assignedTo: {
+              select: { id: true, fullName: true, email: true, role: true },
+            },
+            links: {
+              orderBy: { createdAt: "asc" },
+            },
+            profile: true,
+          },
+          orderBy: { createdAt: "desc" },
+          skip,
+          take: limit,
+        }),
+
+        // 2. Total matching the current status filter (for pagination)
+        prisma.queue.count({ where: filteredWhere }),
+
+        // 3. Real REQUESTED count (ignores status filter)
+        prisma.queue.count({
+          where: { ...baseWhere, status: "REQUESTED" },
+        }),
+
+        // 4. Real GIVEN count (ignores status filter)
+        prisma.queue.count({
+          where: { ...baseWhere, status: "GIVEN" },
+        }),
+      ]);
+
+    const totalPages = Math.ceil(filteredTotal / limit);
 
     return NextResponse.json({
       success: true,
       message: "Queues fetched successfully.",
       data: queues,
+      // Stable counts — always reflect real totals, not the active filter
+      counts: {
+        all: requestedCount + givenCount,
+        requested: requestedCount,
+        given: givenCount,
+      },
       pagination: {
-        total,
+        total: filteredTotal, // respects status filter (drives "X of Y" pagination UI)
         page,
         limit,
         totalPages,
