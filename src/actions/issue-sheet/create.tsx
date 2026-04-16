@@ -63,6 +63,7 @@ export async function createIssueAction(data: IssueSheetSchemaType) {
       noteForSales,
       fileOrMeetingLink,
       riskLevel,
+      assignedPersons,
     } = parsed.data;
 
     // ✅ Create issue
@@ -77,6 +78,7 @@ export async function createIssueAction(data: IssueSheetSchemaType) {
         specialNotes: specialNotes || null,
         noteForSales: noteForSales || null,
         fileOrMeetingLink: fileOrMeetingLink || null,
+        assignedPersons,
         riskLevel,
         creatorId: session.user.id as string,
       },

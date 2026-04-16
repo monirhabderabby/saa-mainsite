@@ -53,6 +53,7 @@ export const issueSheetSchema = z
     fileOrMeetingLink: z.string().optional(),
     specialNotes: z.string().optional(),
     noteForSales: z.string().optional(),
+    assignedPersons: z.string().optional(),
     riskLevel: z.enum(riskLevels).pipe(
       z.enum(riskLevels, {
         message: "Please select a risk level",

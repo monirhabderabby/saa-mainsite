@@ -385,6 +385,8 @@ model IssueSheet {
 
     status IssueStatus @default(open)
 
+    assignedPersons String?
+
     statusChangedAt   DateTime?
     statusChangedById String?   @db.ObjectId
 
