@@ -35,6 +35,7 @@ model User {
     fullName         String
     nickName         String    @unique
     email            String    @unique
+    officeEmail      String?
     image            String?
     employeeId       String    @unique
     dateOfBirth      DateTime?
@@ -383,6 +384,8 @@ model IssueSheet {
     noteForSales      String?
 
     status IssueStatus @default(open)
+
+    assignedPersons String?
 
     statusChangedAt   DateTime?
     statusChangedById String?   @db.ObjectId
