@@ -10,6 +10,7 @@ import {
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogFooter,
+  AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
@@ -103,6 +104,8 @@ const ComplaintViewModal = ({ complaint, trigger, isAdmin }: Props) => {
   const creatorDepartment = creator.department?.name ?? "N/A";
   const creatorEmployeeId = creator.employeeId;
 
+  console.log(complaint);
+
   const onChangeStatus = () => {
     if (!selectedStatus) {
       toast.error("");
@@ -135,9 +138,9 @@ const ComplaintViewModal = ({ complaint, trigger, isAdmin }: Props) => {
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-2.5">
             <FileText className="h-4 w-4 text-muted-foreground" />
-            <h2 className="text-xl font-semibold text-foreground">
+            <AlertDialogTitle className="text-xl font-semibold text-foreground">
               Complaint Details
-            </h2>
+            </AlertDialogTitle>
           </div>
           {/* Status badge in header for quick glance */}
           <div className="flex items-center gap-2">

@@ -1,6 +1,11 @@
 "use client";
 
-import ComplaintViewModal from "@/components/shared/modal/complains/ComplaintViewModal";
+const ComplaintViewModal = dynamic(
+  () => import("@/components/shared/modal/complains/ComplaintViewModal"),
+  {
+    ssr: false,
+  },
+);
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -22,6 +27,7 @@ import {
   XCircle,
   Zap,
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useState } from "react";
 import DeleteButton from "./delete-button";

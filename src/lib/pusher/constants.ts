@@ -5,6 +5,7 @@ export const getUserChannel = (userId: string) => `user-${userId}`;
 
 export const PUSHER_EVENTS = {
   QUEUE_REQUESTED: "queue:requested",
+  QUEUE_GIVEN: "queue:given",
   UPDATE_SHEET_CREATED: "update-sheet:created",
 } as const;
 
