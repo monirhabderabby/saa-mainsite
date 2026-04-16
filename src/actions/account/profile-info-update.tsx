@@ -36,6 +36,7 @@ export async function UpdatePersonalInfoAction(data: PersonalInfoSchema) {
       data: {
         fullName: parsed.data.fullName,
         email: parsed.data.email,
+        officeEmail: parsed.data.officeEmail,
         dateOfBirth: parsed.data.dateOfBirth,
         phone: parsed.data.phone,
         parmanentAddress: parsed.data.parmanentAddress,

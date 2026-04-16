@@ -35,6 +35,7 @@ model User {
     fullName         String
     nickName         String    @unique
     email            String    @unique
+    officeEmail      String?
     image            String?
     employeeId       String    @unique
     dateOfBirth      DateTime?
