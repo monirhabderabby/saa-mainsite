@@ -97,15 +97,15 @@ export function QueuePageClient({
   });
 
   const queues = data?.data ?? [];
-  const pagination = data?.pagination;
 
   const isOperation = userRole === "OPERATION_MEMBER";
   const isSales = userRole === "SALES_MEMBER" || userRole === "ADMIN";
 
+  // ✅ Use real counts from the API, not client-side filtering
   const counts = {
-    all: pagination?.total ?? queues.length,
-    requested: queues.filter((q) => q.status === "REQUESTED").length,
-    given: queues.filter((q) => q.status === "GIVEN").length,
+    all: data?.counts?.all ?? 0,
+    requested: data?.counts?.requested ?? 0,
+    given: data?.counts?.given ?? 0,
   };
 
   const handleSuccess = () => {
