@@ -29,6 +29,12 @@ export interface GetQueuesResponse {
   success: boolean;
   message: string;
   data: QueueWithRelations[];
+  counts: {
+    // ← add this
+    all: number;
+    requested: number;
+    given: number;
+  };
   pagination: {
     total: number;
     page: number;
