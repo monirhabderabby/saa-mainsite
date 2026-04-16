@@ -36,10 +36,7 @@ interface Props {
 }
 
 const getStatusConfig = (status: IssueStatus) => {
-  const configs: Record<
-    IssueStatus,
-    { label: string; className: string }
-  > = {
+  const configs: Record<IssueStatus, { label: string; className: string }> = {
     open: {
       label: "Open",
       className:
@@ -124,13 +121,7 @@ const DetailRow = ({
   </div>
 );
 
-const LinkButton = ({
-  href,
-  label,
-}: {
-  href: string;
-  label: string;
-}) => (
+const LinkButton = ({ href, label }: { href: string; label: string }) => (
   <a
     href={href}
     target="_blank"
@@ -162,7 +153,7 @@ const IssueViewModal = ({ data, open, onOpenChange }: Props) => {
                 <Badge
                   className={cn(
                     "text-xs font-medium border",
-                    statusConfig.className
+                    statusConfig.className,
                   )}
                 >
                   {statusConfig.label}
@@ -170,10 +161,15 @@ const IssueViewModal = ({ data, open, onOpenChange }: Props) => {
                 <Badge
                   className={cn(
                     "text-xs font-medium border cursor-default gap-1.5",
-                    riskConfig.className
+                    riskConfig.className,
                   )}
                 >
-                  <span className={cn("h-1.5 w-1.5 rounded-full shrink-0", riskConfig.dotColor)} />
+                  <span
+                    className={cn(
+                      "h-1.5 w-1.5 rounded-full shrink-0",
+                      riskConfig.dotColor,
+                    )}
+                  />
                   {riskConfig.label} Risk
                 </Badge>
               </div>
@@ -212,9 +208,7 @@ const IssueViewModal = ({ data, open, onOpenChange }: Props) => {
                     <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
                       Last Updated
                     </p>
-                    <p className="text-sm font-medium">
-                      {updatedAt.fromNow()}
-                    </p>
+                    <p className="text-sm font-medium">{updatedAt.fromNow()}</p>
                   </div>
                 </div>
               </div>
@@ -247,10 +241,15 @@ const IssueViewModal = ({ data, open, onOpenChange }: Props) => {
                   <Badge
                     className={cn(
                       "text-xs font-medium border cursor-default gap-1.5",
-                      riskConfig.className
+                      riskConfig.className,
                     )}
                   >
-                    <span className={cn("h-1.5 w-1.5 rounded-full shrink-0", riskConfig.dotColor)} />
+                    <span
+                      className={cn(
+                        "h-1.5 w-1.5 rounded-full shrink-0",
+                        riskConfig.dotColor,
+                      )}
+                    />
                     {riskConfig.label}
                   </Badge>
                 </DetailRow>
@@ -269,13 +268,21 @@ const IssueViewModal = ({ data, open, onOpenChange }: Props) => {
                       {data.statusChangedAt && (
                         <p className="text-xs text-muted-foreground">
                           {moment(data.statusChangedAt).format(
-                            "DD MMM, YYYY [at] hh:mm A"
+                            "DD MMM, YYYY [at] hh:mm A",
                           )}
                         </p>
                       )}
                     </div>
                   </DetailRow>
                 )}
+
+                <DetailRow icon={Users} label="Assigned Persons">
+                  {data.assignedPersons ? (
+                    <span className="font-medium">{data.assignedPersons}</span>
+                  ) : (
+                    <span className="text-muted-foreground italic">N/A</span>
+                  )}
+                </DetailRow>
 
                 {data.reference && (
                   <div className="col-span-2">

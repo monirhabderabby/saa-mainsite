@@ -83,6 +83,7 @@ export async function editIssueAction(id: string, data: IssueSheetSchemaType) {
       specialNotes,
       noteForSales,
       fileOrMeetingLink,
+      assignedPersons,
       riskLevel,
     } = parsed.data;
 
@@ -100,6 +101,7 @@ export async function editIssueAction(id: string, data: IssueSheetSchemaType) {
         noteForSales: noteForSales || null,
         riskLevel: riskLevel,
         fileOrMeetingLink: fileOrMeetingLink || null,
+        assignedPersons,
         // Optionally track who last modified the issue
         // updatedById: user.id,
       },

@@ -53,7 +53,7 @@ const PersonalInformation = ({ user }: Props) => {
         <ResizablePanel.Root value={state}>
           <ResizablePanel.Content value="view">
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="space-y-1">
                   <Label className="text-sm font-medium text-muted-foreground">
                     Full Name
@@ -62,15 +62,24 @@ const PersonalInformation = ({ user }: Props) => {
                 </div>
                 <div className="space-y-1">
                   <Label className="text-sm font-medium text-muted-foreground">
-                    Email Address
+                    Email Address (Personal)
                   </Label>
                   <div className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-muted-foreground" />
                     <p className="text-sm">{user.email}</p>
                   </div>
                 </div>
+                <div className="space-y-1">
+                  <Label className="text-sm font-medium text-muted-foreground">
+                    Email Address (Office)
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-muted-foreground" />
+                    <p className="text-sm">{user.officeEmail ?? "N/A"}</p>
+                  </div>
+                </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="space-y-1">
                   <Label className="text-sm font-medium text-muted-foreground">
                     Employee ID
@@ -87,15 +96,14 @@ const PersonalInformation = ({ user }: Props) => {
                       : "N/A"}
                   </p>
                 </div>
-              </div>
-
-              <div className="space-y-1">
-                <Label className="text-sm font-medium text-muted-foreground">
-                  Phone Number
-                </Label>
-                <div className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-muted-foreground" />
-                  <p className="text-sm">{user.phone ?? "N/A"}</p>
+                <div className="space-y-1">
+                  <Label className="text-sm font-medium text-muted-foreground">
+                    Phone Number
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-4 w-4 text-muted-foreground" />
+                    <p className="text-sm">{user.phone ?? "N/A"}</p>
+                  </div>
                 </div>
               </div>
 

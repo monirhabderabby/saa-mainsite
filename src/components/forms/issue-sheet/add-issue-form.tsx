@@ -105,6 +105,7 @@ export default function AddIssueForm({
       inboxPageUrl: initianData?.inboxPageUrl ?? "",
       specialNotes: initianData?.specialNotes ?? "",
       noteForSales: initianData?.noteForSales ?? "",
+      assignedPersons: initianData?.assignedPersons ?? "",
       riskLevel: initianData?.riskLevel ?? "low",
     },
   });
@@ -316,7 +317,7 @@ export default function AddIssueForm({
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5">
           <FormField
             control={form.control}
             name="specialNotes"
@@ -352,6 +353,21 @@ export default function AddIssueForm({
                       form.clearErrors("urlGroup"); // clear form-level error immediately
                     }}
                   />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="assignedPersons"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Assigned Person</FormLabel>
+                <FormControl>
+                  <Input placeholder="ex: Monir/Adnan" type="" {...field} />
                 </FormControl>
 
                 <FormMessage />

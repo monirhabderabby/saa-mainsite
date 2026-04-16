@@ -53,6 +53,7 @@ export default function PersonalInfoForm({
     defaultValues: {
       fullName: user.fullName ?? "",
       email: user.email ?? "",
+      officeEmail: user.officeEmail ?? "",
       phone: user.phone ?? "",
       parmanentAddress: user.parmanentAddress ?? "",
       presentAddress: user.presentAddress ?? "",
@@ -76,7 +77,7 @@ export default function PersonalInfoForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {/* Full Name */}
           <FormField
             control={form.control}
@@ -98,16 +99,35 @@ export default function PersonalInfoForm({
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email Address</FormLabel>
+                <FormLabel>Email Address (Personal)</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       type="email"
                       placeholder="Enter your email address"
-                      className="pl-10"
                       {...field}
-                      disabled
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {/* Office Email */}
+          <FormField
+            control={form.control}
+            name="officeEmail"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email Address (Office)</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="email"
+                      placeholder="Enter your email address"
+                      {...field}
                     />
                   </div>
                 </FormControl>
@@ -132,7 +152,7 @@ export default function PersonalInfoForm({
                         variant="outline"
                         className={cn(
                           "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
+                          !field.value && "text-muted-foreground",
                         )}
                       >
                         {field.value ? (
