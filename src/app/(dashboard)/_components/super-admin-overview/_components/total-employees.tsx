@@ -8,6 +8,9 @@ const TotalEmployees = async () => {
       accountStatus: {
         in: ["ACTIVE"],
       },
+      role: {
+        in: ["ADMIN", "OPERATION_MEMBER", "SALES_MEMBER"],
+      },
     },
   });
   return (
