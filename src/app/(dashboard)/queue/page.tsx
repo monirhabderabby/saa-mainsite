@@ -1,6 +1,7 @@
 // app/dashboard/queue/page.tsx
 import { auth } from "@/auth";
 import { Card } from "@/components/ui/card";
+import { isQueueAccess } from "@/helper/permissions/queue-page-permission";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { QueuePageClient } from "./_components/queue-page-client";
@@ -18,7 +19,7 @@ export default async function QueuePage() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { id: true, role: true },
+    select: { id: true, role: true, managedServices: true },
   });
 
   const profiles = await prisma.profile.findMany();
@@ -36,6 +37,20 @@ export default async function QueuePage() {
   });
 
   const selectedProfilesShouldBe = stationAssignment.map((i) => i.profileId);
+
+  const isServiceManager = user.managedServices;
+
+  const isAccess = await isQueueAccess({
+    cuRole: user.role,
+    cuId: user.id,
+    isServiceManager: !!isServiceManager,
+  });
+
+  console.log("isServiceManager", isServiceManager);
+
+  if (!isAccess) {
+    redirect("/");
+  }
 
   return (
     <Card className="p-5">
