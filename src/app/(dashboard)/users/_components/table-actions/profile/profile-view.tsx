@@ -1,10 +1,12 @@
 // components/profile-view.tsx
 "use client";
 
+import { getUserOptions } from "@/actions/user/get-user-options";
 import { updateUserInfo } from "@/actions/user/info-update";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
@@ -15,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
@@ -25,12 +28,14 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
 import { UserWithAllIncludes } from "@/types/user";
-import { EmployeeStatus } from "@prisma/client";
+import { Department, Designations, EmployeeStatus, Services, Team } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
 import {
   Building2,
-  Calendar,
+  Calendar as CalendarIcon,
   CheckCircle2,
   Hash,
   Loader2,
@@ -41,9 +46,9 @@ import {
   Shield,
   User as UserIcon,
   Users,
-  XCircle,
+  XCircle
 } from "lucide-react";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { PermissionSwitch } from "./permission-switch";
 
@@ -85,13 +90,55 @@ export default function ProfileView({ trigger, user }: ProfileViewProps) {
     nickName: user.nickName ?? "",
     email: user.email ?? "",
     phone: user.phone ?? "",
-    dateOfBirth: user.dateOfBirth
-      ? new Date(user.dateOfBirth).toISOString().split("T")[0]
-      : "",
+    dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth) : undefined,
     parmanentAddress: user.parmanentAddress ?? "",
     presentAddress: user.presentAddress ?? "",
     employeeStatus: user.employeeStatus ?? "PROBATION",
+    departmentId: user.departmentId ?? "",
+    serviceId: user.serviceId ?? "",
+    designationId: user.designationId ?? "",
+    teamId: user.userTeams?.[0]?.teamId ?? "",
   });
+
+  const [options, setOptions] = useState<{
+    departments: Department[];
+    services: Services[];
+    teams: Team[];
+    designations: Designations[];
+  }>({
+    departments: [],
+    services: [],
+    teams: [],
+    designations: [],
+  });
+
+  const [loadingOptions, setLoadingOptions] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      const fetchOptions = async () => {
+        console.log(loadingOptions)
+        setLoadingOptions(true);
+        const result = await getUserOptions();
+        if (result.success && result.data) {
+          setOptions(result.data);
+        }
+        setLoadingOptions(false);
+      };
+      fetchOptions();
+    }
+  }, [open]);
+
+  // Cascading lists
+  const filteredServices = options.services.filter(
+    (s) => !form.departmentId || s.departmentId === form.departmentId
+  );
+  const filteredTeams = options.teams.filter(
+    (t) => !form.serviceId || t.serviceId === form.serviceId
+  );
+  const filteredDesignations = options.designations.filter(
+    (d) => !form.serviceId || d.serviceId === form.serviceId
+  );
 
   const getInitials = (name: string) =>
     name
@@ -101,7 +148,8 @@ export default function ProfileView({ trigger, user }: ProfileViewProps) {
       .toUpperCase()
       .slice(0, 2);
 
-  const handleChange = (key: keyof typeof form, value: string) =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleChange = (key: keyof typeof form, value: any) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
   const handleSave = async () => {
@@ -112,10 +160,14 @@ export default function ProfileView({ trigger, user }: ProfileViewProps) {
       nickName: form.nickName,
       email: form.email,
       phone: form.phone || undefined,
-      dateOfBirth: form.dateOfBirth ? new Date(form.dateOfBirth) : null,
+      dateOfBirth: form.dateOfBirth || null,
       parmanentAddress: form.parmanentAddress || undefined,
       presentAddress: form.presentAddress || undefined,
       employeeStatus: form.employeeStatus as EmployeeStatus,
+      departmentId: form.departmentId || undefined,
+      serviceId: form.serviceId || undefined,
+      designationId: form.designationId || undefined,
+      teamId: form.teamId || undefined,
     });
     setSaving(false);
 
@@ -225,7 +277,7 @@ export default function ProfileView({ trigger, user }: ProfileViewProps) {
                       <InfoRow icon={Mail} label="Email" value={user.email} />
                       <InfoRow icon={Phone} label="Phone" value={user.phone} />
                       <InfoRow
-                        icon={Calendar}
+                        icon={CalendarIcon}
                         label="Date of Birth"
                         value={
                           user.dateOfBirth
@@ -365,14 +417,34 @@ export default function ProfileView({ trigger, user }: ProfileViewProps) {
                           <Label className="text-[10px] uppercase tracking-wide text-muted-foreground">
                             Date of Birth
                           </Label>
-                          <Input
-                            className="h-8 text-xs"
-                            type="date"
-                            value={form.dateOfBirth}
-                            onChange={(e) =>
-                              handleChange("dateOfBirth", e.target.value)
-                            }
-                          />
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant={"outline"}
+                                className={cn(
+                                  "w-full h-8 px-2 justify-start text-left font-normal text-xs",
+                                  !form.dateOfBirth && "text-muted-foreground"
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-3 w-3" />
+                                {form.dateOfBirth ? (
+                                  format(form.dateOfBirth, "PPP")
+                                ) : (
+                                  <span>Pick a date</span>
+                                )}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={form.dateOfBirth}
+                                onSelect={(date) =>
+                                  handleChange("dateOfBirth", date)
+                                }
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
                         </div>
 
                         {/* Employee Status */}
@@ -400,8 +472,132 @@ export default function ProfileView({ trigger, user }: ProfileViewProps) {
                           </Select>
                         </div>
 
-                        {/* Present Address */}
+                        {/* Department */}
                         <div className="space-y-1">
+                          <Label className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                            Department
+                          </Label>
+                          <Select
+                            value={form.departmentId}
+                            onValueChange={(v) => {
+                              setForm((prev) => ({
+                                ...prev,
+                                departmentId: v,
+                                serviceId: "",
+                                teamId: "",
+                                designationId: "",
+                              }));
+                            }}
+                          >
+                            <SelectTrigger className="h-8 text-xs">
+                              <SelectValue placeholder="Select Department" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {options.departments.map((dept) => (
+                                <SelectItem
+                                  key={dept.id}
+                                  value={dept.id}
+                                  className="text-xs"
+                                >
+                                  {dept.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Service */}
+                        <div className="space-y-1">
+                          <Label className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                            Service
+                          </Label>
+                          <Select
+                            value={form.serviceId}
+                            disabled={!form.departmentId}
+                            onValueChange={(v) => {
+                              setForm((prev) => ({
+                                ...prev,
+                                serviceId: v,
+                                teamId: "",
+                                designationId: "",
+                              }));
+                            }}
+                          >
+                            <SelectTrigger className="h-8 text-xs">
+                              <SelectValue placeholder="Select Service" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {filteredServices.map((service) => (
+                                <SelectItem
+                                  key={service.id}
+                                  value={service.id}
+                                  className="text-xs"
+                                >
+                                  {service.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Team */}
+                        <div className="space-y-1">
+                          <Label className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                            Team
+                          </Label>
+                          <Select
+                            value={form.teamId}
+                            disabled={!form.serviceId}
+                            onValueChange={(v) => handleChange("teamId", v)}
+                          >
+                            <SelectTrigger className="h-8 text-xs">
+                              <SelectValue placeholder="Select Team" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {filteredTeams.map((team) => (
+                                <SelectItem
+                                  key={team.id}
+                                  value={team.id}
+                                  className="text-xs"
+                                >
+                                  {team.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Designation */}
+                        <div className="space-y-1">
+                          <Label className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                            Designation
+                          </Label>
+                          <Select
+                            value={form.designationId}
+                            disabled={!form.serviceId}
+                            onValueChange={(v) =>
+                              handleChange("designationId", v)
+                            }
+                          >
+                            <SelectTrigger className="h-8 text-xs">
+                              <SelectValue placeholder="Select Designation" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {filteredDesignations.map((desig) => (
+                                <SelectItem
+                                  key={desig.id}
+                                  value={desig.id}
+                                  className="text-xs"
+                                >
+                                  {desig.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Present Address */}
+                        <div className="space-y-1 col-span-1">
                           <Label className="text-[10px] uppercase tracking-wide text-muted-foreground">
                             Present Address
                           </Label>
@@ -415,7 +611,7 @@ export default function ProfileView({ trigger, user }: ProfileViewProps) {
                         </div>
 
                         {/* Permanent Address */}
-                        <div className="space-y-1">
+                        <div className="space-y-1 col-span-1">
                           <Label className="text-[10px] uppercase tracking-wide text-muted-foreground">
                             Permanent Address
                           </Label>
