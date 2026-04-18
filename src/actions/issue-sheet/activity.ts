@@ -7,10 +7,7 @@ import { IssueActivityType, Prisma } from "@prisma/client";
 /**
  * Adds a comment activity to an issue sheet.
  */
-export async function addIssueComment(
-  issueSheetId: string,
-  content: string
-) {
+export async function addIssueComment(issueSheetId: string, content: string) {
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -76,6 +73,7 @@ export async function getIssueActivities(issueSheetId: string) {
             fullName: true,
             nickName: true,
             image: true,
+            employeeId: true,
           },
         },
       },

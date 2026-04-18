@@ -1,6 +1,9 @@
 "use client";
 
-import { addIssueComment, getIssueActivities } from "@/actions/issue-sheet/activity";
+import {
+  addIssueComment,
+  getIssueActivities,
+} from "@/actions/issue-sheet/activity";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -33,6 +36,7 @@ interface Activity {
     fullName: string;
     nickName: string;
     image: string | null;
+    employeeId: string;
   };
 }
 
@@ -96,8 +100,6 @@ const formatStatusLabel = (status: string) => {
   return status.charAt(0).toUpperCase() + status.slice(1);
 };
 
-
-
 const ActivityItem = ({ activity }: { activity: Activity }) => {
   const Icon = getActivityIcon(activity.type);
   const colorClass = getActivityColor(activity.type);
@@ -109,7 +111,7 @@ const ActivityItem = ({ activity }: { activity: Activity }) => {
       <div
         className={cn(
           "flex items-center justify-center w-7 h-7 rounded-full shrink-0 mt-0.5 border",
-          colorClass
+          colorClass,
         )}
       >
         <Icon className="w-3.5 h-3.5" />
@@ -119,7 +121,7 @@ const ActivityItem = ({ activity }: { activity: Activity }) => {
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-1.5 flex-wrap">
           <span className="text-xs font-semibold text-foreground truncate">
-            {activity.actor.nickName}
+            {activity.actor.nickName} ({activity.actor.employeeId})
           </span>
           <span className="text-[10px] text-muted-foreground/60">
             {moment(activity.createdAt).fromNow()}
@@ -138,7 +140,7 @@ const ActivityItem = ({ activity }: { activity: Activity }) => {
             <span
               className={cn(
                 "text-[10px] px-1.5 py-0.5 rounded-md font-medium",
-                getStatusBadgeColor(meta.from)
+                getStatusBadgeColor(meta.from),
               )}
             >
               {formatStatusLabel(meta.from)}
@@ -147,7 +149,7 @@ const ActivityItem = ({ activity }: { activity: Activity }) => {
             <span
               className={cn(
                 "text-[10px] px-1.5 py-0.5 rounded-md font-medium",
-                getStatusBadgeColor(meta.to)
+                getStatusBadgeColor(meta.to),
               )}
             >
               {formatStatusLabel(meta.to)}
@@ -203,7 +205,7 @@ const IssueActivityPanel = ({ issueSheetId }: Props) => {
     startTransition(async () => {
       const result = await addIssueComment(issueSheetId, comment);
       if (result.success) {
-        setComment("")
+        setComment("");
         toast.success("Comment added");
         // Re-fetch activities to get the new comment
         await fetchActivities();
