@@ -12,9 +12,10 @@ interface Props {
       designation: true;
     };
   }>;
+  queueAccess: boolean;
 }
 
-const MobileSidebar = ({ cu }: Props) => {
+const MobileSidebar = ({ cu, queueAccess }: Props) => {
   const [open, setOpen] = useState(false);
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -25,7 +26,7 @@ const MobileSidebar = ({ cu }: Props) => {
       </SheetTrigger>
 
       <SheetContent side="left" className="p-0 w-60">
-        <Sidebar cu={cu} onNavigationLink={setOpen} />
+        <Sidebar cu={cu} onNavigationLink={setOpen} queueAccess={queueAccess} />
       </SheetContent>
     </Sheet>
   );
