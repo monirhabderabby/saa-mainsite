@@ -46,8 +46,6 @@ export default async function QueuePage() {
     isServiceManager: !!isServiceManager,
   });
 
-  console.log("isServiceManager", isServiceManager);
-
   if (!isAccess) {
     redirect("/");
   }

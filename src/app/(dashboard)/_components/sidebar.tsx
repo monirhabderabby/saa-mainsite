@@ -142,6 +142,7 @@ const routes = [
       "SALES_MEMBER",
       "OPERATION_MEMBER",
     ] as Role[],
+    checkAdvanceAccess: true,
   },
 ];
 
@@ -152,9 +153,10 @@ interface Props {
     };
   }>;
   onNavigationLink?: (state: boolean) => void;
+  queueAccess: boolean;
 }
 
-const Sidebar = ({ cu, onNavigationLink }: Props) => {
+const Sidebar = ({ cu, onNavigationLink, queueAccess }: Props) => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -186,9 +188,23 @@ const Sidebar = ({ cu, onNavigationLink }: Props) => {
   }, []);
 
   // inside Sidebar component, before return
-  const accessibleRoutes = routes.filter((route) =>
-    route.access.includes(cu.role),
-  );
+  const accessibleRoutes = routes.filter((route) => {
+    // 1. First check if user has required role
+    if (!route.access.includes(cu.role)) {
+      return false;
+    }
+
+    // 2. Special check for routes that need advance access (like Queue)
+    if (route.checkAdvanceAccess) {
+      // Currently only Queue uses this flag
+      if (route.href === "/queue") {
+        return queueAccess === true; // Only show if queueAccess is true
+      }
+    }
+
+    // 3. All other routes just need role access
+    return true;
+  });
 
   return (
     <>
