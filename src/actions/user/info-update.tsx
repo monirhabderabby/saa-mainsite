@@ -21,9 +21,10 @@ interface UpdateUserInfoProps {
   designationId?: string;
   departmentId?: string;
   serviceId?: string;
+  teamId?: string;
 }
 
-export async function updateUserInfo({ id, ...data }: UpdateUserInfoProps) {
+export async function updateUserInfo({ id, teamId, ...data }: UpdateUserInfoProps) {
   const session = await auth();
 
   if (!session || !session.user) {
@@ -69,12 +70,34 @@ export async function updateUserInfo({ id, ...data }: UpdateUserInfoProps) {
       return { success: false, message: "Nick name already in use." };
   }
 
-  const user = await prisma.user.update({
-    where: { id },
-    data: {
-      ...data,
-      updatedAt: new Date(),
-    },
+  // Update user info and team
+  const user = await prisma.$transaction(async (tx) => {
+    // 1. Update User basic info
+    const updatedUser = await tx.user.update({
+      where: { id },
+      data: {
+        ...data,
+        updatedAt: new Date(),
+      },
+    });
+
+    // 2. Update Team if provided
+    if (teamId) {
+      // Delete existing team assignments
+      await tx.userTeam.deleteMany({
+        where: { userId: id },
+      });
+
+      // Create new team assignment
+      await tx.userTeam.create({
+        data: {
+          userId: id,
+          teamId: teamId,
+        },
+      });
+    }
+
+    return updatedUser;
   });
 
   revalidatePath("/employees");
