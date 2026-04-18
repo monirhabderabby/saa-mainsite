@@ -33,6 +33,12 @@ const Page = async ({ params }: { params: { departmentId: string } }) => {
           email: true,
           role: true,
         },
+        where: {
+          accountStatus: "ACTIVE",
+          role: {
+            in: ["ADMIN", "OPERATION_MEMBER", "SALES_MEMBER"],
+          },
+        },
       },
       serviceManager: {
         select: {
@@ -49,11 +55,11 @@ const Page = async ({ params }: { params: { departmentId: string } }) => {
     totalServices: services.length,
     totalTeams: services.reduce(
       (acc, service) => acc + service.teams.length,
-      0
+      0,
     ),
     totalMembers: services.reduce(
       (acc, service) => acc + service.users.length,
-      0
+      0,
     ),
   };
 
