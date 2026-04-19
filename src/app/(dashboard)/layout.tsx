@@ -33,7 +33,7 @@ const SiteLayout = async ({ children }: Props) => {
 
   if (!user) redirect("/login");
 
-  const isServiceManager = user.managedServices;
+  const isServiceManager = user.managedServices.length > 0;
 
   const isAccess = await isQueueAccess({
     cuRole: user.role,

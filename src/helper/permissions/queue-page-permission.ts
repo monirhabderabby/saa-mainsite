@@ -16,6 +16,8 @@ export async function isQueueAccess({ cuRole, cuId, isServiceManager }: Props) {
 
   if (isSalesAndAdmin) return true;
 
+  if (isServiceManager) return true;
+
   const isOperationRole = operationRoles.includes(cuRole);
 
   if (!isOperationRole) return false;
@@ -38,9 +40,7 @@ export async function isQueueAccess({ cuRole, cuId, isServiceManager }: Props) {
     currentUserTeam?.responsibility ?? "",
   );
 
-  if (!isServiceManager) return false;
+  if (isServiceLineTeamLeader) return true;
 
-  if (!isServiceLineTeamLeader) return false;
-
-  return true;
+  return false;
 }
