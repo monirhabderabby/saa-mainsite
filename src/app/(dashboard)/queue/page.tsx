@@ -38,12 +38,12 @@ export default async function QueuePage() {
 
   const selectedProfilesShouldBe = stationAssignment.map((i) => i.profileId);
 
-  const isServiceManager = user.managedServices;
+  const isServiceManager = user.managedServices.length > 0;
 
   const isAccess = await isQueueAccess({
     cuRole: user.role,
     cuId: user.id,
-    isServiceManager: !!isServiceManager,
+    isServiceManager: isServiceManager,
   });
 
   if (!isAccess) {
