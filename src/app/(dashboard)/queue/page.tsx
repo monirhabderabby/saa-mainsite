@@ -57,6 +57,7 @@ export default async function QueuePage() {
         currentUserId={user.id}
         profiles={profiles}
         defaultSelectedProfiles={selectedProfilesShouldBe}
+        isAccess={isAccess}
       />
     </Card>
   );
