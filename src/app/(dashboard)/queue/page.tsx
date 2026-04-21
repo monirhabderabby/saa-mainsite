@@ -46,8 +46,6 @@ export default async function QueuePage() {
     isServiceManager: !!isServiceManager,
   });
 
-  console.log("isServiceManager", isServiceManager);
-
   if (!isAccess) {
     redirect("/");
   }
@@ -59,6 +57,7 @@ export default async function QueuePage() {
         currentUserId={user.id}
         profiles={profiles}
         defaultSelectedProfiles={selectedProfilesShouldBe}
+        isAccess={isAccess}
       />
     </Card>
   );
