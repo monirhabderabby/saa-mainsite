@@ -1,19 +1,22 @@
 // app/api/users/route.ts
+import { auth } from "@/auth";
 import { getUsers } from "@/helper/users";
 import { AccountStatus, Role } from "@prisma/client";
 import { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(req: NextRequest) {
-  // const cu = await auth();
+const allowedRoles = ["ADMIN", "SUPER_ADMIN"] as Role[];
 
-  // if (!cu || !cu.user || !cu.user.id) {
-  //   return Response.json(
-  //     { success: false, message: "Unauthorized" },
-  //     { status: 401 }
-  //   );
-  // }
+export async function GET(req: NextRequest) {
+  const cu = await auth();
+
+  if (!cu || !cu.user || !cu.user.id || !allowedRoles.includes(cu.user.role)) {
+    return Response.json(
+      { success: false, message: "Unauthorized" },
+      { status: 401 },
+    );
+  }
 
   try {
     const searchParams = req.nextUrl.searchParams;

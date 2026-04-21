@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import CommandPaletteContainer from "@/components/command-palette/command-palette-container";
+import { isQueueAccess } from "@/helper/permissions/queue-page-permission";
 import prisma from "@/lib/prisma";
 import { NotificationProvider } from "@/providers/notification/notification-provider";
 import dynamic from "next/dynamic";
@@ -26,21 +27,34 @@ const SiteLayout = async ({ children }: Props) => {
     },
     include: {
       designation: true,
+      managedServices: true,
     },
   });
 
   if (!user) redirect("/login");
 
+  const isServiceManager = user.managedServices.length > 0;
+
+  const isAccess = await isQueueAccess({
+    cuRole: user.role,
+    cuId: user.id,
+    isServiceManager: !!isServiceManager,
+  });
+
   return (
     <>
       <div className="flex  flex-col h-screen">
         <aside className="hidden md:block">
-          <Sidebar cu={user} />
+          <Sidebar cu={user} queueAccess={isAccess} />
         </aside>
         {/* Main Content */}
         <div className="md:ml-60 flex flex-1 flex-col h-full">
           {/* Top Bar */}
-          <Topbar name={user.fullName as string} cu={user} />
+          <Topbar
+            name={user.fullName as string}
+            cu={user}
+            queueAccess={isAccess}
+          />
 
           <div className=" bg-[#F5F7FA] dark:bg-background h-[calc(100vh-64px)] overflow-y-auto md:p-5">
             {children}

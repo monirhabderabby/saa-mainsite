@@ -7,11 +7,20 @@ interface Props {
   isServiceManager: boolean;
 }
 
-const allowedRoles = ["ADMIN", "SUPER_ADMIN", "OPERATION_MEMBER"] as Role[];
-export async function isQueueAccess({ cuRole, cuId, isServiceManager }: Props) {
-  const isRolesMatched = allowedRoles.includes(cuRole);
+const salesAndAdmin = ["ADMIN", "SUPER_ADMIN", "SALES_MEMBER"] as Role[];
 
-  if (!isRolesMatched) return false;
+const operationRoles = ["OPERATION_MEMBER"] as Role[];
+
+export async function isQueueAccess({ cuRole, cuId, isServiceManager }: Props) {
+  const isSalesAndAdmin = salesAndAdmin.includes(cuRole);
+
+  if (isSalesAndAdmin) return true;
+
+  if (isServiceManager) return true;
+
+  const isOperationRole = operationRoles.includes(cuRole);
+
+  if (!isOperationRole) return false;
 
   const currentUserTeam = await prisma.userTeam.findFirst({
     where: {
@@ -31,9 +40,7 @@ export async function isQueueAccess({ cuRole, cuId, isServiceManager }: Props) {
     currentUserTeam?.responsibility ?? "",
   );
 
-  if (!isServiceManager) return false;
+  if (isServiceLineTeamLeader) return true;
 
-  if (!isServiceLineTeamLeader) return false;
-
-  return true;
+  return false;
 }
