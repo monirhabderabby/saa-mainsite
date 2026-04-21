@@ -50,6 +50,7 @@ interface QueuePageClientProps {
   currentUserId: string;
   profiles: Profile[];
   defaultSelectedProfiles: string[];
+  isAccess: boolean;
 }
 
 type StatusFilter = "ALL" | "REQUESTED" | "GIVEN";
@@ -59,6 +60,7 @@ export function QueuePageClient({
   currentUserId,
   profiles,
   defaultSelectedProfiles,
+  isAccess,
 }: QueuePageClientProps) {
   // Modal states
   const [queueModal, setQueueModal] = useState<{
@@ -133,6 +135,8 @@ export function QueuePageClient({
     });
   };
 
+  const isQueueCreateEnabled = isAccess && !["SALES_MEMBER"].includes(userRole);
+
   return (
     <div className="flex flex-col h-full min-h-0">
       {/* Page header */}
@@ -157,7 +161,7 @@ export function QueuePageClient({
               className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`}
             />
           </Button>
-          {isOperation && (
+          {isQueueCreateEnabled && (
             <Button
               size="sm"
               className="h-7 text-xs gap-1.5"
