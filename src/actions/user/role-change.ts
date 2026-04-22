@@ -68,17 +68,17 @@ export async function changeAccountRole({ userId, updatedRole }: UpdateProps) {
     }
 
     // ✅ Business rule: only Management team can be promoted to Admin
-    if (updatedRole === Role.ADMIN) {
-      const isInManagement = existUser.service?.name === "Management";
+    // if (updatedRole === Role.ADMIN) {
+    //   const isInManagement = existUser.service?.name === "Management";
 
-      if (!isInManagement) {
-        return {
-          success: false,
-          message:
-            "Only members of the Management team can be promoted to Admin.",
-        };
-      }
-    }
+    //   if (!isInManagement) {
+    //     return {
+    //       success: false,
+    //       message:
+    //         "Only members of the Management team can be promoted to Admin.",
+    //     };
+    //   }
+    // }
 
     // ✅ Update role
     await prisma.user.update({

@@ -52,6 +52,7 @@ const FilterContainer = async ({ userId }: Props) => {
     },
     select: {
       serviceId: true,
+      role: true,
     },
   });
 
@@ -71,9 +72,12 @@ const FilterContainer = async ({ userId }: Props) => {
 
   const currentUserServiceid = userInfo.serviceId;
 
+  const isSalesMember = ["SALES_MEMBER"].includes(userInfo.role);
+
   return (
     <div>
       <AddFilterUpdateSheetEntries
+        defaultTlCheck={isSalesMember ? "tlChecked" : undefined}
         defaultSelectedProfiles={defaultSelectedProfiles}
         cuServiceId={currentUserServiceid!}
         profiles={profiles ?? []}

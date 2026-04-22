@@ -92,6 +92,7 @@ interface Props {
   cuServiceId?: string;
   services: Services[];
   defaultSelectedProfiles: string[] | [];
+  defaultTlCheck?: string;
 }
 export default function AddFilterUpdateSheetEntries({
   trigger,
@@ -99,6 +100,7 @@ export default function AddFilterUpdateSheetEntries({
   services,
   cuServiceId,
   defaultSelectedProfiles,
+  defaultTlCheck,
 }: Props) {
   const [open, setOpen] = useState(false);
   const {
@@ -115,6 +117,7 @@ export default function AddFilterUpdateSheetEntries({
     serviceId,
     setServiceId,
     setProfileId,
+    setTlCheck,
   } = useUpdateSheetFilterState();
 
   const form = useForm<UpdateSheetFilter>({
@@ -124,7 +127,7 @@ export default function AddFilterUpdateSheetEntries({
       orderId: orderId ?? undefined,
       profileId: defaultSelectedProfiles ?? profileId ?? undefined,
       updateTo: updateTo ?? undefined,
-      tl: tl ?? undefined,
+      tl: defaultTlCheck ?? tl ?? undefined,
       done: done ?? "notDone",
       createdFrom: createdFrom ? new Date(createdFrom) : undefined,
       sendFrom: sendFrom ? new Date(sendFrom) : undefined,
@@ -145,6 +148,8 @@ export default function AddFilterUpdateSheetEntries({
       setServiceId(cuServiceId);
     } else if (defaultSelectedProfiles && defaultSelectedProfiles.length > 0) {
       setProfileId(defaultSelectedProfiles);
+    } else if (defaultTlCheck) {
+      setTlCheck(defaultTlCheck);
     }
   }, [cuServiceId, serviceId, setServiceId]);
 
