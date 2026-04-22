@@ -79,7 +79,7 @@ const TlCheckComponent = ({
           aria-label="TL Check"
         />
       ) : (
-        "—"
+        "✅"
       )}
     </div>
   );
