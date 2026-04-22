@@ -27,8 +27,9 @@ type ProfileState = {
   setProfileId: (ids: string[]) => void;
   setPage: (page: number) => void;
   setAllValues: (
-    data: UpdateSheetFilter & { page?: number; serviceId?: string }
+    data: UpdateSheetFilter & { page?: number; serviceId?: string },
   ) => void;
+  setTlCheck: (a: string) => void;
   clearFilters: () => void;
 };
 
@@ -99,4 +100,6 @@ export const useUpdateSheetFilterState = create<ProfileState>((set) => ({
       // ✅ Reset serviceId on clear
       serviceId: undefined,
     }),
+
+  setTlCheck: (option: string) => set({ tl: option }),
 }));
