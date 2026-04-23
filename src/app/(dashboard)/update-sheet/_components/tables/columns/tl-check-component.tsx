@@ -25,6 +25,8 @@ const TlCheckComponent = ({
   const [pending, startTransition] = useTransition();
   const [isChecked, setIsChecked] = useState(!!data.tlId);
 
+  const isTlBY = data.tlBy;
+
   const queryClient = useQueryClient();
 
   // const queryClient = useQueryClient();
@@ -78,8 +80,10 @@ const TlCheckComponent = ({
           disabled={pending}
           aria-label="TL Check"
         />
-      ) : (
+      ) : isTlBY ? (
         "✅"
+      ) : (
+        ""
       )}
     </div>
   );
