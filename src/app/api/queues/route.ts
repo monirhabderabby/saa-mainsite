@@ -113,7 +113,14 @@ export async function GET(req: NextRequest) {
             },
             profile: true,
           },
-          orderBy: { createdAt: "desc" },
+          orderBy: {
+            createdAt:
+              status === "GIVEN"
+                ? "desc"
+                : status === "REQUESTED"
+                  ? "asc"
+                  : "desc",
+          },
           skip,
           take: limit,
         }),
