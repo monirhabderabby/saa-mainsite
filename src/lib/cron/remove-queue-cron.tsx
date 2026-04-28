@@ -2,7 +2,7 @@ import prisma from "@/lib/prisma";
 import cron from "node-cron";
 
 cron.schedule(
-  "0 7 * * *", // Every day at 7 AM
+  "0 */2 * * *", // Every 2 hours (12:00, 2:00, 4:00, 6:00...)
   async () => {
     console.log("Running queue cleanup cron...");
 
