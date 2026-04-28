@@ -28,6 +28,15 @@ export type CurrentUserTeam = Prisma.UserTeamGetPayload<{
   };
 }>;
 
+function toLocalDateString(raw: string | Date | null | undefined): string {
+  if (!raw) return "All";
+  const d = new Date(raw);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 interface Props {
   currentUserRole: Role;
   currentUserId: string;
@@ -65,11 +74,9 @@ const TableContainer = ({
   const tl = rawTl ?? "All";
   const done = rawDone ?? "All";
   const createdFrom = rawCreatedFrom
-    ? new Date(rawCreatedFrom).toISOString().split("T")[0]
+    ? toLocalDateString(rawCreatedFrom)
     : "All";
-  const sendFrom = rawSendFrom
-    ? new Date(rawSendFrom).toISOString().split("T")[0]
-    : "All";
+  const sendFrom = rawSendFrom ? toLocalDateString(rawSendFrom) : "All";
 
   const profileIds = profileId?.join(",") ?? "All";
 
@@ -101,10 +108,10 @@ const TableContainer = ({
     initialPageParam: 1,
     queryFn: ({ pageParam = 1, signal }) =>
       fetch(
-        `/api/update-entries?profileId=${profileIds}&updateTo=${updateTo}&clientName=${clientName}&orderId=${orderId}&page=${pageParam}&limit=25&tl=${tl}&done=${done}&createdFrom=${createdFrom}&sendFroms=${sendFrom}&serviceId=${serviceId}`,
+        `/api/update-entries?profileId=${profileIds}&updateTo=${updateTo}&clientName=${clientName}&orderId=${orderId}&page=${pageParam}&limit=25&tl=${tl}&done=${done}&createdFrom=${createdFrom}&sendFrom=${sendFrom}&serviceId=${serviceId}`,
         {
           signal,
-        }
+        },
       ).then((res) => res.json()),
     getNextPageParam: (lastPage) => {
       if (lastPage.pagination.currentPage < lastPage.pagination.totalPages) {
@@ -121,7 +128,7 @@ const TableContainer = ({
 
     const nextPageNumber = currentPage + 1;
     const nextPageLoaded = data.pages.some(
-      (page) => page.pagination.currentPage === nextPageNumber
+      (page) => page.pagination.currentPage === nextPageNumber,
     );
 
     if (!nextPageLoaded) {
@@ -207,7 +214,7 @@ const Table = ({
       (entries) => {
         if (entries[0].isIntersecting) fetchNextPage();
       },
-      { root: scrollRef.current, rootMargin: "200px" }
+      { root: scrollRef.current, rootMargin: "200px" },
     );
 
     observer.observe(observerTarget);
