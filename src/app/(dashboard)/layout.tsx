@@ -13,6 +13,9 @@ const Sidebar = dynamic(() => import("./_components/sidebar"), {
   ssr: false,
 });
 
+// cron runned
+import "@/lib/cron/remove-queue-cron";
+
 interface Props {
   children: ReactNode;
 }
