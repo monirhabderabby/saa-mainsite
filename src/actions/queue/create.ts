@@ -13,6 +13,7 @@ export async function createQueueAction(input: {
   clientName: string;
   orderId?: string;
   message: string;
+  serviceId?: string;
 }) {
   const session = await auth();
 
@@ -20,7 +21,7 @@ export async function createQueueAction(input: {
     return { success: false, message: "Unauthorized." };
   }
 
-  const { profileId, clientName, orderId, message } = input;
+  const { profileId, clientName, orderId, message, serviceId } = input;
 
   if (!profileId?.trim()) {
     return { success: false, message: "Profile ID is required." };
@@ -33,6 +34,49 @@ export async function createQueueAction(input: {
   }
 
   try {
+    // ── 5-hour duplicate prevention ────────────────────────────────────────────
+    // Block if the same user already has ANY queue (regardless of status —
+    // REQUESTED, GIVEN, anything) with the same clientName + serviceId
+    // created within the last 5 hours.
+    const fiveHoursAgo = new Date(Date.now() - 5 * 60 * 60 * 1000);
+
+    const existing = await prisma.queue.findFirst({
+      where: {
+        requestedById: session.user.id,
+        clientName: {
+          equals: clientName.trim(),
+          mode: "insensitive",
+        },
+        // Scope to the exact serviceId that was submitted (including null).
+        // This means "FSD + aromaitaly" and "null + aromaitaly" are treated
+        // as separate combinations, which is the correct behaviour.
+        serviceId: serviceId?.trim()
+          ? { equals: serviceId.trim() }
+          : { equals: null },
+        createdAt: { gte: fiveHoursAgo },
+        // ✅ Intentionally NO status filter — a GIVEN queue still blocks re-submission
+      },
+    });
+
+    if (existing) {
+      const minutesAgo = Math.floor(
+        (Date.now() - existing.createdAt.getTime()) / 1000 / 60,
+      );
+      const minutesLeft = 300 - minutesAgo; // 300 min = 5 hours
+      const hoursLeft = Math.floor(minutesLeft / 60);
+      const minsLeft = minutesLeft % 60;
+      const timeLeftStr =
+        hoursLeft > 0
+          ? `${hoursLeft}h ${minsLeft}m`
+          : `${minutesLeft} minute(s)`;
+
+      return {
+        success: false,
+        message: `A queue for "${clientName.trim()}" already exists (submitted ${minutesAgo} min ago). Please wait ${timeLeftStr} before submitting again.`,
+      };
+    }
+    // ──────────────────────────────────────────────────────────────────────────
+
     const queueKey = await generateUniqueIdForQueue("QU");
 
     const queue = await prisma.queue.create({
@@ -44,12 +88,14 @@ export async function createQueueAction(input: {
         message: message.trim(),
         requestedById: session.user.id,
         status: "REQUESTED",
+        ...(serviceId?.trim() ? { serviceId: serviceId.trim() } : {}),
       },
       include: {
         requestedBy: true,
         assignedTo: true,
         links: true,
         profile: true,
+        service: true,
       },
     });
 
@@ -69,7 +115,6 @@ export async function createQueueAction(input: {
         createdAt: queue.createdAt.toISOString(),
       };
 
-      // Trigger on each sales member's private channel
       await Promise.all(
         salesMemberIds.map((userId) =>
           pusherServer.trigger(

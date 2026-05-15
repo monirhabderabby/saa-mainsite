@@ -52,8 +52,6 @@ export async function GET(req: NextRequest) {
       : [];
 
     // ─── Base where (no status filter) ────────────────────────────────────────
-    // Used for stable counts — so the stat strip always shows real totals
-    // regardless of which status tab the user has selected.
     const baseWhere: Prisma.QueueWhereInput = {};
 
     if (user.role === "OPERATION_MEMBER") {
@@ -88,7 +86,6 @@ export async function GET(req: NextRequest) {
     }
 
     // ─── Filtered where (includes status) ─────────────────────────────────────
-    // Used for the actual queue list query and its paginated total.
     const filteredWhere: Prisma.QueueWhereInput = { ...baseWhere };
 
     if (status && ["REQUESTED", "GIVEN"].includes(status)) {
@@ -98,7 +95,6 @@ export async function GET(req: NextRequest) {
     // ─── Run all queries in a single transaction ───────────────────────────────
     const [queues, filteredTotal, requestedCount, givenCount] =
       await prisma.$transaction([
-        // 1. Paginated queue list (respects status filter)
         prisma.queue.findMany({
           where: filteredWhere,
           include: {
@@ -112,6 +108,10 @@ export async function GET(req: NextRequest) {
               orderBy: { createdAt: "asc" },
             },
             profile: true,
+            // ✅ Include service
+            service: {
+              select: { id: true, name: true },
+            },
           },
           orderBy: {
             createdAt:
@@ -125,15 +125,12 @@ export async function GET(req: NextRequest) {
           take: limit,
         }),
 
-        // 2. Total matching the current status filter (for pagination)
         prisma.queue.count({ where: filteredWhere }),
 
-        // 3. Real REQUESTED count (ignores status filter)
         prisma.queue.count({
           where: { ...baseWhere, status: "REQUESTED" },
         }),
 
-        // 4. Real GIVEN count (ignores status filter)
         prisma.queue.count({
           where: { ...baseWhere, status: "GIVEN" },
         }),
@@ -145,14 +142,13 @@ export async function GET(req: NextRequest) {
       success: true,
       message: "Queues fetched successfully.",
       data: queues,
-      // Stable counts — always reflect real totals, not the active filter
       counts: {
         all: requestedCount + givenCount,
         requested: requestedCount,
         given: givenCount,
       },
       pagination: {
-        total: filteredTotal, // respects status filter (drives "X of Y" pagination UI)
+        total: filteredTotal,
         page,
         limit,
         totalPages,

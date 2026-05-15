@@ -31,7 +31,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useDeleteAllQueues } from "@/hook/queues/use-delete-ll-queues";
 import { QueueWithRelations, useGetQueues } from "@/hook/queues/use-get-queues";
 import { cn } from "@/lib/utils";
-import { Profile, Role } from "@prisma/client";
+import { Profile, Role, Services } from "@prisma/client";
 import {
   Check,
   ChevronsUpDown,
@@ -53,6 +53,7 @@ interface QueuePageClientProps {
   profiles: Profile[];
   defaultSelectedProfiles: string[];
   isAccess: boolean;
+  services: Services[]; // ✅ NEW
 }
 
 type StatusFilter = "ALL" | "REQUESTED" | "GIVEN";
@@ -63,11 +64,12 @@ export function QueuePageClient({
   profiles,
   defaultSelectedProfiles,
   isAccess,
+  services, // ✅ NEW
 }: QueuePageClientProps) {
   // Modal states
   const [queueModal, setQueueModal] = useState<{
     open: boolean;
-    queue: QueueWithRelations | null; // null = create, non-null = edit
+    queue: QueueWithRelations | null;
   }>({ open: false, queue: null });
 
   const [deleteDialog, setDeleteDialog] = useState<{
@@ -80,7 +82,7 @@ export function QueuePageClient({
     queue: QueueWithRelations | null;
   }>({ open: false, queue: null });
 
-  // Filter states (these drive the API query)
+  // Filter states
   const [search, setSearch] = useState("");
   const [selectedProfiles, setSelectedProfiles] = useState<string[]>(
     defaultSelectedProfiles ?? [],
@@ -96,7 +98,6 @@ export function QueuePageClient({
 
   const { data, isLoading, isError, refetch, isFetching } = useGetQueues({
     status: statusFilter === "ALL" ? undefined : statusFilter,
-    // Pass search as clientName filter; extend as needed
     searchQuery: search || undefined,
     profileIds: selectedProfiles.length
       ? selectedProfiles.join(",")
@@ -109,7 +110,6 @@ export function QueuePageClient({
   const isOperation = userRole === "OPERATION_MEMBER";
   const isSales = userRole === "SALES_MEMBER" || userRole === "ADMIN";
 
-  // ✅ Use real counts from the API, not client-side filtering
   const counts = {
     all: data?.counts?.all ?? 0,
     requested: data?.counts?.requested ?? 0,
@@ -195,7 +195,7 @@ export function QueuePageClient({
               <Button
                 variant="link"
                 className="h-7 text-xs gap-1.5"
-                onClick={() => setDeleteAllDialog(true)} // ← add this
+                onClick={() => setDeleteAllDialog(true)}
               >
                 Delete All
                 <Trash />
@@ -415,6 +415,7 @@ export function QueuePageClient({
           onOpenChange={(open) => setQueueModal((prev) => ({ ...prev, open }))}
           queue={queueModal.queue}
           profiles={profiles}
+          services={services} // ✅ pass services
           onSuccess={handleSuccess}
         />
 

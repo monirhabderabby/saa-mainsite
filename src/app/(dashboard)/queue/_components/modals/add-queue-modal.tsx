@@ -30,9 +30,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { Queue } from "@/types/queue";
-import { Profile } from "@prisma/client";
+import { Profile, Services } from "@prisma/client";
 import {
   Check,
   ChevronsUpDown,
@@ -47,6 +54,7 @@ interface AddQueueModalProps {
   onOpenChange: (open: boolean) => void;
   queue?: Queue | null;
   profiles: Profile[];
+  services: Services[]; // ✅ NEW
   onSuccess?: () => void;
 }
 
@@ -55,6 +63,7 @@ interface FormState {
   clientName: string;
   orderId: string;
   message: string;
+  serviceId: string; // ✅ NEW
 }
 
 const EMPTY_FORM: FormState = {
@@ -62,6 +71,7 @@ const EMPTY_FORM: FormState = {
   clientName: "",
   orderId: "",
   message: "",
+  serviceId: "", // ✅ NEW
 };
 
 export function AddQueueModal({
@@ -69,6 +79,7 @@ export function AddQueueModal({
   onOpenChange,
   queue,
   profiles,
+  services,
   onSuccess,
 }: AddQueueModalProps) {
   const isEditMode = !!queue;
@@ -86,6 +97,8 @@ export function AddQueueModal({
               clientName: queue.clientName,
               orderId: queue.orderId ?? "",
               message: queue.message,
+              serviceId:
+                (queue as unknown as { serviceId?: string }).serviceId ?? "",
             }
           : EMPTY_FORM,
       );
@@ -107,6 +120,7 @@ export function AddQueueModal({
   };
 
   const selectedProfile = profiles.find((p) => p.id === form.profileId);
+  const selectedService = services.find((s) => s.id === form.serviceId);
 
   const handleSubmit = () => {
     startTransition(async () => {
@@ -117,12 +131,12 @@ export function AddQueueModal({
           clientName: form.clientName.trim(),
           orderId: form.orderId.trim() || undefined,
           message: form.message.trim(),
+          serviceId: form.serviceId.trim() || undefined,
         });
 
         if (result.success) {
           toast.success(result.message);
           onOpenChange(false);
-
           onSuccess?.();
         } else {
           toast.error(result.message);
@@ -133,30 +147,14 @@ export function AddQueueModal({
           clientName: form.clientName.trim(),
           orderId: form.orderId.trim() || undefined,
           message: form.message.trim(),
+          serviceId: form.serviceId.trim() || undefined,
         });
 
         if (result.success) {
           toast.success(result.message, {
             description: `Key: ${result.data?.queueKey}`,
           });
-
           onOpenChange(false);
-          // queryClient.setQueriesData(
-          //   { queryKey: ["queues"] },
-          //   (oldData: GetQueuesResponse | undefined) => {
-          //     if (!oldData) return oldData;
-
-          //     return {
-          //       ...oldData,
-          //       data: [result.data, ...oldData.data], // 🔥 add to top
-          //       pagination: {
-          //         ...oldData.pagination,
-          //         total: oldData.pagination.total + 1,
-          //       },
-          //     };
-          //   },
-          // );
-
           onSuccess?.();
         } else {
           toast.error(result.message);
@@ -243,7 +241,6 @@ export function AddQueueModal({
                       {profiles.map((profile) => (
                         <CommandItem
                           key={profile.id}
-                          // value drives the Command search — use name so typing filters by name
                           value={profile.name}
                           onSelect={() => {
                             setForm((prev) => ({
@@ -270,6 +267,53 @@ export function AddQueueModal({
                 </Command>
               </PopoverContent>
             </Popover>
+          </div>
+
+          {/* Service Line ✅ NEW */}
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium text-foreground">
+              Service Line{" "}
+              <span className="text-muted-foreground font-normal">
+                (optional)
+              </span>
+            </Label>
+            <Select
+              value={form.serviceId}
+              onValueChange={(val) =>
+                setForm((prev) => ({
+                  ...prev,
+                  serviceId: val === "__none__" ? "" : val,
+                }))
+              }
+              disabled={isPending}
+            >
+              <SelectTrigger className="h-8 text-xs">
+                <SelectValue placeholder="Select a service line...">
+                  {selectedService ? (
+                    <span className="text-foreground">
+                      {selectedService.name}
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">
+                      Select a service line...
+                    </span>
+                  )}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  value="__none__"
+                  className="text-xs text-muted-foreground"
+                >
+                  — None —
+                </SelectItem>
+                {services.map((s) => (
+                  <SelectItem key={s.id} value={s.id} className="text-xs">
+                    {s.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Client Name */}

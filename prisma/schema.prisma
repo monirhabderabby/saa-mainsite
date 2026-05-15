@@ -138,6 +138,7 @@ model Services {
     createdAt    DateTime      @default(now())
     updatedAt    DateTime      @updatedAt
     updateSheets UpdateSheet[]
+    queues       Queue[]
 
     @@unique([name, departmentId])
 }
@@ -764,7 +765,9 @@ model Queue {
 
     profile Profile @relation(fields: [profileId], references: [id])
 
-    // ✅ Fixed: removed duplicate userId/user, kept named relations only
+    serviceId String?   @db.ObjectId
+    service   Services? @relation(fields: [serviceId], references: [id])
+
     requestedById String @db.ObjectId
     requestedBy   User   @relation("RequestedQueues", fields: [requestedById], references: [id])
 

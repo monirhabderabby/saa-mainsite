@@ -22,6 +22,12 @@ export type QueueWithRelations = Prisma.QueueGetPayload<{
     };
     links: true;
     profile: true;
+    service: {
+      select: {
+        id: true;
+        name: true;
+      };
+    };
   };
 }>;
 
@@ -30,7 +36,6 @@ export interface GetQueuesResponse {
   message: string;
   data: QueueWithRelations[];
   counts: {
-    // ← add this
     all: number;
     requested: number;
     given: number;

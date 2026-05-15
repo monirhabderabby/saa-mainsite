@@ -10,6 +10,7 @@ export async function editQueueAction(input: {
   clientName: string;
   orderId?: string;
   message: string;
+  serviceId?: string;
 }) {
   const session = await auth();
 
@@ -17,7 +18,7 @@ export async function editQueueAction(input: {
     return { success: false, message: "Unauthorized." };
   }
 
-  const { queueId, profileId, clientName, orderId, message } = input;
+  const { queueId, profileId, clientName, orderId, message, serviceId } = input;
 
   if (!profileId?.trim()) {
     return { success: false, message: "Profile ID is required." };
@@ -60,12 +61,14 @@ export async function editQueueAction(input: {
         clientName: clientName.trim(),
         orderId: orderId?.trim() || null,
         message: message.trim(),
+        serviceId: serviceId?.trim() || null,
       },
       include: {
         requestedBy: true,
         assignedTo: true,
         links: true,
         profile: true,
+        service: true,
       },
     });
 

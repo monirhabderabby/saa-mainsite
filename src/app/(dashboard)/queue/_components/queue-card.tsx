@@ -25,6 +25,7 @@ import {
   Clock,
   ExternalLink,
   Hash,
+  Layers,
   Link2,
   MoreHorizontal,
   Package,
@@ -72,11 +73,14 @@ export function QueueCard({
   const canEdit = isOwner && queue.status === "REQUESTED";
   const canDelete = isOwner || userRole === "ADMIN";
 
+  // ✅ service can be null if not set
+  const serviceName = queue.service?.name ?? null;
+
   return (
     <div className="group relative flex flex-col gap-0 rounded-lg border border-border/60 bg-card hover:border-border hover:shadow-sm transition-all duration-150">
       {/* Top row */}
       <div className="flex items-start justify-between px-4 pt-3.5 pb-2.5">
-        <div className="flex items-center gap-2 min-w-0">
+        <div className="flex items-center gap-2 min-w-0 flex-wrap">
           {/* Queue key badge */}
           <span className="inline-flex items-center gap-1 rounded-md bg-primary/8 px-2 py-0.5 text-[11px] font-mono font-semibold text-primary border border-primary/15 shrink-0">
             <Hash className="h-2.5 w-2.5" />
@@ -91,10 +95,21 @@ export function QueueCard({
             <StatusIcon className="h-2.5 w-2.5" />
             {status.label}
           </Badge>
+
+          {/* ✅ Service line badge */}
+          {serviceName && (
+            <Badge
+              variant="outline"
+              className="h-5 gap-1 px-1.5 text-[10px] font-medium bg-blue-500/8 text-blue-600 border-blue-500/20"
+            >
+              <Layers className="h-2.5 w-2.5" />
+              {serviceName}
+            </Badge>
+          )}
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
           {isSales && queue.status === "REQUESTED" && (
             <TooltipProvider>
               <Tooltip>
@@ -187,7 +202,7 @@ export function QueueCard({
 
       {/* Message */}
       <div className="px-4 pb-3">
-        <p className="text-xs  font-medium leading-relaxed line-clamp-2">
+        <p className="text-xs font-medium leading-relaxed line-clamp-2">
           {queue.message}
         </p>
       </div>
