@@ -9,6 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useQueueBadgeCount } from "@/hook/queues/use-queue-badge-count";
 import { useUpdateSheetFilterState } from "@/zustand/update-sheet";
 import { useUserFilterStore } from "@/zustand/users";
 import { Prisma, Role } from "@prisma/client";
@@ -163,6 +164,9 @@ const Sidebar = ({ cu, onNavigationLink, queueAccess }: Props) => {
   const { clearFilters } = useUpdateSheetFilterState();
   const { resetFilters } = useUserFilterStore();
 
+  // Real-time pending queue badge (SALES_MEMBER only)
+  const pendingQueueCount = useQueueBadgeCount();
+
   const pathname = usePathname();
 
   const onLogout = () => {
@@ -229,6 +233,11 @@ const Sidebar = ({ cu, onNavigationLink, queueAccess }: Props) => {
                     ? pathname === "/"
                     : pathname.startsWith(route.href);
 
+                const showQueueBadge =
+                  route.label === "Queue" &&
+                  cu.role === "SALES_MEMBER" &&
+                  pendingQueueCount > 0;
+
                 return (
                   <li key={route.id}>
                     <Link
@@ -243,7 +252,12 @@ const Sidebar = ({ cu, onNavigationLink, queueAccess }: Props) => {
         `}
                     >
                       <Icon className="h-4 w-4" />
-                      <span>{route.label}</span>
+                      <span className="flex-1">{route.label}</span>
+                      {showQueueBadge && (
+                        <span className="ml-auto flex h-5 min-w-5 items-center justify-center bg-primary-green rounded-full dark:bg-customYellow-primary/70 px-1.5 text-[10px] font-semibold text-white leading-none">
+                          {pendingQueueCount > 99 ? "99+" : pendingQueueCount}
+                        </span>
+                      )}
                     </Link>
                   </li>
                 );
