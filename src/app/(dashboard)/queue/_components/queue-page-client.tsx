@@ -41,9 +41,11 @@ import {
   RefreshCw,
   Search,
   Trash,
+  Upload,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AddQueueModal } from "./modals/add-queue-modal";
+import { BulkUploadModal } from "./modals/bulk-upload-modal";
 import SubmitLinksModal from "./modals/submit-links";
 import { QueueCard } from "./queue-card";
 
@@ -81,6 +83,8 @@ export function QueuePageClient({
     open: boolean;
     queue: QueueWithRelations | null;
   }>({ open: false, queue: null });
+
+  const [bulkUploadOpen, setBulkUploadOpen] = useState(false);
 
   // Filter states
   const [search, setSearch] = useState("");
@@ -159,8 +163,8 @@ export function QueuePageClient({
     <>
       <div className="flex flex-col h-full min-h-0">
         {/* Page header */}
-        <div className="flex items-center justify-between mb-4">
-          <div>
+        <div className="flex items-start justify-between gap-2 mb-4 flex-wrap">
+          <div className="min-w-0">
             <h1 className="text-sm font-semibold text-foreground">Queue</h1>
             <p className="text-xs text-muted-foreground mt-0.5">
               {isSales
@@ -168,7 +172,7 @@ export function QueuePageClient({
                 : "Your submitted queue requests"}
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap justify-end">
             <Button
               variant="ghost"
               size="icon"
@@ -181,14 +185,27 @@ export function QueuePageClient({
               />
             </Button>
             {isQueueCreateEnabled && (
-              <Button
-                size="sm"
-                className="h-7 text-xs gap-1.5"
-                onClick={() => setQueueModal({ open: true, queue: null })}
-              >
-                <PlusCircle className="h-3.5 w-3.5" />
-                Create Queue
-              </Button>
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs gap-1.5"
+                  onClick={() => setBulkUploadOpen(true)}
+                >
+                  <Upload className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Bulk Upload</span>
+                  <span className="sm:hidden">Bulk</span>
+                </Button>
+                <Button
+                  size="sm"
+                  className="h-7 text-xs gap-1.5"
+                  onClick={() => setQueueModal({ open: true, queue: null })}
+                >
+                  <PlusCircle className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Create Queue</span>
+                  <span className="sm:hidden">Create</span>
+                </Button>
+              </>
             )}
 
             {queues.length > 0 && (
@@ -426,6 +443,17 @@ export function QueuePageClient({
           queue={linksModal.queue}
           onSuccess={handleSuccess}
         />
+
+        {/* Bulk upload modal */}
+        {isQueueCreateEnabled && (
+          <BulkUploadModal
+            open={bulkUploadOpen}
+            onOpenChange={setBulkUploadOpen}
+            profiles={profiles}
+            services={services}
+            onSuccess={handleSuccess}
+          />
+        )}
 
         <AlertModal
           isOpen={deleteDialog.open}
