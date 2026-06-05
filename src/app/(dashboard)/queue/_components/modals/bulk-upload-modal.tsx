@@ -1,10 +1,7 @@
 // components/queue/modals/bulk-upload-modal.tsx
 "use client";
 
-import { useCallback, useMemo, useRef, useState, useTransition } from "react";
-import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import { toast } from "sonner";
 import {
   AlertCircle,
   CheckCircle2,
@@ -16,6 +13,9 @@ import {
   Upload,
   XCircle,
 } from "lucide-react";
+import { useCallback, useMemo, useRef, useState, useTransition } from "react";
+import { toast } from "sonner";
+import * as XLSX from "xlsx";
 
 import {
   bulkCreateQueueAction,
@@ -193,11 +193,7 @@ export function BulkUploadModal({
             "clientname",
           ]);
           const orderId = pickField(row, ["order id", "orderid", "order"]);
-          const message = pickField(row, [
-            "message",
-            "details",
-            "description",
-          ]);
+          const message = pickField(row, ["message", "details", "description"]);
 
           return {
             id: makeRowId(),
@@ -375,6 +371,9 @@ export function BulkUploadModal({
               results={results}
               totalSubmitted={rows.length}
               totalCreated={results.filter((r) => r.success).length}
+              submittedRows={validRows}
+              profiles={profiles}
+              services={services}
             />
           )}
         </div>
@@ -591,7 +590,9 @@ function PreviewStep({
       <div className="px-4 sm:px-5 py-2.5 border-b border-border/60 flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <FileSpreadsheet className="h-3.5 w-3.5" />
-          <span>{rows.length} row{rows.length === 1 ? "" : "s"}</span>
+          <span>
+            {rows.length} row{rows.length === 1 ? "" : "s"}
+          </span>
           {invalidCount > 0 && (
             <span className="text-destructive">
               · {invalidCount} need attention
@@ -620,11 +621,11 @@ function PreviewStep({
         </div>
       </div>
 
-      <ScrollArea className="flex-1 min-h-0">
+      <ScrollArea className="h-[min(58vh,520px)] min-h-[260px] w-full">
         {/* Desktop table */}
-        <div className="hidden md:block">
+        <div className="hidden md:block min-w-[820px]">
           <table className="w-full text-xs">
-            <thead className="bg-muted/40 sticky top-0 z-10">
+            <thead className="bg-muted  sticky top-0 z-10">
               <tr className="text-left">
                 <th className="px-3 py-2 font-medium text-muted-foreground w-8">
                   #
@@ -647,7 +648,7 @@ function PreviewStep({
                 <th className="px-3 py-2 w-8" />
               </tr>
             </thead>
-            <tbody>
+            <tbody className="overflow-hidden">
               {rows.map((row, idx) => {
                 const errs = validateRow(row);
                 const isInvalid = errs.length > 0;
@@ -975,7 +976,6 @@ function PreviewStep({
           </div>
         )}
       </ScrollArea>
-
     </div>
   );
 }
@@ -1004,12 +1004,29 @@ function ResultsStep({
   results,
   totalSubmitted,
   totalCreated,
+  submittedRows,
+  profiles,
+  services,
 }: {
   results: BulkRowResult[];
   totalSubmitted: number;
   totalCreated: number;
+  submittedRows: ParsedRow[];
+  profiles: Profile[];
+  services: Services[];
 }) {
   const totalFailed = results.length - totalCreated;
+  const profileNameById = useMemo(() => {
+    const map = new Map<string, string>();
+    profiles.forEach((profile) => map.set(profile.id, profile.name));
+    return map;
+  }, [profiles]);
+  const serviceNameById = useMemo(() => {
+    const map = new Map<string, string>();
+    services.forEach((service) => map.set(service.id, service.name));
+    return map;
+  }, [services]);
+
   return (
     <div className="flex flex-col flex-1 min-h-0">
       <div className="px-4 sm:px-5 py-3 border-b border-border/60 grid grid-cols-3 gap-2">
@@ -1017,12 +1034,24 @@ function ResultsStep({
         <Stat label="Created" value={totalCreated} tone="success" />
         <Stat label="Failed" value={totalFailed} tone="danger" />
       </div>
-      <ScrollArea className="flex-1 min-h-0">
+      <ScrollArea className="h-[min(58vh,520px)] min-h-[260px] w-full">
         <ul className="divide-y divide-border/60">
-          {results.map((r) => (
+          {results.map((r) => {
+            const submittedRow = submittedRows[r.index];
+            const profileName = submittedRow?.profileId
+              ? profileNameById.get(submittedRow.profileId)
+              : undefined;
+            const serviceName = submittedRow?.serviceId
+              ? serviceNameById.get(submittedRow.serviceId)
+              : undefined;
+
+            return (
             <li
               key={r.index}
-              className="px-4 sm:px-5 py-2.5 flex items-start gap-2.5 text-xs"
+              className={cn(
+                "px-4 sm:px-5 py-2.5 flex items-start gap-2.5 text-xs",
+                !r.success && "bg-destructive/[0.03]",
+              )}
             >
               {r.success ? (
                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 mt-0.5 shrink-0" />
@@ -1047,12 +1076,46 @@ function ResultsStep({
                 >
                   {r.message}
                 </p>
+
+                {!r.success && submittedRow && (
+                  <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-1.5 rounded-md border border-destructive/20 bg-background/70 p-2 text-[11px] text-muted-foreground">
+                    <ResultField
+                      label="Profile"
+                      value={profileName ?? submittedRow.rawProfile}
+                    />
+                    <ResultField
+                      label="Service"
+                      value={serviceName ?? submittedRow.rawService ?? "None"}
+                    />
+                    <ResultField
+                      label="Client"
+                      value={submittedRow.clientName}
+                    />
+                    <ResultField
+                      label="Order ID"
+                      value={submittedRow.orderId || "None"}
+                    />
+                    <div className="sm:col-span-2">
+                      <ResultField label="Message" value={submittedRow.message} />
+                    </div>
+                  </div>
+                )}
               </div>
             </li>
-          ))}
+            );
+          })}
         </ul>
       </ScrollArea>
     </div>
+  );
+}
+
+function ResultField({ label, value }: { label: string; value?: string }) {
+  return (
+    <p className="min-w-0">
+      <span className="font-medium text-foreground">{label}: </span>
+      <span className="break-words">{value || "Blank"}</span>
+    </p>
   );
 }
 
@@ -1070,7 +1133,9 @@ function Stat({
       className={cn(
         "rounded-lg border px-3 py-2",
         tone === "success" && "border-emerald-500/30 bg-emerald-500/5",
-        tone === "danger" && value > 0 && "border-destructive/30 bg-destructive/5",
+        tone === "danger" &&
+          value > 0 &&
+          "border-destructive/30 bg-destructive/5",
         !tone && "border-border/60 bg-card",
       )}
     >
@@ -1089,4 +1154,3 @@ function Stat({
     </div>
   );
 }
-
