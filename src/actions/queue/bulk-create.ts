@@ -35,6 +35,11 @@ export interface BulkCreateResponse {
 
 const MAX_BULK_ROWS = 200;
 
+// 🚧 Bulk upload is currently paused for all users. Flip to `true` to re-enable.
+// Typed as `boolean` (not the literal `false`) so the guard below doesn't make
+// the rest of the action statically unreachable.
+const BULK_UPLOAD_ENABLED: boolean = false;
+
 export async function bulkCreateQueueAction(
   rows: BulkQueueInput[],
 ): Promise<BulkCreateResponse> {
@@ -44,6 +49,17 @@ export async function bulkCreateQueueAction(
     return {
       success: false,
       message: "Unauthorized.",
+      totalSubmitted: 0,
+      totalCreated: 0,
+      totalFailed: 0,
+      results: [],
+    };
+  }
+
+  if (!BULK_UPLOAD_ENABLED) {
+    return {
+      success: false,
+      message: "Bulk upload is currently disabled.",
       totalSubmitted: 0,
       totalCreated: 0,
       totalFailed: 0,

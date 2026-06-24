@@ -34,15 +34,26 @@ export async function createQueueAction(input: {
   }
 
   try {
+    // Determine whether the creator is an Operation user — this changes the
+    // scope of the duplicate check below.
+    const creator = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { role: true },
+    });
+    const isOperation = creator?.role === "OPERATION_MEMBER";
+
     // ── 5-hour duplicate prevention ────────────────────────────────────────────
-    // Block if the same user already has ANY queue (regardless of status —
-    // REQUESTED, GIVEN, anything) with the same clientName + serviceId
-    // created within the last 5 hours.
+    // Block if a queue with the same clientName + serviceId already exists
+    // (regardless of status — REQUESTED, GIVEN, anything) within the last 5 hours.
+    //   • Operation: the lock is SERVICE-WIDE — any user in that service line
+    //     blocks the client+service combination for everyone.
+    //   • Others (Admin, etc.): the lock is per-user (unchanged).
     const fiveHoursAgo = new Date(Date.now() - 5 * 60 * 60 * 1000);
 
     const existing = await prisma.queue.findFirst({
       where: {
-        requestedById: session.user.id,
+        // Service-wide for Operation (no requestedById), per-user otherwise.
+        ...(isOperation ? {} : { requestedById: session.user.id }),
         clientName: {
           equals: clientName.trim(),
           mode: "insensitive",
@@ -56,13 +67,16 @@ export async function createQueueAction(input: {
         createdAt: { gte: fiveHoursAgo },
         // ✅ Intentionally NO status filter — a GIVEN queue still blocks re-submission
       },
+      include: {
+        requestedBy: { select: { fullName: true } },
+      },
     });
 
     if (existing) {
       const minutesAgo = Math.floor(
         (Date.now() - existing.createdAt.getTime()) / 1000 / 60,
       );
-      const minutesLeft = 300 - minutesAgo; // 300 min = 5 hours
+      const minutesLeft = Math.max(300 - minutesAgo, 0); // 300 min = 5 hours
       const hoursLeft = Math.floor(minutesLeft / 60);
       const minsLeft = minutesLeft % 60;
       const timeLeftStr =
@@ -70,9 +84,13 @@ export async function createQueueAction(input: {
           ? `${hoursLeft}h ${minsLeft}m`
           : `${minutesLeft} minute(s)`;
 
+      const message = isOperation
+        ? `A queue for "${clientName.trim()}" under this service was already requested by ${existing.requestedBy.fullName} ${minutesAgo} min ago. Please wait ${timeLeftStr} before requesting it again.`
+        : `A queue for "${clientName.trim()}" already exists (submitted ${minutesAgo} min ago). Please wait ${timeLeftStr} before submitting again.`;
+
       return {
         success: false,
-        message: `A queue for "${clientName.trim()}" already exists (submitted ${minutesAgo} min ago). Please wait ${timeLeftStr} before submitting again.`,
+        message,
       };
     }
     // ──────────────────────────────────────────────────────────────────────────

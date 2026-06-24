@@ -19,7 +19,11 @@ export async function GET(req: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { role: true },
+      select: {
+        role: true,
+        managedServices: { select: { id: true } },
+        userTeams: { select: { teamId: true, responsibility: true } },
+      },
     });
 
     if (!user) {
@@ -54,8 +58,39 @@ export async function GET(req: NextRequest) {
     // ─── Base where (no status filter) ────────────────────────────────────────
     const baseWhere: Prisma.QueueWhereInput = {};
 
+    // ─── Operation role-scoped visibility ──────────────────────────────────────
+    // Admin / Super Admin / Sales keep their see-all behaviour (no filter).
+    // For OPERATION_MEMBER the visible queues depend on their position:
+    //   • Service Manager → queues from all users in his managed service(s)
+    //   • Team Leader/Coleader → queues from all members of his team(s)
+    //   • Plain Member → only his own queues
     if (user.role === "OPERATION_MEMBER") {
-      baseWhere.requestedById = session.user.id;
+      const managedServiceIds = user.managedServices.map((s) => s.id);
+      const leaderTeamIds = user.userTeams
+        .filter((ut) => ut.responsibility === "Leader" || ut.responsibility === "Coleader")
+        .map((ut) => ut.teamId);
+
+      // Always include the user's own queues.
+      const allowedRequesterIds = new Set<string>([session.user.id]);
+
+      if (managedServiceIds.length > 0) {
+        // Service manager → everyone belonging to the managed service(s).
+        const serviceUsers = await prisma.user.findMany({
+          where: { serviceId: { in: managedServiceIds } },
+          select: { id: true },
+        });
+        serviceUsers.forEach((u) => allowedRequesterIds.add(u.id));
+      } else if (leaderTeamIds.length > 0) {
+        // Team leader/coleader → all members of his team(s).
+        const teamMembers = await prisma.userTeam.findMany({
+          where: { teamId: { in: leaderTeamIds } },
+          select: { userId: true },
+        });
+        teamMembers.forEach((m) => allowedRequesterIds.add(m.userId));
+      }
+      // else: plain member → only the own id already in the set.
+
+      baseWhere.requestedById = { in: Array.from(allowedRequesterIds) };
     }
 
     if (profileIds.length > 0) {

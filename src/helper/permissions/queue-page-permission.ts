@@ -1,4 +1,3 @@
-import prisma from "@/lib/prisma";
 import { Role } from "@prisma/client";
 
 interface Props {
@@ -11,7 +10,7 @@ const salesAndAdmin = ["ADMIN", "SUPER_ADMIN", "SALES_MEMBER"] as Role[];
 
 const operationRoles = ["OPERATION_MEMBER"] as Role[];
 
-export async function isQueueAccess({ cuRole, cuId, isServiceManager }: Props) {
+export async function isQueueAccess({ cuRole, isServiceManager }: Props) {
   const isSalesAndAdmin = salesAndAdmin.includes(cuRole);
 
   if (isSalesAndAdmin) return true;
@@ -20,27 +19,9 @@ export async function isQueueAccess({ cuRole, cuId, isServiceManager }: Props) {
 
   const isOperationRole = operationRoles.includes(cuRole);
 
-  if (!isOperationRole) return false;
-
-  const currentUserTeam = await prisma.userTeam.findFirst({
-    where: {
-      userId: cuId,
-    },
-    include: {
-      team: {
-        include: {
-          service: true,
-        },
-      },
-    },
-  });
-
-  // 3. team leader or co-leader under same service line
-  const isServiceLineTeamLeader = ["Leader", "Coleader"].includes(
-    currentUserTeam?.responsibility ?? "",
-  );
-
-  if (isServiceLineTeamLeader) return true;
+  // Every Operation user (plain member, team leader, service manager) can
+  // access and create queues.
+  if (isOperationRole) return true;
 
   return false;
 }
