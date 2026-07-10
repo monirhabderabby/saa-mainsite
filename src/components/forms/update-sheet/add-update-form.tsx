@@ -108,10 +108,10 @@ export const allowUpdateTo = [
     id: UpdateTo.REVIEW_RESPONSE,
     name: "Review Response",
   },
-  {
-    id: UpdateTo.FIVERR_SUPPORT_REPLY,
-    name: "Fiverr Support Reply",
-  },
+  // {
+  //   id: UpdateTo.FIVERR_SUPPORT_REPLY,
+  //   name: "Fiverr Support Reply",
+  // },
   {
     id: UpdateTo.SPECIAL_ORDER_DELIVERY,
     name: "Special Sales Delivery",
